@@ -1,2 +1,14 @@
+# tick ledger (managed by the tick CLI on an orphan branch)
 /.tick
 .tick.lock
+
+# Node / Vite
+node_modules/
+dist/
+coverage/
+*.local
+.vite/
+
+# Editor / OS
+.DS_Store
+*.log
