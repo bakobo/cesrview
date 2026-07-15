@@ -595,6 +595,32 @@ Make CESR legible to developers in the browser = goal:
             Dual-pane and CodeMirror stand (@p6hw4k holds); only the left pane's content is reformatted,
             not literal.
 
+        Source pane is a lighter custom virtualized pane, not CodeMirror = tension:
+          id: s5kn7w
+          why: >
+            @p6hw4k chose a read-only CodeMirror 6 source pane and @p4rz6b affirmed "CodeMirror stands".
+            Building it surfaced three problems with CM6 here: the pane is READ-ONLY (its edit
+            machinery is unused), CM6 is a heavy multi-package dependency that cuts against @r4vkp7's
+            "consumers pick their dependency weight", and — decisively for this repo — CM6 is very hard
+            to test to the 100%-branch coverage bar because it needs layout and measurement DOM APIs
+            jsdom does not implement. Confirmed with the owner.
+          resolution: >
+            The source pane is a LIGHTER, hand-rolled pretty-print pane (plain DOM plus windowing), not
+            CodeMirror: it gives the user-facing read tooling that mattered — line numbers, copy,
+            keyboard navigation, and byte<->node span mapping — while staying jsdom-testable and
+            dependency-light. Stream-wide search-highlight-all (a real CM6 win) is deferred, and CM6
+            remains a future upgrade if advanced text tooling is demanded. Everything else in @p6hw4k
+            and @p4rz6b HOLDS: the dual-pane split, the READ-ONLY source, the cesrview PRETTY-PRINTED
+            content, virtualization of large panes, and selection sync as the teaching moment — only
+            CodeMirror the MECHANISM is replaced. The pretty printer is a pure tier-1 function
+            prettyPrint(walkResult, bytes) -> { text, lines } emitting a newline per message body and
+            per attachment group/primitive, each display line carrying its original byte span (message
+            bodies map coarsely to the whole body span, since the walker does not split JSON fields;
+            attachments map finely). Built in slices: 3a is the pretty printer plus the pane plus the
+            dual-pane layout, rendering all lines; virtualization and 3b's byte<->node selection sync
+            (a selectedSpan on the CesrView context) follow. Accepted tradeoff: we hand-roll the pane
+            and defer search and (initially) virtualization instead of inheriting CM6's.
+
         Proof band is typed per message type = tension:
           id: h5nw2c
           why: >
