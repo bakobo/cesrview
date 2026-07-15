@@ -14,12 +14,13 @@ const DASH = 0x2d; // '-'
 /** v1 version string, e.g. `"v":"KERI10JSON00012b_"` -> proto KERI, ver 1.0, JSON, size 0x12b. */
 const VERSION_RE = /"v"\s*:\s*"([A-Z]{4})(\d)(\d)([A-Z]{4})([0-9a-f]{6})_"/;
 
-/** How a counter's payload is framed. A part is either one primitive (`p`) or one indexed
- * signature (`sig`); a quadlet group is `count` 4-byte quadlets of (as-yet opaque) material. */
-type Part = 'p' | 'sig';
+/** One element of a group item: a primitive (`p` = Matter, `sig` = indexed Indexer) or `grp` = one
+ * nested attachment group (e.g. the -A ControllerIdxSigs inside a -F/-H). */
+type PrimitivePart = 'p' | 'sig';
+type Part = PrimitivePart | 'grp';
 interface GroupSpec {
   quadlet?: boolean;
-  parts?: Part[]; // the primitive sequence of ONE item; repeated `count` times
+  parts?: Part[]; // the element sequence of ONE item; repeated `count` times
 }
 const GROUP_SPEC: Record<string, GroupSpec> = {
   '-V': { quadlet: true }, // AttachedMaterialQuadlets (universal wrapper)
@@ -27,7 +28,12 @@ const GROUP_SPEC: Record<string, GroupSpec> = {
   '-L': { quadlet: true }, // PathedMaterialQuadlets
   '-A': { parts: ['sig'] }, // ControllerIdxSigs
   '-B': { parts: ['sig'] }, // WitnessIdxSigs
+  '-C': { parts: ['p', 'p'] }, // NonTransReceiptCouples (verfer, cigar)
+  '-D': { parts: ['p', 'p', 'p', 'sig'] }, // TransReceiptQuadruples (prefixer, seqner, saider, siger)
+  '-E': { parts: ['p', 'p'] }, // FirstSeenReplayCouples (seqner, dater)
+  '-F': { parts: ['p', 'p', 'p', 'grp'] }, // TransIdxSigGroups (prefixer, seqner, saider, nested -A)
   '-G': { parts: ['p', 'p'] }, // SealSourceCouples (seqner, saider)
+  '-H': { parts: ['p', 'grp'] }, // TransLastIdxSigGroups (prefixer, nested -A)
   '-I': { parts: ['p', 'p', 'p'] }, // SealSourceTriples (prefixer, seqner, saider)
 };
 
@@ -58,7 +64,7 @@ interface GroupSequence {
 }
 
 /** Frame one primitive of the given part kind at `at`, delegating sizing to signify-ts. */
-function framePrimitive(bytes: Uint8Array, at: number, part: Part): Primitive | null {
+function framePrimitive(bytes: Uint8Array, at: number, part: PrimitivePart): Primitive | null {
   const q = td.decode(bytes.subarray(at, at + 128));
   try {
     const prim = part === 'sig' ? new Indexer({ qb64: q }) : new Matter({ qb64: q });
@@ -82,7 +88,7 @@ function frameGroup(bytes: Uint8Array, at: number): FramedGroup | null {
   const spec = GROUP_SPEC[code];
 
   if (!spec) {
-    // ~7k4r — a recognized counter (e.g. -E TransIdxSigGroups) whose inner framing we do not yet
+    // ~4ptb — a recognized counter (e.g. -J/-K SadPathSig groups) whose inner framing we do not yet
     // model: framed structurally as far as its header, marked unknown (decision d3rk6n).
     const end = at + headerLen;
     return { group: { ...base, span: { start: at, end }, state: 'unknown', items: [] }, end };
@@ -113,13 +119,24 @@ function frameGroup(bytes: Uint8Array, at: number): FramedGroup | null {
   let p = at + headerLen;
   for (let k = 0; k < count; k++) {
     for (const part of parts) {
-      const prim = framePrimitive(bytes, p, part);
-      if (!prim) {
-        // a malformed item — we can no longer frame this group
-        return { group: { ...base, span: { start: at, end: p }, state: 'invalid', items }, end: p };
+      if (part === 'grp') {
+        // a nested attachment group (the -A ControllerIdxSigs inside a -F/-H); frame it recursively
+        // and require it fully known, else this item — and so this group — cannot be framed
+        const nested = frameGroup(bytes, p);
+        if (!nested || nested.group.state !== 'known') {
+          return { group: { ...base, span: { start: at, end: p }, state: 'invalid', items }, end: p };
+        }
+        items.push(nested.group);
+        p = nested.end;
+      } else {
+        const prim = framePrimitive(bytes, p, part);
+        if (!prim) {
+          // a malformed item — we can no longer frame this group
+          return { group: { ...base, span: { start: at, end: p }, state: 'invalid', items }, end: p };
+        }
+        items.push(prim);
+        p = prim.span.end;
       }
-      items.push(prim);
-      p = prim.span.end;
     }
   }
   return { group: { ...base, span: { start: at, end: p }, state: 'known', items }, end: p };

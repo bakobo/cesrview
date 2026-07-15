@@ -184,7 +184,7 @@ Make CESR legible to developers in the browser = goal:
                         a nested -A group). This required EXTENDING the group-framing grammar with a
                         nested-GROUP element: a part can now be another attachment group, not only a
                         primitive, because -F and -H interleave primitives with an inner -A group.
-                        Corrects a code-table error carried in the ~7k4r tick and the @p3wk7n why — per
+                        Corrects a code-table error carried in the 7k4r tick and the @p3wk7n why — per
                         signify-ts's own table -E is FirstSeenReplayCouples and -F/-H are TransIdxSig
                         Groups/TransLastIdxSigGroups; the earlier text mislabelled -E as TransIdxSig
                         Groups. Rejected leaving these as resilient "unknown" children (honest but it

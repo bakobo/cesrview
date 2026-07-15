@@ -10,6 +10,13 @@ const SAID = 'ELXXiPwoaWOVOTLMOAmg4IKkjFHFs3q2hsL9tHvuuC2D'; // 44-char Blake3 d
 const SEQNER = '0A' + 'A'.repeat(22); // 24-char Number/Seqner primitive (sn 0)
 const G_GROUP = '-GAB' + SEQNER + SAID; // one -G seal-source-couple = 72 bytes (18 quadlets)
 
+// Throwaway primitives from keripy, for the compound trans-sig/receipt groups (t6nv4q).
+const SIG = 'AACMeIMNXpYbryJsyq2VCJsFl1trtbhBMUetIKvC9aft4uI_bMFz0YvTNA2w-PAgkzMfXeV8tzeyWVr7SBlkmZoC'; // 88-char indexed Siger
+const DAT = '1AAG2020-08-22T17c50c09d988921p00c00'; // 36-char Dater (datetime)
+const VER = 'DDVHH3ix0_aawmzCf-IBLdRe2UiFGCxEdXFuiecqyLEy'; // 44-char Verfer (Ed25519 public key)
+const CIG = '0BCMeIMNXpYbryJsyq2VCJsFl1trtbhBMUetIKvC9aft4uI_bMFz0YvTNA2w-PAgkzMfXeV8tzeyWVr7SBlkmZoC'; // 88-char non-indexed Cigar
+const A_GROUP = '-AAB' + SIG; // one -A ControllerIdxSigs group (count 1) = 92 bytes
+
 /** Build a self-framed v1 message with a correct version-string size, for synthetic edge cases. */
 function mkMessage(fields: Record<string, unknown>, proto = 'KERI'): string {
   const enc = new TextEncoder();
@@ -161,15 +168,15 @@ describe('walk — -V/-0V inner decomposition (decision z4pm7k)', () => {
     expect(consumed).toBe(stream.length);
   });
 
-  it('leaves a recognized-but-unmodelled inner counter as an unknown child, without halting (tick ~7k4r)', () => {
+  it('leaves a recognized-but-unmodelled inner counter as an unknown child, without halting (tick ~4ptb)', () => {
     const msg2 = mkMessage({ t: 'ixn', s: '2' });
-    const stream = bytesOf(mkMessage({ t: 'ixn' }) + '-VAB' + '-CAB' + msg2); // -C: known counter, unframed
+    const stream = bytesOf(mkMessage({ t: 'ixn' }) + '-VAB' + '-JAB' + msg2); // -J: known counter, unframed
     const { messages, errors } = walk(stream);
     expect(errors).toEqual([]);
     expect(messages).toHaveLength(2);
     const v = messages[0].attachments[0];
     expect(v).toMatchObject({ code: '-V', state: 'known' });
-    expect(asGroup(v.items[0])).toMatchObject({ code: '-C', state: 'unknown' });
+    expect(asGroup(v.items[0])).toMatchObject({ code: '-J', state: 'unknown' });
   });
 
   it('stops decomposing a -V when inner content underfills it, keeping the wrapper and continuing', () => {
@@ -181,6 +188,92 @@ describe('walk — -V/-0V inner decomposition (decision z4pm7k)', () => {
     const v = messages[0].attachments[0];
     expect(v).toMatchObject({ code: '-V', state: 'known' });
     expect(asGroup(v.items[0]).code).toBe('-G'); // decoded up to the filler, then stopped
+  });
+});
+
+describe('walk — compound trans-sig and receipt groups (decision t6nv4q)', () => {
+  const attach = (payload: string) => bytesOf(mkMessage({ t: 'ixn' }) + payload);
+
+  it('frames a -F TransIdxSigGroups: prefixer, seqner, saider, then a nested -A group', () => {
+    const stream = attach('-FAB' + SAID + SEQNER + SAID + A_GROUP);
+    const { messages, errors, consumed } = walk(stream);
+    expect(errors).toEqual([]);
+    expect(consumed).toBe(stream.length);
+    const f = messages[0].attachments[0];
+    expect(f).toMatchObject({ code: '-F', count: 1, state: 'known' });
+    expect(f.items.map((it) => it.kind)).toEqual(['primitive', 'primitive', 'primitive', 'group']);
+    const nested = asGroup(f.items[3]);
+    expect(nested).toMatchObject({ code: '-A', state: 'known' });
+    expect(nested.items).toHaveLength(1); // one indexed sig
+  });
+
+  it('frames a -H TransLastIdxSigGroups: prefixer, then a nested -A group', () => {
+    const stream = attach('-HAB' + SAID + A_GROUP);
+    const { messages, errors } = walk(stream);
+    expect(errors).toEqual([]);
+    const h = messages[0].attachments[0];
+    expect(h).toMatchObject({ code: '-H', count: 1, state: 'known' });
+    expect(h.items.map((it) => it.kind)).toEqual(['primitive', 'group']);
+    expect(asGroup(h.items[1])).toMatchObject({ code: '-A', state: 'known' });
+  });
+
+  it('frames a -D TransReceiptQuadruples of (prefixer, seqner, saider, siger)', () => {
+    const stream = attach('-DAB' + SAID + SEQNER + SAID + SIG);
+    const { messages, errors, consumed } = walk(stream);
+    expect(errors).toEqual([]);
+    expect(consumed).toBe(stream.length);
+    const d = messages[0].attachments[0];
+    expect(d).toMatchObject({ code: '-D', count: 1, state: 'known' });
+    expect(d.items).toHaveLength(4);
+    expect(d.items.every((it) => it.kind === 'primitive')).toBe(true);
+  });
+
+  it('frames a -E FirstSeenReplayCouples of (seqner, dater)', () => {
+    const stream = attach('-EAB' + SEQNER + DAT);
+    const { messages, errors } = walk(stream);
+    expect(errors).toEqual([]);
+    const e = messages[0].attachments[0];
+    expect(e).toMatchObject({ code: '-E', count: 1, state: 'known' });
+    expect(e.items).toHaveLength(2);
+  });
+
+  it('frames a -C NonTransReceiptCouples of (verfer, cigar)', () => {
+    const stream = attach('-CAB' + VER + CIG);
+    const { messages, errors, consumed } = walk(stream);
+    expect(errors).toEqual([]);
+    expect(consumed).toBe(stream.length);
+    const c = messages[0].attachments[0];
+    expect(c).toMatchObject({ code: '-C', count: 1, state: 'known' });
+    expect(c.items).toHaveLength(2);
+  });
+
+  it('marks a -F invalid when its nested -A group is malformed', () => {
+    const stream = attach('-FAB' + SAID + SEQNER + SAID + '-AAB' + '####'); // bad sig in nested -A
+    const { messages, errors } = walk(stream);
+    expect(messages[0].attachments[0]).toMatchObject({ code: '-F', state: 'invalid' });
+    expect(errors[0].message).toMatch(/cannot frame counter -F/);
+  });
+});
+
+describe('walk — compound -F keripy oracle fixture (t6nv4q)', () => {
+  const dir = 'src/cesr/__tests__/fixtures';
+  const stream = new Uint8Array(readFileSync(`${dir}/tiny-endorsed.cesr`));
+  const golden = JSON.parse(readFileSync(`${dir}/tiny-endorsed.golden.json`, 'utf8'));
+
+  it('decomposes a real seal-endorsed message: -V wrapping a -F with a nested -A', () => {
+    const { messages, errors, consumed } = walk(stream);
+    expect(errors).toEqual([]);
+    expect(consumed).toBe(stream.length);
+    expect(messages).toHaveLength(1);
+    const m = messages[0];
+    expect(m.said).toBe(golden.said);
+    const v = m.attachments[0];
+    expect(v).toMatchObject({ code: '-V', state: 'known' });
+    expect(v.items.map((it) => asGroup(it).code)).toEqual(golden.innerGroups); // ['-F']
+    const f = asGroup(v.items[0]);
+    expect(f).toMatchObject({ code: '-F', state: 'known' });
+    // the -F item: three primitives then a nested -A group
+    expect(f.items.map((it) => (it.kind === 'group' ? asGroup(it).code : 'primitive'))).toEqual(golden.fParts);
   });
 });
 
@@ -249,11 +342,11 @@ describe('walk — resilience (decision d3rk6n)', () => {
 
   it('keeps the message but marks an unrecognized (unframable) counter and stops', () => {
     const msg = mkMessage({ t: 'ixn' });
-    const stream = bytesOf(msg + '-CAB'); // -C is a known code we do not yet frame
+    const stream = bytesOf(msg + '-JAB'); // -J SadPathSig: a known code we do not yet frame (~4ptb)
     const { messages, errors, consumed } = walk(stream);
     expect(messages).toHaveLength(1);
-    expect(messages[0].attachments[0]).toMatchObject({ code: '-C', state: 'unknown' });
-    expect(errors[0].message).toMatch(/cannot frame counter -C/);
+    expect(messages[0].attachments[0]).toMatchObject({ code: '-J', state: 'unknown' });
+    expect(errors[0].message).toMatch(/cannot frame counter -J/);
     expect(consumed).toBeLessThan(stream.length);
   });
 

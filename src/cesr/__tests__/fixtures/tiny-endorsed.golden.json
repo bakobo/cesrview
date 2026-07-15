@@ -1,0 +1,17 @@
+{
+  "bytes": 511,
+  "ilk": "icp",
+  "said": "EMKvAnCrMLtiD2mF6xJOBTB9ZiEjqck_7khok81hyU7L",
+  "size": 299,
+  "wrapper": "-V",
+  "innerGroups": [
+    "-F"
+  ],
+  "fParts": [
+    "primitive",
+    "primitive",
+    "primitive",
+    "-A"
+  ],
+  "endorser": "EMKvAnCrMLtiD2mF6xJOBTB9ZiEjqck_7khok81hyU7L"
+}
