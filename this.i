@@ -27,6 +27,30 @@ Make CESR legible to developers in the browser = goal:
         static bundle that deploys straight to GitHub Pages under the custom domain. Accepted
         tradeoff: SPA-only means no server-side rendering or SEO for deep-linked parses, which is
         acceptable because the tool is interactive-first and holds no durable content to index.
+      children:
+        CESR visualization ships as a separate package, not just this app = decision:
+          id: r4vkp7
+          why: >
+            The reusable deliverable in @w4bn2p is sharpened: CESR VISUALIZATION ships as its own
+            publishable package that any project can embed WITHOUT the cesrview application, rather
+            than as a single monolithic <CesrViewer> or as components welded into this app. Three
+            tiers: (1) a FRAMEWORK-AGNOSTIC data core — the walker (@n6wd3k), the annotation layer
+            (@w6ph4k) and the stream model (@w3rn6k), already React-free and importing only
+            signify-ts; (2) a library of GRANULAR, prop-driven React presentation components that
+            render data-core outputs a la carte (a primitive chip, an attachment/proof group, a
+            decoded event, a KEL lane) and hold no app state; (3) the cesrview APP shell (dual-pane,
+            rails, dock, source<->decoded sync per @p6hw4k / @t2vd6m) that COMPOSES tier 2 into this
+            product. Tiers 1 and 2 are what other UIs consume; tier 3 stays app-specific. Split into
+            TWO packages — a framework-agnostic core (walker + annotate + model, no React, usable from
+            Node or any framework) and a React component library that depends on it — so the core is
+            reusable beyond React; the exact names are settled when the component API stabilises.
+            Rejected a single embeddable <CesrViewer> (loses the chunk-level reuse the owner wants:
+            one event, one proof band, one lane on their own) and permanently bundling components
+            inside the app repo (couples reuse to the app's release). Following @n6wd3k's pattern the
+            code is DEVELOPED HERE in src/ under TDD and EXTRACTED to the package(s) once the
+            component API is proven, avoiding premature repo/publish overhead. The component API is a
+            first-class output of the Phase-3 UX interview, not an afterthought. Accepted tradeoff: a
+            later extraction step and an app-depends-on-package edge once split.
 
     In-browser TS stream-walker, upstreamed; keripy as oracle = decision:
       id: h6rk4d
