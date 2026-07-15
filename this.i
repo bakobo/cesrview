@@ -143,6 +143,31 @@ Make CESR legible to developers in the browser = goal:
                 @h5nw2c; output shape unchanged (@m4dp7k already admits nested groups via AttachmentNode).
                 Accepted tradeoff: mutual recursion between group framing and sequence framing, and
                 carrying the -L / resync gaps as tracked debt until a later increment.
+              children:
+                Material-quadlet wrapper is a resilience boundary, inner limits never halt the walk = tension:
+                  id: p3wk7n
+                  why: >
+                    z4pm7k deferred resync (tick 5ygd) and kept the conservative "stop the walk on
+                    the first inner framing failure" behaviour. Running the decomposition against the
+                    real corpus overturned that: every KEL event wraps its proof in a -V whose inner
+                    content includes a -E (TransIdxSigGroups) compound group the walker does not yet
+                    model, so stopping on the first unmodelled inner group halted the walk at message 1
+                    and regressed corpus framing from delta 0 to a single event. A -V that used to be
+                    opaque (skipped as count*4 bytes) let the walk continue; DECOMPOSING it must not
+                    make the walker less resilient than leaving it opaque.
+                  resolution: >
+                    A size-known material-quadlet wrapper (-V/-0V) is a RESILIENCE BOUNDARY: inner
+                    decomposition proceeds until the first group the walker cannot frame or size, then
+                    stops decomposing that wrapper — but the wrapper stays "known" (its size is
+                    count*4), the groups decoded so far (including an "unknown" node for a recognised
+                    but unmodelled counter) remain its items, and the walk RESUMES at the wrapper's
+                    known end instead of halting. This brings the 5ygd resync forward, so that tick is
+                    resolved; only a TOP-LEVEL group with no enclosing size to resync from still halts
+                    the walk (unchanged, and it still surfaces genuine wrapper-size corruption because a
+                    wrong count*4 desynchronises the next message's boundary). Model B (z4pm7k) holds
+                    and is strengthened; its "stop the walk on inner failure" clause is withdrawn.
+                    Modelling -E/-F/-D compound inner groups so decomposition is COMPLETE, not merely
+                    resilient, is tracked separately.
 
         Develop the walker in cesrview, upstream once proven = decision:
           id: n6wd3k
