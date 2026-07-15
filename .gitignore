@@ -12,3 +12,9 @@ coverage/
 # Editor / OS
 .DS_Store
 *.log
+
+# Local, uncommitted real-data corpus (may carry identity-correlating AIDs)
+/samples/
+
+# Phase-1 UX working material — quotes specifics from the real (identity-correlating) corpus
+/docs/ux/phase1-strategy.md

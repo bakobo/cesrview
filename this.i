@@ -66,3 +66,82 @@ Make CESR legible to developers in the browser = goal:
         watchers cross-origin requires a proxy or runs into CORS, which collides directly with the
         backend-free constraint in the root goal. Accepted tradeoff: v1 users must paste CESR
         themselves; URL/OOBI fetch lands in a later phase once the CORS/proxy approach is decided.
+
+    Primary user is the expert debugging a real stream = decision:
+      id: q7m4rp
+      why: >
+        Confirmed in the Phase-1 UX interview: cesrview optimizes first for an intermediate/expert
+        developer inspecting a specific real CESR stream, not for a newcomer learning the format
+        from scratch. Chose the jwt.io posture — dense, information-first, fast — with teaching kept
+        always one hover/click away rather than presented as inline prose. Rejected a
+        teaching-forward default (gentle, explanation-heavy) and an equal-weight "serve both" design,
+        because serving learner and expert equally without a mode switch tends to please neither, and
+        the real corpus (a 102-event multisig KEL, a 4-ACDC chained presentation) is expert-shaped
+        work. Accepted tradeoff: newcomers get a steeper first impression, mitigated by annotations
+        and a curated sample library. This is the master UX intent from which the density, navigation,
+        annotation-prominence, and the decisions nested below follow.
+      children:
+        Statement foreground, proof layer demoted = decision:
+          id: v3nk7t
+          why: >
+            A CESR stream stacks a human-readable signed statement (the JSON event) over opaque
+            base64 proof groups (indexed/witness signatures, receipt couples, seal sources — the
+            nested -VDC/-AAD/-BAF counter groups seen in samples/multisig-oobi.cesr). Chose to make
+            the signed statement the visual foreground and render the proof groups as a distinct,
+            muted, collapsed-by-default band (fully annotated on open, with a global hide-proof
+            toggle), over giving the two domains equal weight or foregrounding the crypto. The
+            expert-debug user (@q7m4rp) is usually reading semantic content and wants the proof
+            present but out of the way, and this asymmetry is the product's core visual signature that
+            distinguishes it from a generic JSON viewer. Accepted tradeoff: a proof-forward user must
+            toggle/expand to make the cryptographic material primary.
+
+        Structure-only viewer with self-contained integrity checks = decision:
+          id: b6zx2d
+          why: >
+            cesrview is a viewer, not a verifier, but users will read "signatures shown" as
+            "signatures valid." Chose to make NO cryptographic-validity claims in v1 (no green checks,
+            no "valid" language) while still performing the checks that need no external state — SAID
+            recomputation and serialization-length agreement — surfaced explicitly as "structural
+            integrity," visibly distinct from cryptographic validity. Rejected both zero-validation
+            (misses cheap, honest, self-contained signal) and full in-browser signature/key-state
+            verification (much larger scope, needs crypto plus KEL key-state resolution, and creates a
+            "we said valid but were wrong" failure that violates fail-closed). This applies the org
+            fail-closed principle: an unverifiable claim of validity is not made. Accepted tradeoff:
+            users must confirm cryptographic validity elsewhere; full verification is deferred.
+
+        View-only, with read-only text/binary reveal = decision:
+          id: j4wc5h
+          why: >
+            Chose to keep v1 view-only — no editing, no re-serialization — while exposing CESR's
+            unique text/binary domain duality read-only: any primitive can reveal its binary-domain
+            form and "copy as binary." Rejected strictly-view-only (misses a distinctive CESR teaching
+            moment that is nearly free once the parser exists) and editing/re-serialization (a much
+            larger tool with a far bigger correctness and security surface, out of scope for a
+            paste-and-prettify v1 per @n2fq6b). Accepted tradeoff: users cannot mutate or convert whole
+            streams in v1.
+
+        No payload-in-URL sharing; ship a sample library instead = decision:
+          id: r7pm3q
+          why: >
+            Deliberately NOT providing shareable permalinks that encode the pasted stream in the URL,
+            though a "share this parse" link is an obvious jwt.io-style feature. Encoding a
+            possibly-key-bearing CESR stream into a URL is exfiltration — it can land in browser
+            history, server logs, and referrer headers — which violates the root-goal privacy
+            constraint (@k7t3mq: nothing leaves the machine) and fail-closed. Instead ship a curated
+            one-click sample library (corpus sanitized/blessed for inclusion) so users have shareable
+            reference material without exfiltrating their own data. Accepted tradeoff: no deep-link to
+            a specific user parse; users share by sending the raw CESR out-of-band.
+
+        Render AIDs with entviz <EntvizPill> = decision:
+          id: g2hd6n
+          why: >
+            Chose to render every KERI AID (44-char base64 identifier) via the published entviz React
+            component (@entviz/react <EntvizPill>) rather than as raw base64 text or a bespoke pill.
+            Real streams carry ~80 near-identical-looking AIDs that cross-reference each other
+            (samples/multisig-oobi.cesr); entviz gives a compact clickable pill with a deterministic
+            visual fingerprint that lets users tell same-vs-different AIDs apart at a glance, plus
+            copy/expand — solving the identifier-web legibility problem for free. The pill label is
+            host-controlled (short prefix or full value) and its default type annotation is turned off
+            (showType=false). Accepted tradeoff: an external UI dependency (@entviz/react, peer
+            React >=17, only transitive dep @noble/hashes, themeable via --entviz-pill-* vars) whose
+            release cadence we track; justified because it is maintained in-house (bakobo/dhh1128).
