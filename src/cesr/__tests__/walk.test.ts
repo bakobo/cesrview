@@ -56,14 +56,48 @@ describe('walk — synthetic structure', () => {
     expect(consumed).toBe(messages[0].span.end);
   });
 
-  it('frames a -V quadlet attachment group by count*4', () => {
+  it('frames a -V quadlet attachment group by count*4 (opaque items for now)', () => {
     const stream = bytesOf(mkMessage({ t: 'ixn' }) + '-VAB' + 'AAAA'); // count 1 -> 4 bytes
     const { messages, errors, consumed } = walk(stream);
     expect(errors).toEqual([]);
     expect(consumed).toBe(stream.length);
     expect(messages[0].attachments).toEqual([
-      { code: '-V', count: 1, span: { start: messages[0].span.end, end: stream.length }, state: 'known' },
+      {
+        kind: 'group',
+        code: '-V',
+        count: 1,
+        span: { start: messages[0].span.end, end: stream.length },
+        state: 'known',
+        items: [],
+      },
     ]);
+  });
+
+  it('frames an -I seal-source-triple group into typed (i, s, d) primitives', () => {
+    const said = 'ELXXiPwoaWOVOTLMOAmg4IKkjFHFs3q2hsL9tHvuuC2D'; // real 44-char Blake3 digest
+    const seqner = '0A' + 'A'.repeat(22); // sn 0, a 24-char Number/Seqner primitive
+    const iGroup = '-IAB' + said + seqner + said; // count 1: prefixer, seqner, saider
+    const stream = bytesOf(mkMessage({ t: 'ixn' }) + iGroup);
+    const { messages, errors, consumed } = walk(stream);
+    expect(errors).toEqual([]);
+    expect(consumed).toBe(stream.length);
+    const group = messages[0].attachments[0];
+    expect(group).toMatchObject({ kind: 'group', code: '-I', count: 1, state: 'known' });
+    expect(group.items).toEqual([
+      { kind: 'primitive', code: 'E', span: expect.any(Object) },
+      { kind: 'primitive', code: '0A', span: expect.any(Object) },
+      { kind: 'primitive', code: 'E', span: expect.any(Object) },
+    ]);
+  });
+
+  it('frames a -G seal-source-couple group into (s, d) primitives', () => {
+    const said = 'ELXXiPwoaWOVOTLMOAmg4IKkjFHFs3q2hsL9tHvuuC2D';
+    const seqner = '0A' + 'A'.repeat(22);
+    const stream = bytesOf(mkMessage({ t: 'ixn' }) + '-GAB' + seqner + said);
+    const { messages, errors } = walk(stream);
+    expect(errors).toEqual([]);
+    expect(messages[0].attachments[0]).toMatchObject({ code: '-G', count: 1, state: 'known' });
+    expect(messages[0].attachments[0].items).toHaveLength(2);
   });
 
   it('nulls ilk, sn and said when the fields are absent (e.g. an ACDC)', () => {
@@ -114,5 +148,15 @@ describe('walk — resilience (decision d3rk6n)', () => {
     const { messages, errors } = walk(stream);
     expect(messages[0].attachments[0]).toMatchObject({ code: '-A', state: 'invalid' });
     expect(errors[0].message).toMatch(/cannot frame counter -A/);
+  });
+
+  it('marks a primitive group invalid when a primitive item is malformed', () => {
+    const said = 'ELXXiPwoaWOVOTLMOAmg4IKkjFHFs3q2hsL9tHvuuC2D';
+    const stream = bytesOf(mkMessage({ t: 'ixn' }) + '-IAB' + said + '####'); // 2nd part unparseable
+    const { messages, errors } = walk(stream);
+    const group = messages[0].attachments[0];
+    expect(group).toMatchObject({ code: '-I', state: 'invalid' });
+    expect(group.items).toHaveLength(1); // only the first primitive framed
+    expect(errors[0].message).toMatch(/cannot frame counter -I/);
   });
 });

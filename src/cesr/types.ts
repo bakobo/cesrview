@@ -16,13 +16,25 @@ export type NodeState =
   | 'unknown' // well-formed but code not recognized; may be framable by size rules
   | 'invalid'; // cannot be framed
 
+/** A single CESR primitive (key, digest, signature, sequence number, …) within a group. */
+export interface Primitive {
+  kind: 'primitive';
+  code: string;
+  span: ByteSpan;
+}
+
 /** A counter-framed attachment group (e.g. controller sigs `-A`, material quadlets `-V`). */
 export interface AttachmentGroup {
+  kind: 'group';
   code: string;
   count: number;
   span: ByteSpan;
   state: NodeState;
+  items: AttachmentNode[]; // typed children; empty for opaque quadlet frames and unknown codes
 }
+
+/** A node in the attachment tree. */
+export type AttachmentNode = AttachmentGroup | Primitive;
 
 /** A parsed message (KEL/TEL event or ACDC) with its attachments. */
 export interface CesrMessage {

@@ -4,8 +4,8 @@
  * attachment counters, delegating primitive/counter sizing to signify-ts. Resilient: on a code it
  * cannot frame it stops and reports, returning everything parsed so far (decision d3rk6n). */
 
-import { Counter, Indexer } from 'signify-ts';
-import type { AttachmentGroup, CesrMessage, ParseError, WalkResult } from './types';
+import { Counter, Indexer, Matter } from 'signify-ts';
+import type { AttachmentGroup, AttachmentNode, CesrMessage, ParseError, Primitive, WalkResult } from './types';
 
 const td = new TextDecoder();
 const OPEN = 0x7b; // '{'
@@ -14,10 +14,22 @@ const DASH = 0x2d; // '-'
 /** v1 version string, e.g. `"v":"KERI10JSON00012b_"` -> proto KERI, ver 1.0, JSON, size 0x12b. */
 const VERSION_RE = /"v"\s*:\s*"([A-Z]{4})(\d)(\d)([A-Z]{4})([0-9a-f]{6})_"/;
 
-/** Counters whose count is in 4-byte quadlets of opaque material. */
-const QUADLET = new Set(['-V', '-0V']);
-/** Counters whose items are self-framing indexed signatures. */
-const INDEXED_SIG = new Set(['-A', '-B']);
+/** How a counter's payload is framed. A part is either one primitive (`p`) or one indexed
+ * signature (`sig`); a quadlet group is `count` 4-byte quadlets of (as-yet opaque) material. */
+type Part = 'p' | 'sig';
+interface GroupSpec {
+  quadlet?: boolean;
+  parts?: Part[]; // the primitive sequence of ONE item; repeated `count` times
+}
+const GROUP_SPEC: Record<string, GroupSpec> = {
+  '-V': { quadlet: true }, // AttachedMaterialQuadlets (universal wrapper)
+  '-0V': { quadlet: true }, // BigAttachedMaterialQuadlets
+  '-L': { quadlet: true }, // PathedMaterialQuadlets
+  '-A': { parts: ['sig'] }, // ControllerIdxSigs
+  '-B': { parts: ['sig'] }, // WitnessIdxSigs
+  '-G': { parts: ['p', 'p'] }, // SealSourceCouples (seqner, saider)
+  '-I': { parts: ['p', 'p', 'p'] }, // SealSourceTriples (prefixer, seqner, saider)
+};
 
 interface Version {
   proto: string;
@@ -38,6 +50,17 @@ interface FramedGroup {
   end: number; // byte offset just past the group (only meaningful when state === 'known')
 }
 
+/** Frame one primitive of the given part kind at `at`, delegating sizing to signify-ts. */
+function framePrimitive(bytes: Uint8Array, at: number, part: Part): Primitive | null {
+  const q = td.decode(bytes.subarray(at, at + 128));
+  try {
+    const prim = part === 'sig' ? new Indexer({ qb64: q }) : new Matter({ qb64: q });
+    return { kind: 'primitive', code: prim.code, span: { start: at, end: at + prim.qb64.length } };
+  } catch {
+    return null;
+  }
+}
+
 /** Frame one attachment group at `at`. Returns null if the counter itself is unparseable. */
 function frameGroup(bytes: Uint8Array, at: number): FramedGroup | null {
   let counter: Counter;
@@ -48,28 +71,36 @@ function frameGroup(bytes: Uint8Array, at: number): FramedGroup | null {
   }
   const { code, count } = counter;
   const headerLen = counter.qb64.length;
+  const base = { kind: 'group' as const, code, count };
+  const spec = GROUP_SPEC[code];
 
-  if (QUADLET.has(code)) {
+  if (!spec) {
+    // a recognized counter whose framing we do not yet model
+    const end = at + headerLen;
+    return { group: { ...base, span: { start: at, end }, state: 'unknown', items: [] }, end };
+  }
+
+  if (spec.quadlet) {
+    // opaque for now: the byte length is count*4; inner decomposition is a later increment
     const end = at + headerLen + count * 4;
-    return { group: { code, count, span: { start: at, end }, state: 'known' }, end };
+    return { group: { ...base, span: { start: at, end }, state: 'known', items: [] }, end };
   }
 
-  if (INDEXED_SIG.has(code)) {
-    let p = at + headerLen;
-    for (let k = 0; k < count; k++) {
-      try {
-        p += new Indexer({ qb64: td.decode(bytes.subarray(p, p + 100)) }).qb64.length;
-      } catch {
+  const parts = spec.parts as Part[];
+  const items: AttachmentNode[] = [];
+  let p = at + headerLen;
+  for (let k = 0; k < count; k++) {
+    for (const part of parts) {
+      const prim = framePrimitive(bytes, p, part);
+      if (!prim) {
         // a malformed item — we can no longer frame this group
-        return { group: { code, count, span: { start: at, end: p }, state: 'invalid' }, end: p };
+        return { group: { ...base, span: { start: at, end: p }, state: 'invalid', items }, end: p };
       }
+      items.push(prim);
+      p = prim.span.end;
     }
-    return { group: { code, count, span: { start: at, end: p }, state: 'known' }, end: p };
   }
-
-  // a recognized counter whose framing we do not yet model
-  const end = at + headerLen;
-  return { group: { code, count, span: { start: at, end }, state: 'unknown' }, end };
+  return { group: { ...base, span: { start: at, end: p }, state: 'known', items }, end: p };
 }
 
 /** Walk a CESR stream into a provenance-carrying decomposition. */
