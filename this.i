@@ -117,6 +117,32 @@ Make CESR legible to developers in the browser = goal:
             Accepted tradeoff: selector/size-class sizing (the cold-start hard/lead/quadlet rules) is
             real work beyond consuming signify-ts's known-code tables; the -V wrapper covers the common
             attachment case meanwhile, and 100% of the real v1 corpus parses via known codes anyway.
+          children:
+            Decompose -V/-0V wrappers into a typed nested group sequence = decision:
+              id: z4pm7k
+              why: >
+                Chose to recurse the universal material-quadlet wrappers -V (AttachedMaterialQuadlets)
+                and -0V (BigAttachedMaterialQuadlets) into a TYPED nested sequence of attachment groups,
+                reusing the same group framing used at the top level, so the KEL's real proof content
+                (controller/witness sigs, receipt couples, seal sources) becomes typed nodes rather than
+                an opaque count*4 byte span. This is what makes the typed proof band (@h5nw2c) real: 459
+                of the 463 messages in the sample corpus wrap their proof in -V, so without this the
+                walker shows almost no proof structure. The wrapper's OWN state stays framed ("known")
+                whenever its size is derivable from count*4 — which is always, since a self-declaring
+                wrapper size is the entire reason CESR defines the universal wrapper (a receiver can skip
+                attachments it cannot parse). Inner framing problems surface as the CHILD node's own
+                state plus a byte-positioned ParseError inside the wrapper, not by condemning the
+                wrapper. Rejected marking the whole -V "invalid" when its contents are unrecognised
+                (that conflates "could not size the wrapper", which never happens, with "did not
+                recognise the contents", and blanks a wrapper we framed correctly, losing the debugger
+                value of @r7cm3b). Deferred two things as tracked debt rather than widening this
+                increment: -L (PathedMaterialQuadlets) inner decomposition, whose inner grammar is a
+                leading path primitive then groups, not a plain group run; and using the known wrapper
+                size as a resync boundary to CONTINUE the walk past a malformed -V (today the walk still
+                stops conservatively on the first inner framing failure). Refines @d3rk6n; serves
+                @h5nw2c; output shape unchanged (@m4dp7k already admits nested groups via AttachmentNode).
+                Accepted tradeoff: mutual recursion between group framing and sequence framing, and
+                carrying the -L / resync gaps as tracked debt until a later increment.
 
         Develop the walker in cesrview, upstream once proven = decision:
           id: n6wd3k
