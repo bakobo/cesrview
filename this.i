@@ -118,6 +118,22 @@ Make CESR legible to developers in the browser = goal:
             real work beyond consuming signify-ts's known-code tables; the -V wrapper covers the common
             attachment case meanwhile, and 100% of the real v1 corpus parses via known codes anyway.
 
+        Develop the walker in cesrview, upstream once proven = decision:
+          id: n6wd3k
+          why: >
+            The walker is developed as a BOUNDED MODULE INSIDE cesrview (importing only published
+            signify-ts for primitives; no React), and upstreamed to WebOfTrust/signify-ts (via the
+            provenant-dev fork) once proven — rather than developed inside the signify-ts fork now.
+            The local signify-ts is a provenant-dev fork whose true upstream (WebOfTrust) is a
+            PR-gated community project; developing there would couple cesrview to an unpublished fork
+            branch and the community merge cycle, and the unknown-but-framed selector enhancement
+            wants to be proven before it is proposed. Building here keeps iteration fast under bakobo
+            TDD/intent standards, while the module boundary (signify-ts-only imports) keeps later
+            extraction trivial. Refines @w6ph4k and @m4dp7k. Rejected develop-in-fork (timeline
+            coupling) and a separate package now (repo/publish overhead, and it diverges from the
+            upstream-into-signify-ts intent). Accepted tradeoff: a later extraction/upstreaming step,
+            and temporarily carrying any v2/selector additions locally until they land in signify-ts.
+
     UX-first, with a parallel engine feasibility spike = decision:
       id: t3zc5m
       why: >
