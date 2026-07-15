@@ -80,6 +80,44 @@ Make CESR legible to developers in the browser = goal:
             against the v1 corpus first; the ENGINE is v1+v2. @s4hd6q and @h6rk4d both hold under this
             reconciliation.
 
+        Walker emits a keripy-shaped typed tree with byte provenance = decision:
+          id: m4dp7k
+          why: >
+            Chose the walker's output contract to MIRROR keripy's per-message decomposition — a
+            deserialised message (Serder-equivalent) plus TYPED attachment groups (controller indexed
+            sigs, witness sigs, nontrans receipt couples, trans idx sig groups, seal-source
+            couples/triples, SAD-path sig groups) — because approximating the shape of the shipping
+            reference parser (keri.core.parsing) makes the walker a more natural upstream contribution
+            to signify-ts and reuses a decomposition CESR practitioners already know. cesrview's
+            ADDITION is byte-span PROVENANCE on every node (message, group, primitive): the [start,end)
+            offset in the original stream, which keripy does not track (it processes into a DB, not a
+            rendered source pane). Chosen over (a) a flat token+offset stream (pushes tree assembly and
+            group typing onto every consumer) and (b) annotations baked in (couples the upstreamable
+            walker to cesrview's teaching layer, violating @w6ph4k). Byte provenance is a superset
+            keripy lacks but is independently useful (exact-byte verification) and non-conflicting, so
+            it does not compromise upstreamability. Accepted tradeoff: threading offsets through
+            recursive framing is slightly more bookkeeping than a process-only parser.
+
+        Resilient three-state parse - known, unknown-but-framed, invalid = decision:
+          id: d3rk6n
+          why: >
+            On imperfect input the walker never fails all-or-nothing (a debugger must show the broken
+            stream it is handed): it returns everything parsed up to a failure plus a typed error node
+            at that byte boundary. It distinguishes THREE outcomes per element, honouring CESR's
+            self-framing design: KNOWN (code in the tables -> parsed and annotated); UNKNOWN-BUT-FRAMED
+            (code not in the tables but its byte size is derivable from CESR's selector/size-class
+            rules, or it sits inside a -V/-0V quadlet wrapper whose length is count*4 -> framed
+            structurally, byte span known, marked "unrecognised code", no annotation); and INVALID
+            (cannot be framed even by size rules -> typed error). The unknown-but-framed state is what
+            makes a v2-capable parser tolerant of v2.x/3.x additions it does not yet annotate.
+            Empirically, signify-ts today THROWS "Unsupported code" on any unknown code (verified) — it
+            does NOT self-frame unknowns — so selector/size-class framing is a capability cesrview
+            IMPLEMENTS and contributes upstream, not one it inherits. Rejected strict-throw (wrong tool
+            for a debugger) and known-codes-only (brittle to the versioned future CESR is built for).
+            Accepted tradeoff: selector/size-class sizing (the cold-start hard/lead/quadlet rules) is
+            real work beyond consuming signify-ts's known-code tables; the -V wrapper covers the common
+            attachment case meanwhile, and 100% of the real v1 corpus parses via known codes anyway.
+
     UX-first, with a parallel engine feasibility spike = decision:
       id: t3zc5m
       why: >
