@@ -45,6 +45,40 @@ Make CESR legible to developers in the browser = goal:
         every parse against keripy's canonical Parser as a golden oracle. Provisional pending the
         Phase-1 engine spike (see @t3zc5m); keripy-via-Pyodide is the documented fallback, and if
         the spike overturns this, record a tension rather than editing this node silently.
+      children:
+        Consume signify-ts tables; author only the annotation layer = decision:
+          id: w6ph4k
+          why: >
+            Chose to CONSUME the structural code tables (code -> hard/soft/full length and framing
+            semantics) by delegating primitive, counter and indexer parsing to signify-ts's
+            Matter/Counter/Indexer classes and their size tables, rather than authoring a fresh
+            code-table artifact — a hand-kept copy would inevitably drift from the spec and from the
+            implementations. Where signify-ts is incomplete (notably v2), contribute the additions
+            UPSTREAM (keripy and the spec as reference) rather than fork a private table, keeping one
+            source. cesrview authors ONLY the annotation layer (code/field -> human gloss +
+            spec-anchor URL), which is the product's teaching value-add, is descriptions not sizes,
+            and is therefore low drift-risk even though keyed by signify-ts's codes. Rejected
+            consuming cesride (Rust->WASM adds weight and is not our contribution target) and
+            build-time generation from keripy (still yields a local file to keep in sync). Accepted
+            tradeoff: a runtime dependency on signify-ts's parsing classes, and coupling our v2
+            support to landing upstream table additions.
+
+        Table-driven walker is v2-capable, not v1-only = tension:
+          id: c4nk7p
+          why: >
+            @s4hd6q recorded "detect non-JSON and non-v1 genus, FAIL CLOSED", which over-narrowed the
+            engine toward v1-only and conflicts with this node's (@h6rk4d) intent to build and
+            upstream a v2-CAPABLE walker to signify-ts. Confirmed with the owner: a v1-only walker is
+            a weak contribution and was not the intent.
+          resolution: >
+            The walker is TABLE-DRIVEN and v2-capable: v1 vs v2 is a version-string + table concern,
+            not two parsers, so it handles whatever the (signify-ts) tables cover. v1 is fully tested
+            against the real corpus now; v2 code paths and tables are filled in and tested as tables
+            (and any v2 data) mature. Fail-closed (@s4hd6q) now applies only to GENUINELY unsupported
+            genus/serialization not yet in the tables — not to v2 as a category, and not to CBOR/MGPK
+            once their sniff/table support lands. cesrview the PRODUCT is still polished and tested
+            against the v1 corpus first; the ENGINE is v1+v2. @s4hd6q and @h6rk4d both hold under this
+            reconciliation.
 
     UX-first, with a parallel engine feasibility spike = decision:
       id: t3zc5m
