@@ -51,6 +51,34 @@ Make CESR legible to developers in the browser = goal:
             component API is proven, avoiding premature repo/publish overhead. The component API is a
             first-class output of the Phase-3 UX interview, not an afterthought. Accepted tradeoff: a
             later extraction step and an app-depends-on-package edge once split.
+          children:
+            Tier-2 is prop-driven leaves plus a thin viewer context, built stream-order first = decision:
+              id: b4wnk7
+              why: >
+                Phase-3 UX interview outcome, settling the component architecture @r4vkp7 deferred to
+                it. The tier-2 package is a library of PROP-DRIVEN LEAF components (a primitive chip, an
+                attachment/proof group, a decoded event, a KEL/TEL lane) plus a THIN, OPTIONAL viewer
+                CONTEXT that supplies shared interaction state — selection and identifier
+                cross-referencing (@c5nzr4). A consumer can render a single chunk from props alone, OR
+                wrap a subtree in the context to get always-on correlation for free; the app (tier 3) is
+                then a thin composition, not the owner of component smarts. Chose this over
+                pure-presentational components (every consumer would re-implement cross-ref) and over
+                stateful leaf components (breaks the standalone-chunk reuse @r4vkp7 wants). The DEFAULT
+                view is the STREAM-ORDER spine — decoded messages top to bottom as they arrived — with
+                the KEL/TEL/delegation model (@k2vx5n) as the left-rail index and jump-navigation
+                (@t2vd6m), because the expert debugging a specific stream (@q7m4rp) reads arrival order
+                first; by-owner lanes are the alternate ordering, not the default. Build order is
+                library-first and INCREMENTAL: the decoded pane with annotations (@w6ph4k) first, then
+                the viewer context + cross-ref, then the source pane with selection sync (@p6hw4k /
+                @p4rz6b), then structural integrity (@b3qm7d) — and entviz pills LAST. Pills are deferred
+                because entviz is being actively enhanced (new colour, shape-by-value-class and
+                similar-value affordances the owner is still settling, refining @g4mp2w / @v7kd3m);
+                until they land, high-entropy values render as a simple placeholder chip and
+                cross-referencing keys on VALUE EQUALITY rather than the fingerprint glyph, upgrading to
+                the entviz fingerprint once entviz settles (its new affordances are to be STUDIED at
+                integration time, not assumed). Keyboard and screen-reader access are in from the first
+                component, not bolted on (@f6tk4p). Accepted tradeoff: a viewer-context seam through the
+                component tree, and a placeholder chip later swapped for the entviz pill.
 
     In-browser TS stream-walker, upstreamed; keripy as oracle = decision:
       id: h6rk4d
