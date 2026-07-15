@@ -62,6 +62,28 @@ Make CESR legible to developers in the browser = goal:
             build-time generation from keripy (still yields a local file to keep in sync). Accepted
             tradeoff: a runtime dependency on signify-ts's parsing classes, and coupling our v2
             support to landing upstream table additions.
+          children:
+            Annotate CESR codes and message ilks in a decoupled teaching module = decision:
+              id: x4nb7q
+              why: >
+                Built the annotation layer @w6ph4k promised as a SEPARATE cesrview module (src/annotate)
+                that the walker does NOT import, so the walker stays the generic, upstreamable
+                decomposition (@m4dp7k, @n6wd3k) while the teaching content — the product's value-add —
+                lives on top. It maps each STRUCTURAL code to a human gloss plus a spec-anchor URL:
+                counter/group codes (-A ControllerIdxSigs through -V AttachedMaterialQuadlets), Matter
+                and Indexer primitive codes (looked up per class per @d7km3p, since the two tables
+                collide), and message ilks (icp/rot/ixn/dip/drt/rpy and common TEL types). Anchors
+                deep-link to the relevant spec SECTION (e.g. the CESR spec #count-code-tables), not to
+                per-code fragments, because the specs render codes inside tables with no stable per-code
+                ids — verified against the published CESR spec, and every URL is checked to resolve
+                before it ships. Rejected per-code fragment anchors (they do not exist and would 404)
+                and baking glosses into walker nodes (@m4dp7k forbids it). Message FIELD-KEY glosses
+                (v/t/d/i/s/kt/k/n/...) are deferred as tracked debt: they annotate the message JSON
+                rather than the code-bearing nodes and span the KERI and ACDC specs, a distinct body of
+                content. Lookup is fail-soft — an unannotated code returns null and the node still
+                renders (the @d3rk6n spirit). Accepted tradeoff: the gloss/URL table is hand-authored
+                and versioned in cesrview until the walker is upstreamed, kept low-drift because it is
+                descriptions, not sizes (@w6ph4k).
 
         Table-driven walker is v2-capable, not v1-only = tension:
           id: c4nk7p
@@ -97,6 +119,24 @@ Make CESR legible to developers in the browser = goal:
             keripy lacks but is independently useful (exact-byte verification) and non-conflicting, so
             it does not compromise upstreamability. Accepted tradeoff: threading offsets through
             recursive framing is slightly more bookkeeping than a process-only parser.
+          children:
+            Tag each primitive with its Matter or Indexer class = decision:
+              id: d7km3p
+              why: >
+                A Primitive node's `code` alone is AMBIGUOUS: the same qb64 selector means different
+                things in the Matter table versus the Indexer table (e.g. 'A' is a seed as Matter but
+                an indexed Ed25519 signature as Indexer), so a consumer cannot annotate or label it
+                without knowing which table it came from. Added a `class: 'matter' | 'indexer'`
+                discriminator, which the walker already knows at framing time (a 'sig' part is framed
+                by Indexer, a 'p' part by Matter), making the decomposition self-describing and letting
+                the annotation layer (@w6ph4k) and the UI resolve the correct code table and render
+                "indexed signature" versus "digest/key". Rejected leaving the caller to infer the class
+                from group context (pushes CESR table knowledge into every consumer, and the output
+                tree does not otherwise encode that a -A's children are indexed sigs) and putting a full
+                per-primitive type NAME in the walker (that is the annotation layer's job — baking
+                teaching into the upstreamable module would violate @w6ph4k/@m4dp7k). Refines @m4dp7k;
+                the byte-provenance contract and keripy-shaped decomposition are otherwise unchanged.
+                Accepted tradeoff: one more field threaded through primitive framing.
 
         Resilient three-state parse - known, unknown-but-framed, invalid = decision:
           id: d3rk6n
