@@ -45,16 +45,25 @@ export interface CesrMessage {
   ilk: string | null; // the `t` field, null for ACDCs
   sn: string | null; // the `s` field (hex sequence number), where present
   said: string | null; // the `d` field
-  sad: Record<string, unknown>; // the deserialized message body
+  sad: Record<string, unknown> | null; // the deserialized body, or null when framed but not decoded (s7bk4m)
   span: ByteSpan; // the message body bytes (attachments excluded)
   attachments: AttachmentGroup[];
 }
 
+/** Decodes a serialized message body (the bytes between the version string and the attachments) into
+ * its field map. JSON is built in; other serializations are injected via WalkOptions (decision s7bk4m). */
+export type BodyDecoder = (body: Uint8Array) => Record<string, unknown>;
+
+/** Options for {@link walk}. */
+export interface WalkOptions {
+  /** Body decoders keyed by serialization kind (e.g. 'CBOR', 'MGPK'); JSON is always built in. */
+  decoders?: Record<string, BodyDecoder>;
+}
+
 /** A stable symbolic code for a framing failure — branch on this, not the prose (decision n4kr7p). */
 export type ParseErrorCode =
-  | 'not-a-message' // a message position does not begin with '{'
-  | 'no-version-string' // a '{' with no parseable version string in its leading window
-  | 'malformed-body' // the version size is claimed but the body is not valid JSON
+  | 'no-version-string' // no CESR version string at a message position — not a recognizable message
+  | 'malformed-body' // the version size is claimed but the body does not decode in its serialization
   | 'unparseable-counter' // a '-' counter code signify-ts cannot parse
   | 'unframable-group'; // a recognized counter whose group could not be framed
 

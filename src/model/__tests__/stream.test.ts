@@ -117,6 +117,23 @@ describe('organize — KEL/TEL log model (decision w3rn6k)', () => {
     expect(logs).toEqual([]);
     expect(loose.map((l) => l.message.said)).toEqual(['noi']);
   });
+
+  it('routes a framed-but-undecoded message (sad null) to loose', () => {
+    const undecoded: CesrMessage = {
+      proto: 'KERI',
+      version: '1.0',
+      kind: 'CBOR',
+      ilk: null,
+      sn: null,
+      said: 'blob',
+      sad: null, // a CBOR/MGPK body walked without a decoder
+      span: { start: 0, end: 0 },
+      attachments: [],
+    };
+    const { logs, loose } = organize(result([undecoded]));
+    expect(logs).toEqual([]);
+    expect(loose.map((l) => l.message.said)).toEqual(['blob']);
+  });
 });
 
 describe('organize — real corpus', () => {

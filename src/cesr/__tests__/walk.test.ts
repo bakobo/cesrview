@@ -344,11 +344,11 @@ describe('walk — synthetic structure', () => {
 });
 
 describe('walk — resilience (decision d3rk6n)', () => {
-  it('errors and stops when the stream does not start with a message', () => {
+  it('errors and stops when the stream has no version string at its start', () => {
     const { messages, errors, consumed } = walk(bytesOf('garbage'));
     expect(messages).toEqual([]);
     expect(consumed).toBe(0);
-    expect(errors[0]).toMatchObject({ code: 'not-a-message', permanent: true });
+    expect(errors[0]).toMatchObject({ code: 'no-version-string', permanent: true });
   });
 
   it('errors when a { has no version string', () => {

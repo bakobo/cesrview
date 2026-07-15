@@ -1,0 +1,22 @@
+{
+  "bytes": 660,
+  "kind": "MGPK",
+  "messages": [
+    {
+      "ilk": "icp",
+      "sn": "0",
+      "said": "EE3XxSAy6SFGkkupNcgz9goC6FKgSZNOUhb6FpSmZViD",
+      "size": 249,
+      "bodyStart": 0,
+      "attachLen": 92
+    },
+    {
+      "ilk": "ixn",
+      "sn": "1",
+      "said": "EFeB-zhP6zA6IE1unKeAw0lW0c5njXS70tpgs1KIL7Vu",
+      "size": 227,
+      "bodyStart": 341,
+      "attachLen": 92
+    }
+  ]
+}

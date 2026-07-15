@@ -77,7 +77,7 @@ export function organize(result: WalkResult): StreamModel {
   result.messages.forEach((message, streamIndex) => {
     const ilk = message.ilk;
     const kind: 'KEL' | 'TEL' | null = ilk && KEL_ILKS.has(ilk) ? 'KEL' : ilk && TEL_ILKS.has(ilk) ? 'TEL' : null;
-    const aid = message.sad.i;
+    const aid = message.sad?.i; // undefined for an undecoded (frame-only) body -> falls to loose
     const sn = typeof message.sn === 'string' ? parseInt(message.sn, 16) : NaN;
 
     if (kind && typeof aid === 'string' && Number.isInteger(sn)) {
@@ -87,7 +87,8 @@ export function organize(result: WalkResult): StreamModel {
         byAid.set(aid, log);
         order.push(aid);
       }
-      if (typeof message.sad.di === 'string') log.delegator = message.sad.di;
+      const di = message.sad!.di; // in this branch the ilk is set, so the body was decoded (sad non-null)
+      if (typeof di === 'string') log.delegator = di;
       log.events.push({ message, sn, streamIndex });
     } else {
       loose.push({ message, streamIndex });

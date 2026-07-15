@@ -1,0 +1,22 @@
+{
+  "bytes": 660,
+  "kind": "CBOR",
+  "messages": [
+    {
+      "ilk": "icp",
+      "sn": "0",
+      "said": "EB-80RbphBgE-vxtILWn8ycsqGnbKTkc44stlVVfOCeh",
+      "size": 249,
+      "bodyStart": 0,
+      "attachLen": 92
+    },
+    {
+      "ilk": "ixn",
+      "sn": "1",
+      "said": "ENWzOKQW854_XWXzJAR9npLWEaNCvzxzYz2exws1erCx",
+      "size": 227,
+      "bodyStart": 341,
+      "attachLen": 92
+    }
+  ]
+}

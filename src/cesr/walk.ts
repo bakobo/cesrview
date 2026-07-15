@@ -5,14 +5,27 @@
  * cannot frame it stops and reports, returning everything parsed so far (decision d3rk6n). */
 
 import { Counter, Indexer, Matter } from 'signify-ts';
-import type { AttachmentGroup, AttachmentNode, CesrMessage, ParseError, Primitive, WalkResult } from './types';
+import type {
+  AttachmentGroup,
+  AttachmentNode,
+  BodyDecoder,
+  CesrMessage,
+  ParseError,
+  Primitive,
+  WalkOptions,
+  WalkResult,
+} from './types';
 
 const td = new TextDecoder();
-const OPEN = 0x7b; // '{'
 const DASH = 0x2d; // '-'
 
-/** v1 version string, e.g. `"v":"KERI10JSON00012b_"` -> proto KERI, ver 1.0, JSON, size 0x12b. */
-const VERSION_RE = /"v"\s*:\s*"([A-Z]{4})(\d)(\d)([A-Z]{4})([0-9a-f]{6})_"/;
+/** A CESR version string as a BARE token, e.g. `KERI10JSON00012b_` -> proto KERI, ver 1.0, kind JSON,
+ * size 0x12b. Matched without the JSON `"v":"..."` framing so it is found inside binary CBOR/MGPK
+ * bodies too, where it still appears as ASCII (decision s7bk4m). */
+const VERSION_RE = /([A-Z]{4})(\d)(\d)([A-Z]{4})([0-9a-f]{6})_/;
+
+/** The built-in JSON body decoder (a language builtin — no dependency). */
+const jsonDecoder: BodyDecoder = (body) => JSON.parse(td.decode(body));
 
 /** One element of a group item: a primitive (`p` = Matter, `sig` = indexed Indexer) or `grp` = one
  * nested attachment group (e.g. the -A ControllerIdxSigs inside a -F/-H). */
@@ -181,55 +194,55 @@ function frameGroupSequence(bytes: Uint8Array, start: number, limit: number): Gr
   return { items, end: pos };
 }
 
-/** Walk a CESR stream into a provenance-carrying decomposition. */
-export function walk(bytes: Uint8Array): WalkResult {
+/** Walk a CESR stream into a provenance-carrying decomposition. Body decoding is pluggable
+ * (decision s7bk4m): JSON is built in, and other serializations (CBOR/MGPK) are decoded only when a
+ * decoder for their kind is injected via `opts.decoders`; an undecoded body is framed with sad=null. */
+export function walk(bytes: Uint8Array, opts: WalkOptions = {}): WalkResult {
+  const decoders: Record<string, BodyDecoder> = { JSON: jsonDecoder, ...opts.decoders };
   const messages: CesrMessage[] = [];
   const errors: ParseError[] = [];
   const n = bytes.length;
   let i = 0;
 
   while (i < n) {
-    if (bytes[i] !== OPEN) {
-      errors.push({
-        code: 'not-a-message',
-        message: `A message must begin with '{', but byte ${i} does not.`,
-        span: { start: i, end: n },
-        permanent: true,
-      });
-      break;
-    }
+    // a message is marked by its version string (near the start in every serialization), not by a
+    // leading '{' — CBOR/MGPK bodies begin with a map-header byte (decision s7bk4m)
     const ver = parseVersion(bytes, i);
     if (!ver) {
       errors.push({
         code: 'no-version-string',
-        message: `No version string was found in the message beginning at byte ${i}.`,
+        message: `No CESR version string was found at byte ${i}; this is not a recognizable message.`,
         span: { start: i, end: n },
         permanent: true,
       });
       break;
     }
     const bodyEnd = i + ver.size;
-    let sad: Record<string, unknown>;
-    try {
-      sad = JSON.parse(td.decode(bytes.subarray(i, bodyEnd)));
-    } catch {
-      errors.push({
-        code: 'malformed-body',
-        message: `The message body at byte ${i} is not valid JSON.`,
-        span: { start: i, end: bodyEnd },
-        permanent: true,
-      });
-      break;
+    const decoder = decoders[ver.kind]; // undefined if no decoder is available for this serialization
+    let sad: Record<string, unknown> | null = null;
+    if (decoder) {
+      try {
+        sad = decoder(bytes.subarray(i, bodyEnd));
+      } catch {
+        errors.push({
+          code: 'malformed-body',
+          message: `The message body at byte ${i} is not valid ${ver.kind}.`,
+          span: { start: i, end: bodyEnd },
+          permanent: true,
+        });
+        break;
+      }
     }
+    // when no decoder handles this serialization, the body is framed but left undecoded (sad = null)
 
     const seq = frameGroupSequence(bytes, bodyEnd, n);
     messages.push({
       proto: ver.proto,
       version: ver.version,
       kind: ver.kind,
-      ilk: typeof sad.t === 'string' ? sad.t : null,
-      sn: typeof sad.s === 'string' ? sad.s : null,
-      said: typeof sad.d === 'string' ? sad.d : null,
+      ilk: sad && typeof sad.t === 'string' ? sad.t : null,
+      sn: sad && typeof sad.s === 'string' ? sad.s : null,
+      said: sad && typeof sad.d === 'string' ? sad.d : null,
       sad,
       span: { start: i, end: bodyEnd },
       attachments: seq.items,
