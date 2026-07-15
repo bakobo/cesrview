@@ -125,6 +125,36 @@ Make CESR legible to developers in the browser = goal:
             once their sniff/table support lands. cesrview the PRODUCT is still polished and tested
             against the v1 corpus first; the ENGINE is v1+v2. @s4hd6q and @h6rk4d both hold under this
             reconciliation.
+          children:
+            Support CBOR and MGPK bodies via pluggable, injectable decoders = decision:
+              id: s7bk4m
+              why: >
+                Landed the CBOR/MGPK support @c4nk7p anticipated ("not to CBOR/MGPK once their
+                sniff/table support lands"), reconciling @s4hd6q's fail-closed stance: a non-JSON body
+                is now SUPPORTED when a decoder is available and FRAMED-BUT-UNDECODED — not a hard
+                failure — when it is not. signify-ts ships no CBOR or MGPK decoder (verified: its deps
+                are crypto/base64/mathjs only), so rather than hard-wire cbor/msgpack into the walker
+                and break its signify-ts-only boundary (@n6wd3k), body decoding is PLUGGABLE:
+                walk(bytes, { decoders }) takes a map from serialization kind to a decode function.
+                JSON is built in (a language builtin, no dependency); CBOR and MGPK live in an OPTIONAL
+                src/cesr/decoders module that imports cbor-x and @msgpack/msgpack and is NEVER imported
+                by the core walker. A consumer of the walker or the eventual React components (@r4vkp7)
+                thus PICKS its dependency weight: import nothing and get JSON plus frame-only handling
+                of CBOR/MGPK; inject the decoders and get full field decode. The version string is now
+                found as a BARE token anywhere in the leading window (every serialization carries it as
+                ASCII, even inside binary CBOR/MGPK) rather than requiring JSON "v":"..." syntax — this
+                both generalises detection and mirrors how keripy's own Rever locates it. When no
+                decoder handles a body, `sad` is null and ilk/sn/said are null: a refinement of
+                @m4dp7k's contract (sad was always an object) that keeps the never-throw, three-state
+                spirit of @d3rk6n. Grounded by keripy-transcoded fixtures (the JSON tiny-kel
+                re-serialised to CBOR and MGPK with attachments carried over) and verified that cbor-x
+                and @msgpack/msgpack decode keripy's output field-for-field. Rejected hard-wiring the
+                decoders into the core (breaks @n6wd3k, forces the dependency on every consumer) and
+                frame-only-forever (leaves the decoded view unable to show non-JSON fields). @n6wd3k
+                HOLDS for the core, which stays signify-ts-only; the optional decoders module carries
+                its own deps and becomes part of the separate serialization package at extraction time
+                (@r4vkp7). Accepted tradeoff: two small dependencies in the repo, used only by the
+                optional module, and a decoder-injection seam through walk().
 
         Walker emits a keripy-shaped typed tree with byte provenance = decision:
           id: m4dp7k
