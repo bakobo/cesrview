@@ -225,3 +225,106 @@ Make CESR legible to developers in the browser = goal:
             of raw bytes. The whole view is themeable LIGHT and DARK via CSS variables aligned with
             entviz's --entviz-pill-* vars. Accepted tradeoff: more interaction surface to build and
             test than a read-only tree.
+
+        Colour cannot be the cross-reference invariant = tension:
+          id: v7kd3m
+          why: >
+            Fresh-context adversarial review found the passive cross-reference layer's reliance on
+            per-identifier COLOUR (@c5nzr4, @g4mp2w) unsound: hue = hash mod 360 collides badly across
+            the ~2100 distinct high-entropy tokens a real stream carries, fails for colourblind users,
+            and is illegible at a 15px swatch. Colour cannot be the sameness invariant.
+          resolution: >
+            The deterministic entviz FINGERPRINT glyph is the sameness invariant; per-value colour
+            becomes secondary/decorative. Cross-referencing (passive same-fingerprint, active
+            find-all-references, gutter marks) applies to ALL high-entropy values — the owner REBUTS
+            the reviewers' "pills for AIDs only", because entviz visualises entropy of any kind
+            (identifiers, keys, digests, signatures, nonces). Value CLASSES are distinguished instead
+            by pill SHAPE (e.g. rounded vs square vs angular corners), which becomes part of the entviz
+            extension (@g4mp2w) alongside or instead of the colour work.
+
+        Source pane pretty-printed, both panes virtualised = tension:
+          id: p4rz6b
+          why: >
+            Adversarial review and the engine spike both found that real CESR streams are a SINGLE
+            physical line (0 newlines; 101 KB and 370 KB in the samples), so the dual-pane rationale's
+            "line numbers for free" (@p6hw4k) is vacuous, a 370 KB single line is a CodeMirror
+            performance cliff, and neither pane was virtualised.
+          resolution: >
+            The source pane renders a cesrview-PRETTY-PRINTED stream (a newline per message and per
+            primitive) rather than the raw bytes — which makes line numbers meaningful and gives the
+            byte<->node provenance that selection-sync needs — and BOTH panes are virtualised.
+            Dual-pane and CodeMirror stand (@p6hw4k holds); only the left pane's content is reformatted,
+            not literal.
+
+        Proof band is typed per message type = tension:
+          id: h5nw2c
+          why: >
+            Adversarial review found "statement over proof" (@v3nk7t) is not uniform across message
+            types: rpy carries -FAB signer-seal couples, a TEL iss event has NO signature of its own
+            (its authority is a seal anchored in the ISSUER's KEL — a different event), and an ACDC
+            uses -IAB SAD-path signatures. A single -AAB "controller signature" band misrepresents
+            most of the stream.
+          resolution: >
+            Render the proof band TYPED per message type, and where an event's authority lives in
+            another event (seal -> KEL anchor), surface it as a cross-event LINK rather than a
+            fabricated local signature. Statement-over-proof stands as the visual frame (@v3nk7t
+            holds); the proof CONTENT is typed and may point elsewhere.
+
+        Structural-integrity checks kept but corrected = tension:
+          id: b3qm7d
+          why: >
+            Adversarial review found the structural-integrity checks (@b6zx2d) as prototyped are both
+            unsafe and wrong: a naive SAID recompute (Blake3 over the event with the d field zeroed)
+            FALSELY fails a valid blinded ACDC (the u salt / most-compact rules), and global green
+            "integrity" chips read as signature validity while hiding per-event failures.
+          resolution: >
+            Keep the checks (a real anti-tamper signal) but done correctly: PER-EVENT not global,
+            BLINDING-AWARE (honour the u / most-compact SAID rules), rendered in a NEUTRAL non-green
+            treatment, and labelled "structural integrity, not signature validity." The owner chose
+            keep-and-fix over dropping them. @b6zx2d holds in intent; its computation and presentation
+            are corrected here.
+
+        Context-menu actions need visible and keyboard equivalents = tension:
+          id: f6tk4p
+          why: >
+            Adversarial review found context-menus-as-primary (@f7kb3q) hides core actions
+            (copy-binary, find-references, open-in-spec) with no visible or keyboard path, and the
+            prototype was entirely mouse-only with no keyboard or screen-reader semantics.
+          resolution: >
+            Every context-menu action has a VISIBLE affordance and a KEYBOARD path; context menus are
+            an accelerator, not the only route. Full keyboard navigation and meaningful screen-reader
+            semantics across all regions are first-class v1 requirements, not deferrable polish.
+            @f7kb3q holds; its "primary" framing for context menus is downgraded to "accelerator".
+
+        Stream modelled as multiple KELs preserving stream order = decision:
+          id: k2vx5n
+          why: >
+            A CESR stream commonly interleaves MULTIPLE KELs — 11 distinct event-owning AIDs in the
+            sample — each with its own sequence space, so s-values recur across AIDs and a flat
+            single-sequence outline is misleading (an owner correction to the reviewers' by-AID-only
+            proposal). But the physical STREAM ORDER is itself meaningful — it is how the data arrived
+            and a dimension worth inspecting. Chose to model BOTH orderings: group events by owning AID
+            with per-AID sequence lanes (surfacing gaps and duplicity), AND retain a stream-order
+            view/toggle — over indexing by AID alone (loses arrival order) or by stream order alone
+            (the misleading flat log). Accepted tradeoff: two orderings to render and keep coherent,
+            and event-owner attribution must be computed during the parse.
+
+        First-class failure, empty and loading states = decision:
+          id: r7cm3b
+          why: >
+            For a debugging tool the FAILURE state is the product: malformed, truncated, partial,
+            bare-attachment and wrong-paste inputs are the common case, not an edge case. Chose to
+            design the empty, loading, partial-parse and error states as first-class surfaces with
+            fail-closed, high-quality errors (stable symbolic code, plain-language sentence,
+            retryable-or-not) per the Bakobo error-handling standard, over treating them as
+            afterthoughts. Rejected a happy-path-only v1. Accepted tradeoff: more states to design and
+            test up front.
+
+        Detect non-JSON and non-v1 genus, fail closed = decision:
+          id: s4hd6q
+          why: >
+            Real data is v1 KERI10JSON / ACDC10JSON, but CESR interleaves CBOR, MGPK and CESR-native
+            field maps and defines a v2 genus (--AAACAA). Chose to DETECT non-JSON message bodies and
+            non-v1 genus and FAIL CLOSED with a clear "not yet supported" surface, rather than silently
+            mis-parse or break (which would violate fail-closed). Refines @h6rk4d and the v1 scope
+            @n2fq6b. Accepted tradeoff: detection/sniff code lands before the corresponding support.
