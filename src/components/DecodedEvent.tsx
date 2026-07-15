@@ -2,11 +2,7 @@ import { useState } from 'react';
 import { annotate } from '../annotate/codes';
 import type { CesrMessage } from '../cesr/types';
 import { AttachmentGroup } from './AttachmentGroup';
-
-/** Render a message-body field value; complex values (arrays/objects) as compact JSON. */
-function renderValue(v: unknown): string {
-  return typeof v === 'string' ? v : JSON.stringify(v);
-}
+import { SadValue } from './SadValue';
 
 /** Renders one decoded message: the signed STATEMENT as the foreground (the ilk with its gloss, and
  * the body fields), with the cryptographic proof band demoted to a collapsed-by-default section
@@ -32,7 +28,9 @@ export function DecodedEvent({ message, bytes }: { message: CesrMessage; bytes: 
           {Object.entries(message.sad).map(([k, v]) => (
             <div key={k} className="field">
               <dt>{k}</dt>
-              <dd>{renderValue(v)}</dd>
+              <dd>
+                <SadValue value={v} />
+              </dd>
             </div>
           ))}
         </dl>

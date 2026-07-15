@@ -19,6 +19,19 @@ describe('App', () => {
     expect(screen.getByText(/interaction/i)).toBeInTheDocument();
   });
 
+  it('cross-references identifiers: selecting one highlights its other occurrences', () => {
+    render(<App />);
+    const sample = readFileSync('src/cesr/__tests__/fixtures/tiny-piped-kel.cesr', 'utf8');
+    fireEvent.change(screen.getByLabelText('CESR stream'), { target: { value: sample } });
+    const aids = screen
+      .getAllByRole('button')
+      .filter((b) => /^[A-Za-z0-9_-]{44}$/.test(b.textContent ?? ''));
+    expect(aids.length).toBeGreaterThan(1); // the controller AID recurs across the icp and ixn bodies
+    fireEvent.click(aids[0]);
+    const highlighted = screen.getAllByRole('button').filter((b) => b.getAttribute('aria-pressed') === 'true');
+    expect(highlighted.length).toBeGreaterThan(1); // every occurrence of the selected value lights up
+  });
+
   it('surfaces a parse error for input that is not a CESR stream', () => {
     render(<App />);
     fireEvent.change(screen.getByLabelText('CESR stream'), { target: { value: 'garbage' } });

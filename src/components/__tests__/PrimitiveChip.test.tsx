@@ -30,8 +30,8 @@ describe('PrimitiveChip', () => {
     expect(screen.getByText('ELXXiPwoaWOV')).toHaveAttribute('aria-label', 'ZZ');
   });
 
-  it('is keyboard-focusable', () => {
+  it('renders as a button, so it is natively keyboard-operable', () => {
     render(<PrimitiveChip node={node()} bytes={bytes} />);
-    expect(screen.getByText('ELXXiPwoaWOV')).toHaveAttribute('tabindex', '0');
+    expect(screen.getByRole('button')).toHaveTextContent('ELXXiPwoaWOV');
   });
 });

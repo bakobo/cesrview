@@ -3,6 +3,7 @@ import { describe, it, expect } from 'vitest';
 import { DecodedEvent } from '../DecodedEvent';
 import type { AttachmentGroup, CesrMessage, Primitive } from '../../cesr/types';
 
+const AID = 'EDP1vHcw_wc4M__Fj53-cJaBnZZASd-aMTaSyWEQ-PC2';
 const bytes = new TextEncoder().encode('AAAA');
 const prim: Primitive = { kind: 'primitive', code: 'A', class: 'indexer', span: { start: 0, end: 4 } };
 const aGroup: AttachmentGroup = { kind: 'group', code: '-A', count: 1, state: 'known', span: { start: 0, end: 4 }, items: [prim] };
@@ -12,19 +13,20 @@ const mk = (over: Partial<CesrMessage> = {}): CesrMessage => ({
   kind: 'JSON',
   ilk: 'icp',
   sn: '0',
-  said: 'EABC',
-  sad: { t: 'icp', d: 'EABC', k: ['DKey1', 'DKey2'] },
+  said: AID,
+  sad: { t: 'icp', s: '0', d: AID, k: [AID] },
   span: { start: 0, end: 10 },
   attachments: [aGroup],
   ...over,
 });
 
 describe('DecodedEvent', () => {
-  it('renders the annotated ilk and the statement fields (including array values)', () => {
+  it('renders the annotated ilk and chips high-entropy statement values', () => {
     render(<DecodedEvent message={mk()} bytes={bytes} />);
     expect(screen.getByText(/inception/i)).toBeInTheDocument(); // the ilk gloss
     expect(screen.getByText('k')).toBeInTheDocument(); // a field key
-    expect(screen.getByText('["DKey1","DKey2"]')).toBeInTheDocument(); // array value rendered
+    expect(screen.getByText('0')).toBeInTheDocument(); // the sn value, as plain text
+    expect(screen.getAllByRole('button', { name: AID }).length).toBeGreaterThan(0); // d and k[] chipped
   });
 
   it('keeps the proof band collapsed by default and expands it on click', () => {
