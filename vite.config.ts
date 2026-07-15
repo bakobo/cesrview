@@ -9,6 +9,9 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: './src/test/setup.ts',
+    // jsdom environment setup alone runs several seconds; under coverage instrumentation a React
+    // render can exceed vitest's 5s default and flake. Give jsdom tests generous headroom.
+    testTimeout: 15000,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html'],
