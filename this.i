@@ -150,8 +150,10 @@ Make CESR legible to developers in the browser = goal:
                     z4pm7k deferred resync (tick 5ygd) and kept the conservative "stop the walk on
                     the first inner framing failure" behaviour. Running the decomposition against the
                     real corpus overturned that: every KEL event wraps its proof in a -V whose inner
-                    content includes a -E (TransIdxSigGroups) compound group the walker does not yet
-                    model, so stopping on the first unmodelled inner group halted the walk at message 1
+                    content includes a -E (FirstSeenReplayCouples) group — and a compound -F
+                    TransIdxSigGroups — the walker does not yet model (this why originally mislabelled
+                    -E as TransIdxSigGroups; corrected per @t6nv4q), so stopping on the first
+                    unmodelled inner group halted the walk at message 1
                     and regressed corpus framing from delta 0 to a single event. A -V that used to be
                     opaque (skipped as count*4 bytes) let the walk continue; DECOMPOSING it must not
                     make the walker less resilient than leaving it opaque.
@@ -168,6 +170,36 @@ Make CESR legible to developers in the browser = goal:
                     and is strengthened; its "stop the walk on inner failure" clause is withdrawn.
                     Modelling -E/-F/-D compound inner groups so decomposition is COMPLETE, not merely
                     resilient, is tracked separately.
+                  children:
+                    Model the compound trans-sig and receipt attachment groups = decision:
+                      id: t6nv4q
+                      why: >
+                        Completed -V decomposition (@z4pm7k) by MODELLING the trans-signature and
+                        receipt attachment groups that make up a KEL's proof, so the typed proof band
+                        (@h5nw2c) shows real endorser sigs and receipts instead of the "unknown" gray
+                        boxes @p3wk7n left behind: -C NonTransReceiptCouples (verfer, cigar), -D
+                        TransReceiptQuadruples (prefixer, seqner, saider, siger), -E FirstSeenReplay
+                        Couples (seqner, dater), -F TransIdxSigGroups (prefixer, seqner, saider plus a
+                        nested -A ControllerIdxSigs group), and -H TransLastIdxSigGroups (prefixer plus
+                        a nested -A group). This required EXTENDING the group-framing grammar with a
+                        nested-GROUP element: a part can now be another attachment group, not only a
+                        primitive, because -F and -H interleave primitives with an inner -A group.
+                        Corrects a code-table error carried in the ~7k4r tick and the @p3wk7n why — per
+                        signify-ts's own table -E is FirstSeenReplayCouples and -F/-H are TransIdxSig
+                        Groups/TransLastIdxSigGroups; the earlier text mislabelled -E as TransIdxSig
+                        Groups. Rejected leaving these as resilient "unknown" children (honest but it
+                        defeats the teaching mission for the 94 -E and 8 -F groups the corpus carries
+                        inside its -V wrappers). Frames each nested group GENERICALLY through the same
+                        frameGroup rather than hard-asserting it is -A as keripy does, because a viewer
+                        should render whatever well-formed group is present, not throw. Correctness is
+                        checked by a byte-alignment invariant — every -V's inner groups must sum
+                        exactly to its count*4 with no unknown child or leftover — plus a keripy oracle
+                        fixture, rather than by re-deriving primitive sizes (which stay delegated to
+                        signify-ts). SadPath sig groups (-J/-K) and -L stay unmodelled and tracked, as
+                        they carry a variable-length path primitive this increment does not tackle.
+                        Accepted tradeoff: the grammar now supports nested-group parts (more framing
+                        surface), and the walker carries a small hand-authored structural table for
+                        these groups until it is upstreamed (@n6wd3k).
 
         Develop the walker in cesrview, upstream once proven = decision:
           id: n6wd3k
