@@ -265,6 +265,27 @@ Make CESR legible to developers in the browser = goal:
                         surface), and the walker carries a small hand-authored structural table for
                         these groups until it is upstreamed (@n6wd3k).
 
+            ParseError carries a stable code and states its permanence = decision:
+              id: n4kr7p
+              why: >
+                The walker's ParseError originally carried only a prose `message` and a byte span,
+                which fails the two load-bearing axes of the Bakobo error-handling standard — a STABLE
+                SYMBOLIC CODE and PERMANENT-vs-TRANSIENT — and the standard names both as findings,
+                most acutely at a LIBRARY boundary, which is exactly what the walker is: a consumer
+                catching WalkResult.errors could otherwise only string-match prose to tell one failure
+                from another. Added a ParseErrorCode union (not-a-message, no-version-string,
+                malformed-body, unparseable-counter, unframable-group) so callers branch on KIND, and
+                permanent: true because the walker is PURE and DETERMINISTIC — the same bytes always
+                fail the same way, so retrying never helps; the standard's "assess, don't assume" holds
+                that deterministic code is permanent by nature and must STATE it rather than imply a
+                pointless retry. The messages stay DEVELOPER-facing complete sentences that name what
+                broke and where; per the standard's two-audiences rule any warm user-facing translation
+                belongs in the UI layer above, not in this bounded module. Rejected leaving errors
+                prose-only (fails the standard, and cost-shifts diagnosis onto every consumer) and
+                adding a transient/retryable variant (the walker performs no I/O, so nothing it does is
+                transient). Refines @d3rk6n's typed-error model and @m4dp7k's output contract. Accepted
+                tradeoff: a code union to keep in step with the error sites.
+
         Develop the walker in cesrview, upstream once proven = decision:
           id: n6wd3k
           why: >
