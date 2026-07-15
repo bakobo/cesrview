@@ -68,7 +68,8 @@ function framePrimitive(bytes: Uint8Array, at: number, part: PrimitivePart): Pri
   const q = td.decode(bytes.subarray(at, at + 128));
   try {
     const prim = part === 'sig' ? new Indexer({ qb64: q }) : new Matter({ qb64: q });
-    return { kind: 'primitive', code: prim.code, span: { start: at, end: at + prim.qb64.length } };
+    const cls = part === 'sig' ? 'indexer' : 'matter';
+    return { kind: 'primitive', code: prim.code, class: cls, span: { start: at, end: at + prim.qb64.length } };
   } catch {
     return null;
   }

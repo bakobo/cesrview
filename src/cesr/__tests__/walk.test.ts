@@ -1,10 +1,12 @@
 import { readFileSync } from 'node:fs';
 import { describe, it, expect } from 'vitest';
 import { walk, parseVersion } from '../walk';
-import type { AttachmentGroup, AttachmentNode } from '../types';
+import type { AttachmentGroup, AttachmentNode, Primitive } from '../types';
 
 /** Narrow an attachment node to a group for nested-item assertions (tests build valid groups). */
 const asGroup = (n: AttachmentNode) => n as AttachmentGroup;
+/** Read the Matter/Indexer class off a primitive node (decision d7km3p). */
+const primClass = (n: AttachmentNode) => (n as Primitive).class;
 
 const SAID = 'ELXXiPwoaWOVOTLMOAmg4IKkjFHFs3q2hsL9tHvuuC2D'; // 44-char Blake3 digest (Matter 'E')
 const SEQNER = '0A' + 'A'.repeat(22); // 24-char Number/Seqner primitive (sn 0)
@@ -277,6 +279,28 @@ describe('walk — compound -F keripy oracle fixture (t6nv4q)', () => {
   });
 });
 
+describe('walk — primitive class discriminator (decision d7km3p)', () => {
+  it('tags a -F group: the prefixer/seqner/saider triple as matter, the nested -A sig as indexer', () => {
+    const stream = bytesOf(mkMessage({ t: 'ixn' }) + '-FAB' + SAID + SEQNER + SAID + A_GROUP);
+    const f = walk(stream).messages[0].attachments[0];
+    expect(f.items.slice(0, 3).map(primClass)).toEqual(['matter', 'matter', 'matter']);
+    const nestedA = asGroup(f.items[3]);
+    expect(primClass(nestedA.items[0])).toBe('indexer');
+  });
+
+  it('tags a -D quadruple as three matter primitives then an indexer siger', () => {
+    const stream = bytesOf(mkMessage({ t: 'ixn' }) + '-DAB' + SAID + SEQNER + SAID + SIG);
+    const d = walk(stream).messages[0].attachments[0];
+    expect(d.items.map(primClass)).toEqual(['matter', 'matter', 'matter', 'indexer']);
+  });
+
+  it('tags a -A controller-sig child as indexer', () => {
+    const stream = bytesOf(mkMessage({ t: 'ixn' }) + A_GROUP);
+    const a = walk(stream).messages[0].attachments[0];
+    expect(primClass(a.items[0])).toBe('indexer');
+  });
+});
+
 describe('walk — synthetic structure', () => {
   it('frames a message with no attachments', () => {
     const { messages, errors, consumed } = walk(bytesOf(mkMessage({ t: 'ixn', s: '1', d: 'E_' })));
@@ -297,9 +321,9 @@ describe('walk — synthetic structure', () => {
     const group = messages[0].attachments[0];
     expect(group).toMatchObject({ kind: 'group', code: '-I', count: 1, state: 'known' });
     expect(group.items).toEqual([
-      { kind: 'primitive', code: 'E', span: expect.any(Object) },
-      { kind: 'primitive', code: '0A', span: expect.any(Object) },
-      { kind: 'primitive', code: 'E', span: expect.any(Object) },
+      { kind: 'primitive', code: 'E', class: 'matter', span: expect.any(Object) },
+      { kind: 'primitive', code: '0A', class: 'matter', span: expect.any(Object) },
+      { kind: 'primitive', code: 'E', class: 'matter', span: expect.any(Object) },
     ]);
   });
 

@@ -20,6 +20,7 @@ export type NodeState =
 export interface Primitive {
   kind: 'primitive';
   code: string;
+  class: 'matter' | 'indexer'; // which signify-ts code table framed it — disambiguates `code` (d7km3p)
   span: ByteSpan;
 }
 
