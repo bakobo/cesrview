@@ -50,10 +50,20 @@ export interface CesrMessage {
   attachments: AttachmentGroup[];
 }
 
-/** A framing failure, with the byte position it occurred at. */
+/** A stable symbolic code for a framing failure — branch on this, not the prose (decision n4kr7p). */
+export type ParseErrorCode =
+  | 'not-a-message' // a message position does not begin with '{'
+  | 'no-version-string' // a '{' with no parseable version string in its leading window
+  | 'malformed-body' // the version size is claimed but the body is not valid JSON
+  | 'unparseable-counter' // a '-' counter code signify-ts cannot parse
+  | 'unframable-group'; // a recognized counter whose group could not be framed
+
+/** A framing failure, with a stable code, the byte position it occurred at, and its permanence. */
 export interface ParseError {
+  code: ParseErrorCode;
   message: string;
   span: ByteSpan;
+  permanent: true; // the walker is pure and deterministic — the same bytes always fail the same way
 }
 
 /** The result of walking a stream: what parsed, what failed, and how far we got. */

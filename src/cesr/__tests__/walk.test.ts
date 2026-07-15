@@ -253,7 +253,7 @@ describe('walk — compound trans-sig and receipt groups (decision t6nv4q)', () 
     const stream = attach('-FAB' + SAID + SEQNER + SAID + '-AAB' + '####'); // bad sig in nested -A
     const { messages, errors } = walk(stream);
     expect(messages[0].attachments[0]).toMatchObject({ code: '-F', state: 'invalid' });
-    expect(errors[0].message).toMatch(/cannot frame counter -F/);
+    expect(errors[0]).toMatchObject({ code: 'unframable-group', permanent: true });
   });
 });
 
@@ -348,12 +348,12 @@ describe('walk — resilience (decision d3rk6n)', () => {
     const { messages, errors, consumed } = walk(bytesOf('garbage'));
     expect(messages).toEqual([]);
     expect(consumed).toBe(0);
-    expect(errors[0].message).toMatch(/expected a message at byte 0/);
+    expect(errors[0]).toMatchObject({ code: 'not-a-message', permanent: true });
   });
 
   it('errors when a { has no version string', () => {
     const { errors } = walk(bytesOf('{"x":1}'));
-    expect(errors[0].message).toMatch(/no version string/);
+    expect(errors[0]).toMatchObject({ code: 'no-version-string', permanent: true });
   });
 
   it('errors on a malformed message body', () => {
@@ -361,7 +361,7 @@ describe('walk — resilience (decision d3rk6n)', () => {
     const stream = bytesOf('{"v":"KERI10JSON000020_"XXXXXXXX');
     const { messages, errors } = walk(stream);
     expect(messages).toEqual([]);
-    expect(errors[0].message).toMatch(/malformed message body/);
+    expect(errors[0]).toMatchObject({ code: 'malformed-body', permanent: true });
   });
 
   it('keeps the message but marks an unrecognized (unframable) counter and stops', () => {
@@ -370,21 +370,21 @@ describe('walk — resilience (decision d3rk6n)', () => {
     const { messages, errors, consumed } = walk(stream);
     expect(messages).toHaveLength(1);
     expect(messages[0].attachments[0]).toMatchObject({ code: '-J', state: 'unknown' });
-    expect(errors[0].message).toMatch(/cannot frame counter -J/);
+    expect(errors[0]).toMatchObject({ code: 'unframable-group', permanent: true });
     expect(consumed).toBeLessThan(stream.length);
   });
 
   it('reports an unparseable counter code', () => {
     const stream = bytesOf(mkMessage({ t: 'ixn' }) + '-ZAB'); // -Z: unsupported code
     const { errors } = walk(stream);
-    expect(errors[0].message).toMatch(/unparseable counter/);
+    expect(errors[0]).toMatchObject({ code: 'unparseable-counter', permanent: true });
   });
 
   it('marks an indexed-sig group invalid when an item is malformed', () => {
     const stream = bytesOf(mkMessage({ t: 'ixn' }) + '-AAB' + '####'); // count 1, garbage item
     const { messages, errors } = walk(stream);
     expect(messages[0].attachments[0]).toMatchObject({ code: '-A', state: 'invalid' });
-    expect(errors[0].message).toMatch(/cannot frame counter -A/);
+    expect(errors[0]).toMatchObject({ code: 'unframable-group', permanent: true });
   });
 
   it('marks a primitive group invalid when a primitive item is malformed', () => {
@@ -394,6 +394,6 @@ describe('walk — resilience (decision d3rk6n)', () => {
     const group = messages[0].attachments[0];
     expect(group).toMatchObject({ code: '-I', state: 'invalid' });
     expect(group.items).toHaveLength(1); // only the first primitive framed
-    expect(errors[0].message).toMatch(/cannot frame counter -I/);
+    expect(errors[0]).toMatchObject({ code: 'unframable-group', permanent: true });
   });
 });

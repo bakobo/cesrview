@@ -152,14 +152,28 @@ function frameGroupSequence(bytes: Uint8Array, start: number, limit: number): Gr
   while (pos < limit && bytes[pos] === DASH) {
     const framed = frameGroup(bytes, pos);
     if (!framed) {
-      return { items, end: pos, error: { message: `unparseable counter at byte ${pos}`, span: { start: pos, end: limit } } };
+      return {
+        items,
+        end: pos,
+        error: {
+          code: 'unparseable-counter',
+          message: `The attachment counter at byte ${pos} is not a recognized CESR code.`,
+          span: { start: pos, end: limit },
+          permanent: true,
+        },
+      };
     }
     items.push(framed.group);
     if (framed.group.state !== 'known') {
       return {
         items,
         end: pos,
-        error: { message: `cannot frame counter ${framed.group.code} at byte ${pos}`, span: { start: pos, end: limit } },
+        error: {
+          code: 'unframable-group',
+          message: `The ${framed.group.code} group at byte ${pos} could not be framed.`,
+          span: { start: pos, end: limit },
+          permanent: true,
+        },
       };
     }
     pos = framed.end;
@@ -176,12 +190,22 @@ export function walk(bytes: Uint8Array): WalkResult {
 
   while (i < n) {
     if (bytes[i] !== OPEN) {
-      errors.push({ message: `expected a message at byte ${i}`, span: { start: i, end: n } });
+      errors.push({
+        code: 'not-a-message',
+        message: `A message must begin with '{', but byte ${i} does not.`,
+        span: { start: i, end: n },
+        permanent: true,
+      });
       break;
     }
     const ver = parseVersion(bytes, i);
     if (!ver) {
-      errors.push({ message: `no version string at byte ${i}`, span: { start: i, end: n } });
+      errors.push({
+        code: 'no-version-string',
+        message: `No version string was found in the message beginning at byte ${i}.`,
+        span: { start: i, end: n },
+        permanent: true,
+      });
       break;
     }
     const bodyEnd = i + ver.size;
@@ -189,7 +213,12 @@ export function walk(bytes: Uint8Array): WalkResult {
     try {
       sad = JSON.parse(td.decode(bytes.subarray(i, bodyEnd)));
     } catch {
-      errors.push({ message: `malformed message body at byte ${i}`, span: { start: i, end: bodyEnd } });
+      errors.push({
+        code: 'malformed-body',
+        message: `The message body at byte ${i} is not valid JSON.`,
+        span: { start: i, end: bodyEnd },
+        permanent: true,
+      });
       break;
     }
 
