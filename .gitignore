@@ -18,3 +18,12 @@ coverage/
 
 # Phase-1 UX working material — quotes specifics from the real (identity-correlating) corpus
 /docs/ux/phase1-strategy.md
+
+# Design bake-off prototypes — embed real corpus data (PII/AIDs), local-only
+/design/
+
+# Adversarial critique output — may quote the real (PII-bearing) corpus
+/reviews/
+
+# Engine spike prototype (informs the TDD engine; not product code)
+/spike/
