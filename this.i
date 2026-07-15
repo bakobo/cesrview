@@ -519,6 +519,32 @@ Make CESR legible to developers in the browser = goal:
             view/toggle — over indexing by AID alone (loses arrival order) or by stream order alone
             (the misleading flat log). Accepted tradeoff: two orderings to render and keep coherent,
             and event-owner attribution must be computed during the parse.
+          children:
+            Model the stream as labelled KEL/TEL logs plus loose messages = decision:
+              id: w3rn6k
+              why: >
+                Realized @k2vx5n as a cesrview-side model (src/model) over the walker's WalkResult, NOT
+                inside the walker, keeping that a generic upstreamable decomposition (@m4dp7k, @n6wd3k).
+                organize() groups every sequenced event into an EventLog by owning AID (the `i` field),
+                ordered by NUMERIC sequence number (sn parsed from hex, so lane order is 9, a, ..., 10
+                and not lexical), and surfaces per-log gaps (missing sn) and duplicities (more than one
+                event at one sn) as @k2vx5n requires. Each log is LABELLED kind KEL or TEL from its
+                event ilks (KEL: icp/rot/ixn/dip/drt; TEL: vcp/vrt/iss/rev/bis/brv) rather than lumped
+                under one uber name — the owner asked for the distinction, and it is reliable because
+                the two ilk sets are disjoint and a log's events are homogeneous. Classifying by ILK
+                (not merely by the presence of i and s) is also what keeps ACDCs out of the logs: an
+                ACDC has a string `s` that is a SCHEMA SAID, not a sequence number (verified in the
+                corpus), so a naive i+s test would misfile it as a log event — only a message whose `t`
+                is a known KEL/TEL ilk becomes a log event. Everything else (rpy, exn, ACDC bodies,
+                receipts) is a LOOSE message retained in STREAM order — the owner's choice over
+                cross-referencing loose replies to a subject AID, which is deferred. Delegation is
+                surfaced as an edge: a log's delegator is the `di` on its inception event, or null.
+                Stream order is preserved via a streamIndex on every event and loose message, so both
+                the by-owner and stream-order views (@k2vx5n) are reconstructable without duplicating
+                the message list. Rejected putting this in the walker (KERI/TEL semantics do not belong
+                in the generic framer) and an uber EventLog with no kind label (loses the KEL/TEL
+                distinction). Accepted tradeoff: the model hard-codes the v1 KEL/TEL ilk vocabulary,
+                which lives in cesrview until any of it is needed upstream.
 
         First-class failure, empty and loading states = decision:
           id: r7cm3b
