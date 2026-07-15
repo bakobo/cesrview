@@ -79,6 +79,31 @@ Make CESR legible to developers in the browser = goal:
                 integration time, not assumed). Keyboard and screen-reader access are in from the first
                 component, not bolted on (@f6tk4p). Accepted tradeoff: a viewer-context seam through the
                 component tree, and a placeholder chip later swapped for the entviz pill.
+              children:
+                Cross-ref via an optional selection context and a high-entropy value chip = decision:
+                  id: c7vn4k
+                  why: >
+                    Implements the viewer-context cross-referencing @b4wnk7 / @c5nzr4 describe, in its
+                    value-equality form (@v7kd3m's fingerprint arrives with entviz later). A ValueChip
+                    renders any high-entropy value as a selectable control; a thin, OPTIONAL CesrView
+                    context holds the single SELECTED value; and a useCrossRef(value) hook lights every
+                    chip whose value equals the selection — so selecting one identifier highlights ALL
+                    its occurrences (@c5nzr4 layers 1-2: passive sameness plus active highlight), across
+                    the message body and the attachments alike. The context is OPTIONAL: with no
+                    provider useCrossRef is a no-op, so a single chip still renders standalone (@r4vkp7
+                    / @b4wnk7). "High-entropy" is a base64url string of 44 or more characters (AIDs,
+                    digests and keys are 44, signatures 88), which excludes thresholds (1/3), ilks and
+                    sequence numbers — matching @v7kd3m's "all high-entropy values, not AIDs only"
+                    without cross-referencing noise. Body field values render through a recursive
+                    SadValue that chips high-entropy strings (and array elements, such as the key list)
+                    while leaving small values as plain text. Chose value-equality over building an
+                    occurrence index now (the index — for counts, next/prev and jump-to-establishment —
+                    is a later increment) and over field-key-based detection (brittle; the entropy of
+                    the value is the real signal). Deferred: the gutter reference marks (@c5nzr4 layer
+                    3, needs the source pane), find-all-references navigation, and the entviz
+                    fingerprint/colour (@g4mp2w, entviz still settling). Accepted tradeoff: highlight is
+                    O(chips) per selection with no occurrence count, and the predicate is a heuristic
+                    tunable as real streams exercise it.
 
     In-browser TS stream-walker, upstreamed; keripy as oracle = decision:
       id: h6rk4d
