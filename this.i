@@ -145,3 +145,83 @@ Make CESR legible to developers in the browser = goal:
             (showType=false). Accepted tradeoff: an external UI dependency (@entviz/react, peer
             React >=17, only transitive dep @noble/hashes, themeable via --entviz-pill-* vars) whose
             release cadence we track; justified because it is maintained in-house (bakobo/dhh1128).
+
+        IDE inspector is the chosen view direction = decision:
+          id: m3xq7c
+          why: >
+            Chose the IDE-inspector direction over the two bake-off alternatives (a scaled-up-jwt.io
+            editorial document and a relationship-canvas). Eliminated the canvas because it cannot
+            scale to the hundreds of events real KELs contain and, worse, it dissolves sequence
+            order, which is semantically load-bearing in KERI (the ordered event log IS the key
+            history). Eliminated the editorial document because the confirmed expert user (@q7m4rp)
+            wants density and tooling, not beautiful typesetting. Kept the canvas's one unique virtue
+            — revealing links between identifiers — by importing it into the IDE view as
+            cross-referencing (@c5nzr4) rather than a spatial map. Accepted tradeoff: the IDE view is
+            less immediately approachable to a non-developer than the document direction was.
+
+        Dual-pane source and decoded, CodeMirror + React = decision:
+          id: p6hw4k
+          why: >
+            The decoded view needs rich interactive React (entviz pills, collapsible
+            statement-over-proof, cross-ref affordances), while raw-text tooling (line numbers,
+            search-highlight-all, copy, print, keyboard nav) is exactly what a code editor gives for
+            free. Chose a jwt.io-style two-pane split — raw CESR in a READ-ONLY CodeMirror 6 editor on
+            one side, our React decoded tree on the other, selection synced both ways — over (a)
+            rendering everything in an embedded editor like Monaco (its text model cannot host React
+            components, heavier bundle, IntelliSense is dead weight for read-only CESR) and (b) a
+            single decoded pane where we reimplement editor tooling ourselves. The selection sync
+            between the text and decoded domains is itself the teaching moment. Accepted tradeoff: two
+            panes, a CodeMirror 6 dependency, and the cost of keeping the panes in sync.
+
+        Three-layer identifier cross-referencing = decision:
+          id: c5nzr4
+          why: >
+            Real streams reference ~80 identifiers that cross-link across distant events; a viewer
+            that prettifies each event in isolation loses this. Chose a three-layer solution over any
+            single mechanism: (1) PASSIVE — every occurrence of the same identifier carries the same
+            deterministic entviz fingerprint AND accent colour, so correlation is always-on and needs
+            no interaction (scales to hundreds of events with zero clutter); (2) ACTIVE — selecting an
+            identifier highlights all its occurrences and offers jump-to-establishment and next/prev,
+            the IDE "find all references" pattern; (3) GUTTER reference marks showing forward/back
+            references without drawing a full graph. Separately adopt rainbow-matched delimiters for
+            counter-group / JSON nesting legibility. Rejected the canvas's drawn-line web (doesn't
+            scale, breaks sequence). Accepted tradeoff: more rendering machinery than a plain tree,
+            and a dependency on per-identifier colour support in entviz (@g4mp2w).
+
+        Extend entviz for per-identifier colour, upstreamed = decision:
+          id: g4mp2w
+          why: >
+            The passive cross-ref layer (@c5nzr4) needs each identifier pill to carry a deterministic
+            per-identifier background/accent colour, which the published @entviz/react may not yet
+            expose. Chose to EXTEND the entviz React component and contribute the change upstream,
+            rather than wrap or fork it locally, because cesrview is entviz's first real-world consumer
+            and that feedback loop is how entviz matures — and entviz is maintained in-house
+            (bakobo/dhh1128), so upstreaming is low-friction. Refines @g2hd6n. Accepted tradeoff:
+            cesrview's identifier rendering is coupled to landing an entviz enhancement rather than
+            shipping purely against today's published API.
+
+        Compact layout, bottom annotation dock, desktop-first responsive = decision:
+          id: t2vd6m
+          why: >
+            Values in a CESR stream are mostly small (integers, a single AID), so a permanent wide
+            centre panel wastes space, and the dual-pane (@p6hw4k) already claims horizontal room.
+            Chose a compact, left-weighted layout — left rail (outline + identifier index as entviz
+            PILLS, not large glyphs) · the two panes · a BOTTOM annotation dock — over a permanent
+            multi-column right rail. The dock is visible by default (annotations are the teaching
+            mission, not an opt-in) but collapsible, and sits below rather than stealing pane width,
+            matching DevTools muscle memory. The layout collapses to a single column with rails-as-
+            drawers on narrow screens: responsive and graceful, but DESKTOP-FIRST, because CESR
+            developers work on desktops. Rejected annotation-off-by-default and mobile-first. Accepted
+            tradeoff: mobile works but is not optimised in v1.
+
+        IDE affordances (line numbers, search, menus, hexdump) = decision:
+          id: f7kb3q
+          why: >
+            To meet the expert user (@q7m4rp) on familiar ground, cesrview adopts IDE affordances the
+            bake-off prototypes lacked: line numbers (in the source pane), stream-wide search with
+            all-occurrence highlighting, right-click CONTEXT MENUS (copy value / copy binary / copy
+            path / find references / open-in-spec) as a primary interaction rather than an afterthought,
+            and a proper HEXDUMP (offset · hex · ASCII) for the binary-domain reveal (@j4wc5h) instead
+            of raw bytes. The whole view is themeable LIGHT and DARK via CSS variables aligned with
+            entviz's --entviz-pill-* vars. Accepted tradeoff: more interaction surface to build and
+            test than a read-only tree.
