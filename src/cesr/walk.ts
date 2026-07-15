@@ -50,6 +50,13 @@ interface FramedGroup {
   end: number; // byte offset just past the group (only meaningful when state === 'known')
 }
 
+/** The outcome of framing a run of attachment groups over a byte window. */
+interface GroupSequence {
+  items: AttachmentGroup[];
+  end: number; // where framing stopped
+  error?: ParseError; // set when framing halted on a group it could not frame
+}
+
 /** Frame one primitive of the given part kind at `at`, delegating sizing to signify-ts. */
 function framePrimitive(bytes: Uint8Array, at: number, part: Part): Primitive | null {
   const q = td.decode(bytes.subarray(at, at + 128));
@@ -75,15 +82,30 @@ function frameGroup(bytes: Uint8Array, at: number): FramedGroup | null {
   const spec = GROUP_SPEC[code];
 
   if (!spec) {
-    // a recognized counter whose framing we do not yet model
+    // ~7k4r — a recognized counter (e.g. -E TransIdxSigGroups) whose inner framing we do not yet
+    // model: framed structurally as far as its header, marked unknown (decision d3rk6n).
     const end = at + headerLen;
     return { group: { ...base, span: { start: at, end }, state: 'unknown', items: [] }, end };
   }
 
   if (spec.quadlet) {
-    // opaque for now: the byte length is count*4; inner decomposition is a later increment
-    const end = at + headerLen + count * 4;
-    return { group: { ...base, span: { start: at, end }, state: 'known', items: [] }, end };
+    // A material-quadlet wrapper self-declares its size as count*4, so it is always framed; only
+    // its inner content varies in how (or whether) we decompose it.
+    const innerStart = at + headerLen;
+    const innerEnd = innerStart + count * 4;
+    if (code === '-L') {
+      // ~3cep — -L (PathedMaterialQuadlets) leads with a path primitive, not a plain group run;
+      // its inner decomposition is deferred, so the quadlet body stays opaque for now.
+      return { group: { ...base, span: { start: at, end: innerEnd }, state: 'known', items: [] }, end: innerEnd };
+    }
+    // -V / -0V universal wrappers: recurse into a typed nested group sequence (decision z4pm7k).
+    // The wrapper's size is self-declaring (count*4), so it is a RESILIENCE BOUNDARY (tension
+    // p3wk7n): inner decomposition proceeds as far as it can, an inner limit stops decomposing THIS
+    // wrapper without condemning it, and framing resumes at innerEnd — so decomposing a wrapper is
+    // never less resilient than leaving it opaque. The undecoded groups are simply absent (or a
+    // recognised-but-unmodelled counter is left as an "unknown" child) among the wrapper's items.
+    const seq = frameGroupSequence(bytes, innerStart, innerEnd);
+    return { group: { ...base, span: { start: at, end: innerEnd }, state: 'known', items: seq.items }, end: innerEnd };
   }
 
   const parts = spec.parts as Part[];
@@ -101,6 +123,30 @@ function frameGroup(bytes: Uint8Array, at: number): FramedGroup | null {
     }
   }
   return { group: { ...base, span: { start: at, end: p }, state: 'known', items }, end: p };
+}
+
+/** Frame a run of attachment groups over [start, limit). Stops at `limit`, at the first byte that
+ * is not a counter, or at the first group it cannot frame (recording a typed error). Shared by the
+ * top-level attachment loop and the -V/-0V wrapper recursion, so both frame identically (z4pm7k). */
+function frameGroupSequence(bytes: Uint8Array, start: number, limit: number): GroupSequence {
+  const items: AttachmentGroup[] = [];
+  let pos = start;
+  while (pos < limit && bytes[pos] === DASH) {
+    const framed = frameGroup(bytes, pos);
+    if (!framed) {
+      return { items, end: pos, error: { message: `unparseable counter at byte ${pos}`, span: { start: pos, end: limit } } };
+    }
+    items.push(framed.group);
+    if (framed.group.state !== 'known') {
+      return {
+        items,
+        end: pos,
+        error: { message: `cannot frame counter ${framed.group.code} at byte ${pos}`, span: { start: pos, end: limit } },
+      };
+    }
+    pos = framed.end;
+  }
+  return { items, end: pos };
 }
 
 /** Walk a CESR stream into a provenance-carrying decomposition. */
@@ -129,28 +175,7 @@ export function walk(bytes: Uint8Array): WalkResult {
       break;
     }
 
-    const attachments: AttachmentGroup[] = [];
-    let j = bodyEnd;
-    let stopped = false;
-    while (j < n && bytes[j] === DASH) {
-      const framed = frameGroup(bytes, j);
-      if (!framed) {
-        errors.push({ message: `unparseable counter at byte ${j}`, span: { start: j, end: n } });
-        stopped = true;
-        break;
-      }
-      attachments.push(framed.group);
-      if (framed.group.state !== 'known') {
-        errors.push({
-          message: `cannot frame counter ${framed.group.code} at byte ${j}`,
-          span: { start: j, end: n },
-        });
-        stopped = true;
-        break;
-      }
-      j = framed.end;
-    }
-
+    const seq = frameGroupSequence(bytes, bodyEnd, n);
     messages.push({
       proto: ver.proto,
       version: ver.version,
@@ -160,11 +185,17 @@ export function walk(bytes: Uint8Array): WalkResult {
       said: typeof sad.d === 'string' ? sad.d : null,
       sad,
       span: { start: i, end: bodyEnd },
-      attachments,
+      attachments: seq.items,
     });
 
-    i = j;
-    if (stopped) break;
+    i = seq.end;
+    if (seq.error) {
+      // A top-level group we cannot frame has no enclosing wrapper size to resync from, so the walk
+      // halts here (tension p3wk7n: only size-known wrappers are resilience boundaries). A wrong
+      // wrapper count*4 also surfaces here, by desynchronising the next message boundary.
+      errors.push(seq.error);
+      break;
+    }
   }
 
   return { messages, errors, consumed: i };
