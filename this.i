@@ -645,6 +645,28 @@ Make CESR legible to developers in the browser = goal:
             (a selectedSpan on the CesrView context) follow. Accepted tradeoff: we hand-roll the pane
             and defer search and (initially) virtualization instead of inheriting CM6's.
 
+        Decoded view is primary; the source pane is a collapsed secondary panel = tension:
+          id: m7kv3n
+          why: >
+            @p6hw4k / @p4rz6b / @t2vd6m framed the source and decoded panes as CO-EQUAL halves of a
+            dual pane. In use the owner found the two largely REDUNDANT, with the decoded tree
+            significantly more useful than the pretty-printed source — a co-equal split wastes the most
+            valuable horizontal space and doubles the initial render (a real cost: a large paste froze
+            the UI ~15s). Separately the owner found the layout never went vertical on narrow viewports
+            despite @t2vd6m promising desktop-first RESPONSIVE.
+          resolution: >
+            The DECODED tree is the primary, always-visible centre panel; the SOURCE pane is demoted to
+            a secondary panel COLLAPSED BY DEFAULT (a toggle reveals it) and rendered LAZILY — only when
+            opened — so the pretty-print and its lines are neither computed nor mounted on first paint.
+            Dual-pane and the pretty-printed, provenance-carrying source still STAND (@p6hw4k / @p4rz6b
+            / @s5kn7w hold, and 3b's selection sync will light the source up) — it is simply one toggle
+            away, not co-equal. Also delivers @t2vd6m's stated-but-missing responsive behaviour: the
+            columns stack to a single vertical column on narrow (mobile) viewports. The KEL sequence is
+            NEVER grouped or hidden — the outline stays in STREAM ORDER (the arrival sequence is
+            load-bearing, @m3xq7c / @k2vx5n); it is only ENRICHED with a per-event owning-identifier
+            glyph and an explicit hex sn label so interleaved per-identifier sequences read correctly.
+            Accepted tradeoff: the source is one interaction away instead of always present.
+
         Proof band is typed per message type = tension:
           id: h5nw2c
           why: >
