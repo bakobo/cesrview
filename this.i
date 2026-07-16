@@ -129,6 +129,37 @@ Make CESR legible to developers in the browser = goal:
                     Accepted tradeoff: a hand-authored design system and a stand-in glyph to swap out
                     when entviz lands.
 
+                Adopt entviz pills in corpus posture; replace the stand-in glyph = decision:
+                  id: e5vk7n
+                  why: >
+                    The hand-rolled fingerprint glyph plus colour bucket (@d4nk7v's stand-in for
+                    @g2hd6n / @g4mp2w) was always temporary, and it did the very thing the entviz
+                    security model forbids: it invited a same-glyph-or-colour ⇒ same-value EQUALITY
+                    judgement by eye (the @v7kd3m failure). entviz has settled, so cesrview now CONSUMES
+                    @entviz/react's <EntvizPill> and <Entviz>, driven by @entviz/core's characterize()
+                    and render(): the pill identifies each value's encoding / scheme / ROLE (key,
+                    signature, digest, address, identifier) from a structured characterization —
+                    replacing the crude roleOfPrimitive guess — and renders the certified comparable
+                    diagram. A pasted CESR stream is a single-origin CORPUS (entviz's own example is "a
+                    KERI KEL from the user's own machine"), so every stream pill references one shared
+                    TrustAssumption { posture: "corpus", mnemonic, icon, autoColor }, enabling the
+                    recognition aids — a short mnemonic that keeps a scannable value form visible, a
+                    colourbar icon, and an auto-colour tint — that make RECURRENCE scannable: the sound
+                    form of the passive cross-reference @c5nzr4 wanted. Cross-reference SELECTION drives
+                    the pill's host-controlled `highlight` from actual value equality (not eyeballing);
+                    true cross-origin verification routes through entviz's compare flow (<EntvizCompare>
+                    / <EntvizWalk>), the honest home for "are these the same?" that @b6zx2d demands.
+                    Resolves @g4mp2w by CONSUMPTION rather than extension — entviz already provides
+                    per-value colour/shape recognition in corpus posture, so cesrview neither forks nor
+                    extends it (and any gap found is raised as a PR against entviz-js, maintained
+                    in-house). Deletes the stand-in Fingerprint / fingerprint modules; Vite and Vitest
+                    consume entviz's raw-TypeScript packages with no bundler config (verified). Refines
+                    @v7kd3m (recognition is not verification, enforced by the posture gate) and @g2hd6n.
+                    Accepted tradeoff: two runtime dependencies (@entviz/react + @entviz/core, whose only
+                    dep is the audited @noble/hashes) and coupling the pill UI to entviz's release
+                    cadence — justified because entviz is maintained in-house and is the whole point of
+                    the identifier-legibility design.
+
     In-browser TS stream-walker, upstreamed; keripy as oracle = decision:
       id: h6rk4d
       stage-status: planned
