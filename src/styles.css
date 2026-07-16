@@ -120,7 +120,9 @@ body {
 /* shell: header · input · [rail | decoded centre | collapsible source] · dock */
 .cesr-main { display: grid; grid-template-areas: 'rail center source' 'dock dock dock'; grid-template-columns: 240px minmax(0, 1fr) auto; grid-template-rows: minmax(0, 1fr) auto; min-height: 0; overflow: hidden; }
 .cesr-main.source-open { grid-template-columns: 240px minmax(0, 1fr) minmax(320px, 0.75fr); }
-.cesr-center { grid-area: center; min-height: 0; overflow: auto; padding: 18px 20px 60px; }
+.cesr-center { grid-area: center; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+.cesr-eventlist { flex: 1; overflow: auto; padding: 18px 20px 60px; }
+.list-more { color: var(--faint); font-size: 12px; text-align: center; padding: 14px; }
 .decoding { color: var(--acc2); font-size: 11px; font-family: var(--mono); flex: none; visibility: hidden; }
 .cesr-app[aria-busy='true'] .decoding { visibility: visible; }
 

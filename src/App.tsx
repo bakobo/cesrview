@@ -6,6 +6,7 @@ import { collapseRuns } from './model/collapse';
 import { AnnotationDock } from './components/AnnotationDock';
 import { CesrViewProvider } from './components/CesrView';
 import { DecodedEvent } from './components/DecodedEvent';
+import { EventList } from './components/EventList';
 import { Header } from './components/Header';
 import { LeftRail } from './components/LeftRail';
 import { RunCard } from './components/RunCard';
@@ -48,16 +49,19 @@ export default function App() {
           <div className={`cesr-main${sourceOpen ? ' source-open' : ''}`}>
             <LeftRail messages={result.messages} logs={model.logs} onGo={goto} />
             <div className="cesr-center">
-              {collapseRuns(result.messages).map((item, k) =>
-                item.kind === 'event' ? (
-                  <div key={k} id={`event-${item.index}`}>
-                    <DecodedEvent message={item.message} bytes={bytes} />
-                  </div>
-                ) : (
-                  <RunCard key={k} messages={item.messages} start={item.start} bytes={bytes} />
-                ),
-              )}
               {result.errors.length > 0 ? <p role="alert">{result.errors[0].message}</p> : null}
+              <EventList
+                items={collapseRuns(result.messages)}
+                renderItem={(item, k) =>
+                  item.kind === 'event' ? (
+                    <div key={k} id={`event-${item.index}`}>
+                      <DecodedEvent message={item.message} bytes={bytes} />
+                    </div>
+                  ) : (
+                    <RunCard key={k} messages={item.messages} start={item.start} bytes={bytes} />
+                  )
+                }
+              />
             </div>
             <aside className="cesr-source-panel">
               <button className="source-toggle" aria-expanded={sourceOpen} onClick={() => setSourceOpen((o) => !o)}>
