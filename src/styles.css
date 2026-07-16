@@ -110,6 +110,13 @@ body {
 
 .cesr-undecoded { color: var(--faint); font-family: var(--mono); font-size: 12px; padding: 12px 16px; }
 
+/* collapsed run of interaction events */
+.cesr-run { margin-bottom: 16px; }
+.run-toggle { width: 100%; text-align: left; display: flex; align-items: center; gap: 13px; padding: 13px 16px; border: 1px dashed var(--line); border-radius: 12px; background: #0c111b; color: var(--dim); cursor: pointer; font-family: var(--ui); font-size: 12px; }
+.run-toggle:hover { border-color: var(--acc2); color: var(--ink); }
+.run-count { font-family: var(--mono); font-size: 15px; color: var(--key); }
+.run-expand { margin-left: auto; font-family: var(--mono); color: var(--acc2); font-size: 11px; }
+
 /* shell: header · input · [rail | decoded centre | collapsible source] · dock */
 .cesr-main { display: grid; grid-template-areas: 'rail center source' 'dock dock dock'; grid-template-columns: 240px minmax(0, 1fr) auto; grid-template-rows: minmax(0, 1fr) auto; min-height: 0; overflow: hidden; }
 .cesr-main.source-open { grid-template-columns: 240px minmax(0, 1fr) minmax(320px, 0.75fr); }

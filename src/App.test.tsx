@@ -21,6 +21,15 @@ describe('App', () => {
     expect(screen.getAllByText(/interaction/i).length).toBeGreaterThan(0);
   });
 
+  it('collapses a run of interaction events into one expandable card', () => {
+    render(<App />);
+    const runSample = readFileSync('src/cesr/__tests__/fixtures/tiny-run-kel.cesr', 'utf8');
+    fireEvent.change(screen.getByLabelText('CESR stream'), { target: { value: runSample } });
+    expect(screen.getAllByRole('article')).toHaveLength(1); // only the icp card; the 4 ixn are collapsed
+    fireEvent.click(screen.getByRole('button', { name: /interaction events/i }));
+    expect(screen.getAllByRole('article')).toHaveLength(5); // icp + 4 expanded ixn, in place
+  });
+
   it('keeps the source pane collapsed by default and reveals it on toggle', () => {
     render(<App />);
     paste();

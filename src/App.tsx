@@ -2,11 +2,13 @@ import { useDeferredValue, useState } from 'react';
 import { walk } from './cesr/walk';
 import { prettyPrint } from './cesr/prettyprint';
 import { organize } from './model/stream';
+import { collapseRuns } from './model/collapse';
 import { AnnotationDock } from './components/AnnotationDock';
 import { CesrViewProvider } from './components/CesrView';
 import { DecodedEvent } from './components/DecodedEvent';
 import { Header } from './components/Header';
 import { LeftRail } from './components/LeftRail';
+import { RunCard } from './components/RunCard';
 import { SourcePane } from './components/SourcePane';
 
 const encoder = new TextEncoder();
@@ -46,11 +48,15 @@ export default function App() {
           <div className={`cesr-main${sourceOpen ? ' source-open' : ''}`}>
             <LeftRail messages={result.messages} logs={model.logs} onGo={goto} />
             <div className="cesr-center">
-              {result.messages.map((m, k) => (
-                <div key={k} id={`event-${k}`}>
-                  <DecodedEvent message={m} bytes={bytes} />
-                </div>
-              ))}
+              {collapseRuns(result.messages).map((item, k) =>
+                item.kind === 'event' ? (
+                  <div key={k} id={`event-${item.index}`}>
+                    <DecodedEvent message={item.message} bytes={bytes} />
+                  </div>
+                ) : (
+                  <RunCard key={k} messages={item.messages} start={item.start} bytes={bytes} />
+                ),
+              )}
               {result.errors.length > 0 ? <p role="alert">{result.errors[0].message}</p> : null}
             </div>
             <aside className="cesr-source-panel">
