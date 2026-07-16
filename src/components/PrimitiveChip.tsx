@@ -11,5 +11,13 @@ export function PrimitiveChip({ node, bytes }: { node: Primitive; bytes: Uint8Ar
   const value = td.decode(bytes.subarray(node.span.start, node.span.end));
   const ann = annotate(node.class, node.code);
   const label = ann ? `${node.code}: ${ann.gloss}` : node.code;
-  return <ValueChip value={value} label={label} code={node.code} role={roleOfPrimitive(node.code, node.class)} />;
+  return (
+    <ValueChip
+      value={value}
+      label={label}
+      code={node.code}
+      role={roleOfPrimitive(node.code, node.class)}
+      annotation={{ category: node.class, code: node.code }}
+    />
+  );
 }

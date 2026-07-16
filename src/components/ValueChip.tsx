@@ -1,13 +1,31 @@
-import { useCrossRef } from './CesrView';
+import type { CodeCategory } from '../annotate/codes';
+import { useAnnotationFocus, useCrossRef } from './CesrView';
 import { Fingerprint } from './Fingerprint';
 import { colorBucket, shorten } from './fingerprint';
 
 /** A high-entropy value rendered as an entviz-style pill: a deterministic fingerprint glyph (the
  * primary identity cue, v7kd3m), the shortened value, and an optional role, in a CVD-safe colour
- * bucket. Selecting it highlights every pill in the same CesrView with an equal value (c7vn4k).
- * The glyph is a stand-in until the enhanced entviz pill lands (~2o7m). */
-export function ValueChip({ value, label, role, code }: { value: string; label?: string; role?: string; code?: string }) {
+ * bucket. Clicking it highlights every equal-valued pill (cross-ref, c7vn4k) AND sends its code or
+ * value to the annotation dock (b4wnk7). The glyph is a stand-in until entviz settles (~2o7m). */
+export function ValueChip({
+  value,
+  label,
+  role,
+  code,
+  annotation,
+}: {
+  value: string;
+  label?: string;
+  role?: string;
+  code?: string;
+  annotation?: { category: CodeCategory; code: string };
+}) {
   const { isSelected, select } = useCrossRef(value);
+  const { focus } = useAnnotationFocus();
+  const onClick = () => {
+    select();
+    focus(annotation ? { kind: 'code', ...annotation, value } : { kind: 'value', value });
+  };
   return (
     <button
       type="button"
@@ -19,7 +37,7 @@ export function ValueChip({ value, label, role, code }: { value: string; label?:
       aria-label={label ?? value}
       aria-pressed={isSelected}
       title={value}
-      onClick={select}
+      onClick={onClick}
     >
       <Fingerprint value={value} />
       <span className="pill-val">{shorten(value)}</span>

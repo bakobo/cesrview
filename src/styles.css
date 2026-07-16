@@ -66,7 +66,7 @@ body {
 /* event card */
 .cesr-event { margin-bottom: 16px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: linear-gradient(180deg, #0f1622, #0d131e); box-shadow: 0 1px 0 #ffffff06 inset, 0 8px 30px #00000030; }
 .ev-head { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid var(--line); background: #0e1522; flex-wrap: wrap; }
-.ev-ilk { font-family: var(--mono); font-weight: 700; font-size: 12px; padding: 3px 9px; border-radius: 6px; border: 1px solid var(--line); color: var(--dim); }
+.ev-ilk { font-family: var(--mono); font-weight: 700; font-size: 12px; padding: 3px 9px; border-radius: 6px; border: 1px solid var(--line); color: var(--dim); background: #0e1522; cursor: pointer; }
 .ev-ilk.ilk-icp { color: var(--acc); border-color: #20402f; } .ev-ilk.ilk-rot { color: var(--key); border-color: #42311c; }
 .ev-ilk.ilk-dip { color: var(--id); border-color: #382a4a; } .ev-ilk.ilk-drt { color: var(--id); border-color: #382a4a; }
 .ev-ilk.ilk-rpy { color: var(--dig); border-color: #1d3350; } .ev-ilk.ilk-vcp, .ev-ilk.ilk-iss { color: var(--acc2); border-color: #1b3a37; }
@@ -109,6 +109,34 @@ body {
 .cesr-group-items { display: flex; flex-wrap: wrap; gap: 5px; padding: 6px 0 2px; }
 
 .cesr-undecoded { color: var(--faint); font-family: var(--mono); font-size: 12px; padding: 12px 16px; }
+
+/* 4-region shell: header · [rail | center] · dock */
+.cesr-main { display: grid; grid-template-areas: 'rail center' 'dock dock'; grid-template-columns: 240px minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; min-height: 0; overflow: hidden; }
+.cesr-center { grid-area: center; min-height: 0; overflow: hidden; display: grid; grid-template-rows: minmax(0, 1fr) auto; }
+
+/* left rail */
+.cesr-rail { grid-area: rail; overflow: auto; border-right: 1px solid var(--line); background: var(--panel2); padding: 14px 0; }
+.cesr-rail section { margin-bottom: 20px; }
+.rail-h { margin: 0; padding: 0 16px 8px; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--faint); font-weight: 700; }
+.rail-outline { list-style: none; margin: 0; padding: 0; }
+.toc-item { width: 100%; text-align: left; background: none; border: 0; border-left: 2px solid transparent; padding: 5px 16px; display: flex; gap: 9px; align-items: baseline; cursor: pointer; color: var(--dim); font-family: var(--ui); font-size: 12px; }
+.toc-item:hover { background: #0f1826; color: var(--ink); border-left-color: var(--acc); }
+.toc-item .seq { font-family: var(--mono); font-size: 11px; color: var(--faint); min-width: 20px; }
+.toc-item .ilk { font-family: var(--mono); font-weight: 500; }
+.ilk.ilk-icp { color: var(--acc); } .ilk.ilk-rot { color: var(--key); } .ilk.ilk-ixn { color: var(--dim); }
+.ilk.ilk-dip, .ilk.ilk-drt { color: var(--id); } .ilk.ilk-rpy { color: var(--dig); } .ilk.ilk-vcp, .ilk.ilk-iss { color: var(--acc2); }
+.rail-ids { display: flex; flex-direction: column; gap: 6px; padding: 0 12px; align-items: flex-start; }
+
+/* bottom annotation dock */
+.cesr-dock { grid-area: dock; border-top: 1px solid var(--line); background: linear-gradient(180deg, #0d1420, #0b0f18); padding: 12px 18px; min-height: 92px; max-height: 220px; overflow: auto; }
+.cesr-dock .dock-empty { color: var(--faint); font-size: 12px; margin: 0; }
+.dock-title { font-size: 15px; color: var(--acc2); }
+.dock-kind { font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--faint); margin: 3px 0 10px; }
+.dock-gloss { line-height: 1.6; color: var(--ink); font-size: 12.5px; margin: 0; max-width: 78ch; }
+.dock-gloss.dim { color: var(--dim); }
+.dock-value { font-family: var(--mono); font-size: 11px; color: var(--dim); background: #0a0f18; border: 1px solid var(--line); border-radius: 8px; padding: 8px; margin-top: 10px; word-break: break-all; max-width: 78ch; }
+.dock-spec { display: inline-flex; gap: 6px; align-items: center; margin-top: 12px; font-size: 12px; color: var(--acc); text-decoration: none; border-bottom: 1px dashed #2a4a30; padding-bottom: 1px; }
+.dock-spec:hover { color: var(--acc2); }
 
 /* gallery */
 .cesr-gallery { padding: 24px 30px 60px; }

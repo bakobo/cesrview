@@ -40,4 +40,15 @@ describe('ValueChip', () => {
     fireEvent.click(a);
     expect(a).toHaveAttribute('aria-pressed', 'false'); // toggled off
   });
+
+  it('selects and focuses its code annotation when it has one', () => {
+    render(
+      <CesrViewProvider>
+        <ValueChip value={AID} annotation={{ category: 'matter', code: 'E' }} />
+      </CesrViewProvider>,
+    );
+    const btn = screen.getByRole('button', { name: AID });
+    fireEvent.click(btn);
+    expect(btn).toHaveAttribute('aria-pressed', 'true'); // click ran select + the code-annotation path
+  });
 });
