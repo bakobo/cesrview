@@ -22,11 +22,12 @@ const mk = (over: Partial<CesrMessage> = {}): CesrMessage => ({
 
 describe('DecodedEvent', () => {
   it('renders the annotated ilk and chips high-entropy statement values', () => {
-    render(<DecodedEvent message={mk()} bytes={bytes} />);
+    const { container } = render(<DecodedEvent message={mk()} bytes={bytes} />);
     expect(screen.getByText(/inception/i)).toBeInTheDocument(); // the ilk gloss
     expect(screen.getByText('k')).toBeInTheDocument(); // a field key
     expect(screen.getByText('0')).toBeInTheDocument(); // the sn value, as plain text
-    expect(screen.getAllByRole('button', { name: AID }).length).toBeGreaterThan(0); // d and k[] chipped
+    // the SAID, the d field and the k[] element are each an AID StreamPill (value on the wrapper)
+    expect(container.querySelectorAll(`.cesr-pill[data-value="${AID}"]`).length).toBeGreaterThan(1);
   });
 
   it('keeps the proof band collapsed by default and expands it on click', () => {

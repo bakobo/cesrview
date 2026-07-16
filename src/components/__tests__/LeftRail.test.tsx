@@ -23,17 +23,19 @@ describe('LeftRail', () => {
     fireEvent.click(screen.getByRole('button', { name: /event 0: icp, sn 0/i }));
     expect(onGo).toHaveBeenCalledWith(0);
     expect(screen.getByText('sn a')).toBeInTheDocument(); // the second event's hex sn, prefixed
-    expect(container.querySelectorAll('.owner .cesr-fp').length).toBe(2); // an owner glyph per event
+    expect(container.querySelectorAll('.owner svg').length).toBe(2); // an entviz owner marker per event
   });
 
   it('indexes the owning identifiers as pills', () => {
-    render(
+    const { container } = render(
       <CesrViewProvider>
         <LeftRail messages={messages} logs={logs} onGo={vi.fn()} />
       </CesrViewProvider>,
     );
     expect(screen.getByText(/identifiers · 1/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: AID })).toHaveAttribute('data-value', AID);
+    const pill = container.querySelector(`.rail-ids .cesr-pill[data-value="${AID}"]`);
+    expect(pill).toBeInTheDocument();
+    expect(pill!.querySelector('button')).toBeInTheDocument();
   });
 
   it('falls back to the serialization kind and omits owner/sn when a message has neither', () => {

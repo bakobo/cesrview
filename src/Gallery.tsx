@@ -1,7 +1,7 @@
 import type { AttachmentGroup as GroupNode, CesrMessage, Primitive } from './cesr/types';
 import { CesrViewProvider } from './components/CesrView';
 import { PrimitiveChip } from './components/PrimitiveChip';
-import { ValueChip } from './components/ValueChip';
+import { StreamPill } from './components/StreamPill';
 import { SadValue } from './components/SadValue';
 import { AttachmentGroup } from './components/AttachmentGroup';
 import { DecodedEvent } from './components/DecodedEvent';
@@ -52,8 +52,8 @@ export default function Gallery() {
           <PrimitiveChip node={sigPrim} bytes={bytes} />
         </section>
         <section>
-          <h2>ValueChip</h2>
-          <ValueChip value={AID} label="an AID" />
+          <h2>StreamPill</h2>
+          <StreamPill value={AID} label="an AID" />
         </section>
         <section>
           <h2>SadValue</h2>

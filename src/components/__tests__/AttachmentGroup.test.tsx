@@ -14,6 +14,8 @@ const group = (over: Partial<GroupNode> = {}): GroupNode => ({
   items: [prim],
   ...over,
 });
+// A child primitive renders as a StreamPill; the value 'SIGVALUE' lives on its .cesr-pill wrapper.
+const sig = (c: HTMLElement) => c.querySelector('.cesr-pill[data-value="SIGVALUE"]');
 
 describe('AttachmentGroup', () => {
   it('renders the code, count and gloss', () => {
@@ -24,18 +26,18 @@ describe('AttachmentGroup', () => {
   });
 
   it('shows its children when open and hides them when toggled', () => {
-    render(<AttachmentGroup node={group()} bytes={bytes} />);
-    expect(screen.getByText('SIGVALUE')).toBeInTheDocument();
+    const { container } = render(<AttachmentGroup node={group()} bytes={bytes} />);
+    expect(sig(container)).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { expanded: true }));
-    expect(screen.queryByText('SIGVALUE')).not.toBeInTheDocument();
+    expect(sig(container)).not.toBeInTheDocument();
   });
 
   it('recurses into nested groups', () => {
     const wrapper = group({ code: '-V', items: [group()] });
-    render(<AttachmentGroup node={wrapper} bytes={bytes} />);
+    const { container } = render(<AttachmentGroup node={wrapper} bytes={bytes} />);
     expect(screen.getByText('-V')).toBeInTheDocument();
     expect(screen.getByText('-A')).toBeInTheDocument(); // nested group
-    expect(screen.getByText('SIGVALUE')).toBeInTheDocument(); // deepest primitive
+    expect(sig(container)).toBeInTheDocument(); // deepest primitive
   });
 
   it('renders without a gloss for an unannotated counter code', () => {

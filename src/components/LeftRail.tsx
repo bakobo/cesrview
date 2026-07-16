@@ -1,8 +1,7 @@
+import { Entviz } from '@entviz/react';
 import type { CesrMessage } from '../cesr/types';
 import type { EventLog } from '../model/stream';
-import { Fingerprint } from './Fingerprint';
-import { colorBucket } from './fingerprint';
-import { ValueChip } from './ValueChip';
+import { StreamPill } from './StreamPill';
 
 /** The left rail: the OUTLINE of events IN STREAM ORDER — the arrival sequence is load-bearing and is
  * never grouped or hidden (m3xq7c / k2vx5n) — each row enriched with its owning-identifier glyph and
@@ -33,8 +32,8 @@ export function LeftRail({
                   onClick={() => onGo(k)}
                 >
                   {owner ? (
-                    <span className="owner" data-bucket={colorBucket(owner)} title={owner}>
-                      <Fingerprint value={owner} size={12} />
+                    <span className="owner" title={owner}>
+                      <Entviz value={owner} style={{ width: 16, height: 16 }} />
                     </span>
                   ) : (
                     <span className="owner owner-none" aria-hidden="true" />
@@ -55,7 +54,7 @@ export function LeftRail({
         <h2 className="rail-h">Identifiers · {logs.length}</h2>
         <div className="rail-ids">
           {logs.map((l) => (
-            <ValueChip key={l.aid} value={l.aid} role={l.kind} />
+            <StreamPill key={l.aid} value={l.aid} />
           ))}
         </div>
       </section>

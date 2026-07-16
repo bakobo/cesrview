@@ -11,27 +11,27 @@ const node = (over: Partial<Primitive> = {}): Primitive => ({
   span: { start: 2, end: 14 },
   ...over,
 });
+// The entviz pill never draws the raw value; the value lives on cesrview's own wrapper (see StreamPill).
+const pillFor = (c: HTMLElement, v: string) => c.querySelector<HTMLElement>(`.cesr-pill[data-value="${v}"]`);
 
 describe('PrimitiveChip', () => {
-  it('renders the value sliced from the source bytes', () => {
-    render(<PrimitiveChip node={node()} bytes={bytes} />);
-    expect(screen.getByText('ELXXiPwoaWOV')).toBeInTheDocument();
+  it('renders a pill carrying the value sliced from the source bytes', () => {
+    const { container } = render(<PrimitiveChip node={node()} bytes={bytes} />);
+    expect(pillFor(container, 'ELXXiPwoaWOV')).toBeInTheDocument();
   });
 
-  it('exposes the code and its gloss as an accessible label for a known code', () => {
+  it('labels the pill with the code and its gloss for a known code', () => {
     render(<PrimitiveChip node={node()} bytes={bytes} />);
-    const chip = screen.getByRole('button');
-    expect(chip).toHaveAttribute('aria-label', expect.stringContaining('Blake3'));
-    expect(chip).toHaveAttribute('data-code', 'E');
+    expect(screen.getByText(/E: Blake3-256 digest/)).toBeInTheDocument();
   });
 
-  it('falls back to just the code when the code is not annotated', () => {
+  it('falls back to just the code as the label when the code is not annotated', () => {
     render(<PrimitiveChip node={node({ code: 'ZZ' })} bytes={bytes} />);
-    expect(screen.getByRole('button')).toHaveAttribute('aria-label', 'ZZ');
+    expect(screen.getByText('ZZ')).toBeInTheDocument();
   });
 
-  it('renders as a button, so it is natively keyboard-operable', () => {
-    render(<PrimitiveChip node={node()} bytes={bytes} />);
-    expect(screen.getByRole('button')).toHaveTextContent('ELXXiPwoaWOV');
+  it('renders the pill as a button, so it is natively keyboard-operable', () => {
+    const { container } = render(<PrimitiveChip node={node()} bytes={bytes} />);
+    expect(container.querySelector('.cesr-pill button')).toBeInTheDocument();
   });
 });

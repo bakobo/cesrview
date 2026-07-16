@@ -10,8 +10,6 @@
   --acc: #7ee787; --acc2: #2dd4bf; --key: #f0a35e; --dig: #79c0ff; --id: #d2a8ff; --warn: #ff7b72; --num: #a5d6ff;
   --mono: 'JetBrains Mono', ui-monospace, monospace;
   --ui: 'IBM Plex Sans', system-ui, sans-serif;
-  /* CVD-safe categorical buckets — a SECONDARY cue only; the glyph carries identity (v7kd3m) */
-  --b0: #7ee787; --b1: #79c0ff; --b2: #d2a8ff; --b3: #f0a35e; --b4: #2dd4bf; --b5: #ff9bce; --b6: #a5d6ff; --b7: #e3b341;
 }
 * { box-sizing: border-box; }
 html, body, #root { margin: 0; height: 100%; }
@@ -81,18 +79,9 @@ body {
 .v { font-family: var(--mono); font-size: 12px; word-break: break-all; line-height: 1.9; color: var(--acc); }
 .cesr-array { display: inline-flex; flex-wrap: wrap; gap: 5px; }
 
-/* pill (entviz stand-in) */
-.cesr-pill { display: inline-flex; align-items: center; gap: 7px; padding: 2px 8px 2px 4px; border: 1px solid var(--line); border-radius: 999px; background: #0d1622; cursor: pointer; font-family: var(--mono); font-size: 11.5px; color: var(--ink); vertical-align: middle; transition: .14s; }
-.cesr-pill:hover { border-color: var(--acc2); background: #0e1c22; }
-.cesr-pill[data-selected] { border-color: var(--acc2); background: #123028; box-shadow: 0 0 0 2px var(--acc2), 0 0 14px #2dd4bf55; }
-.cesr-pill[data-selected] .pill-val { color: #eafffb; }
-.cesr-pill .pill-val { color: var(--ink); }
-.cesr-pill .pill-role { font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--faint); }
-.cesr-fp { border-radius: 4px; padding: 1px; background: #0a0f18; flex: none; }
-[data-bucket='0'] .cesr-fp rect { fill: var(--b0); } [data-bucket='1'] .cesr-fp rect { fill: var(--b1); }
-[data-bucket='2'] .cesr-fp rect { fill: var(--b2); } [data-bucket='3'] .cesr-fp rect { fill: var(--b3); }
-[data-bucket='4'] .cesr-fp rect { fill: var(--b4); } [data-bucket='5'] .cesr-fp rect { fill: var(--b5); }
-[data-bucket='6'] .cesr-fp rect { fill: var(--b6); } [data-bucket='7'] .cesr-fp rect { fill: var(--b7); }
+/* pill — a bare inline host for an entviz <EntvizPill>; the pill draws its own chrome and (via the
+   `highlight` prop) its own cross-ref emphasis. The wrapper only carries data-value for cross-ref/tests. */
+.cesr-pill { display: inline-flex; vertical-align: middle; }
 
 /* proof band */
 .proof { border-top: 1px dashed var(--line); background: repeating-linear-gradient(135deg, #0a0e16, #0a0e16 9px, #0b1019 9px, #0b1019 18px); }
@@ -136,7 +125,7 @@ body {
 .toc-item .seq { margin-left: auto; font-family: var(--mono); font-size: 10.5px; color: var(--faint); }
 .toc-item .ilk { font-family: var(--mono); font-weight: 500; }
 .owner { display: inline-flex; flex: none; }
-.owner .cesr-fp { background: #0a0f18; border-radius: 3px; }
+.owner svg { display: block; border-radius: 3px; }
 .owner-none { width: 12px; height: 12px; }
 .ilk.ilk-icp { color: var(--acc); } .ilk.ilk-rot { color: var(--key); } .ilk.ilk-ixn { color: var(--dim); }
 .ilk.ilk-dip, .ilk.ilk-drt { color: var(--id); } .ilk.ilk-rpy { color: var(--dig); } .ilk.ilk-vcp, .ilk.ilk-iss { color: var(--acc2); }

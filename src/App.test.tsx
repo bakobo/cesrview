@@ -54,15 +54,18 @@ describe('App', () => {
   });
 
   it('cross-references identifiers: selecting one highlights its other occurrences', () => {
-    render(<App />);
+    const { container } = render(<App />);
     paste();
-    const aids = screen
-      .getAllByRole('button')
-      .filter((b) => /^[A-Za-z0-9_-]{44}$/.test(b.getAttribute('data-value') ?? ''));
-    expect(aids.length).toBeGreaterThan(1); // the controller AID recurs across the icp and ixn bodies
-    fireEvent.click(aids[0]);
-    const highlighted = screen.getAllByRole('button').filter((b) => b.getAttribute('aria-pressed') === 'true');
-    expect(highlighted.length).toBeGreaterThan(1); // every occurrence of the selected value lights up
+    // Each recurring value is a StreamPill wrapper carrying data-value; the controller AID recurs.
+    const pills = [...container.querySelectorAll<HTMLElement>('.cesr-pill[data-value]')].filter((p) =>
+      /^[A-Za-z0-9_-]{44}$/.test(p.getAttribute('data-value') ?? ''),
+    );
+    const firstAid = pills[0].getAttribute('data-value');
+    const sameValue = pills.filter((p) => p.getAttribute('data-value') === firstAid);
+    expect(sameValue.length).toBeGreaterThan(1); // the controller AID recurs across the icp and ixn bodies
+    fireEvent.click(pills[0].querySelector('button')!); // open the pill -> selects its value
+    const highlighted = sameValue.filter((p) => p.hasAttribute('data-selected'));
+    expect(highlighted.length).toBe(sameValue.length); // every occurrence of the selected value lights up
   });
 
   it('surfaces a parse error for input that is not a CESR stream', () => {

@@ -33,12 +33,12 @@ export function CesrViewProvider({ children }: { children: ReactNode }) {
   );
 }
 
-/** Cross-reference state for one value: whether it is the current selection, and a toggle to
- * select/deselect it. A no-op when there is no surrounding CesrViewProvider. */
+/** Cross-reference state for one value: whether it is the current selection, and a setter that makes
+ * it the selection (so every occurrence of the same value highlights). A no-op with no provider. */
 export function useCrossRef(value: string) {
   const ctx = useContext(ViewContext);
   const isSelected = ctx !== null && ctx.selected === value;
-  const select = () => ctx?.select(isSelected ? null : value);
+  const select = () => ctx?.select(value);
   return { isSelected, select };
 }
 
