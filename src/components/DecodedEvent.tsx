@@ -31,7 +31,11 @@ export function DecodedEvent({ message, bytes }: { message: CesrMessage; bytes: 
           <span className="ev-ilk">{message.kind}</span>
         )}
         {ilkAnn ? <span className="ev-title">{ilkAnn.gloss}</span> : null}
-        {message.sn !== null ? <span className="ev-sub">seq {message.sn}</span> : null}
+        {message.sn !== null ? (
+          <span className="ev-sub" title="sequence number (hex)">
+            sn {message.sn}
+          </span>
+        ) : null}
         {message.said ? (
           <span className="ev-said">
             <ValueChip value={message.said} role="said" />

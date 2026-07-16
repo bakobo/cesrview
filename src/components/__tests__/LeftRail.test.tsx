@@ -7,22 +7,23 @@ import type { EventLog } from '../../model/stream';
 
 const AID = 'EDP1vHcw_wc4M__Fj53-cJaBnZZASd-aMTaSyWEQ-PC2';
 const msg = (over: Partial<CesrMessage>): CesrMessage => ({
-  proto: 'KERI', version: '1.0', kind: 'JSON', ilk: 'icp', sn: '0', said: AID, sad: {}, span: { start: 0, end: 0 }, attachments: [], ...over,
+  proto: 'KERI', version: '1.0', kind: 'JSON', ilk: 'icp', sn: '0', said: AID, sad: { i: AID }, span: { start: 0, end: 0 }, attachments: [], ...over,
 });
-const messages = [msg({ ilk: 'icp', sn: '0' }), msg({ ilk: 'ixn', sn: '1' })];
+const messages = [msg({ ilk: 'icp', sn: '0' }), msg({ ilk: 'ixn', sn: 'a' })]; // hex sn
 const logs: EventLog[] = [{ aid: AID, kind: 'KEL', events: [], delegator: null, gaps: [], duplicities: [] }];
 
 describe('LeftRail', () => {
-  it('lists events in the outline and jumps on click', () => {
+  it('lists events in stream order with an owner glyph and hex sn, and jumps on click', () => {
     const onGo = vi.fn();
-    render(
+    const { container } = render(
       <CesrViewProvider>
         <LeftRail messages={messages} logs={logs} onGo={onGo} />
       </CesrViewProvider>,
     );
-    fireEvent.click(screen.getByRole('button', { name: /event 0: icp/i }));
+    fireEvent.click(screen.getByRole('button', { name: /event 0: icp, sn 0/i }));
     expect(onGo).toHaveBeenCalledWith(0);
-    expect(screen.getByRole('button', { name: /event 1: ixn/i })).toBeInTheDocument();
+    expect(screen.getByText('sn a')).toBeInTheDocument(); // the second event's hex sn, prefixed
+    expect(container.querySelectorAll('.owner .cesr-fp').length).toBe(2); // an owner glyph per event
   });
 
   it('indexes the owning identifiers as pills', () => {
@@ -35,10 +36,10 @@ describe('LeftRail', () => {
     expect(screen.getByRole('button', { name: AID })).toHaveAttribute('data-value', AID);
   });
 
-  it('falls back to the serialization kind for a message with no ilk or sn', () => {
+  it('falls back to the serialization kind and omits owner/sn when a message has neither', () => {
     render(
       <CesrViewProvider>
-        <LeftRail messages={[msg({ ilk: null, sn: null })]} logs={logs} onGo={vi.fn()} />
+        <LeftRail messages={[msg({ ilk: null, sn: null, sad: null })]} logs={logs} onGo={vi.fn()} />
       </CesrViewProvider>,
     );
     expect(screen.getByRole('button', { name: 'event 0: JSON' })).toBeInTheDocument();

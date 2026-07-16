@@ -21,6 +21,14 @@ describe('App', () => {
     expect(screen.getAllByText(/interaction/i).length).toBeGreaterThan(0);
   });
 
+  it('keeps the source pane collapsed by default and reveals it on toggle', () => {
+    render(<App />);
+    paste();
+    expect(screen.queryByRole('region', { name: 'Source' })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Source' }));
+    expect(screen.getByRole('region', { name: 'Source' })).toBeInTheDocument();
+  });
+
   it('explains a clicked ilk badge in the annotation dock', () => {
     render(<App />);
     paste();
