@@ -63,7 +63,8 @@ describe('App', () => {
     const firstAid = pills[0].getAttribute('data-value');
     const sameValue = pills.filter((p) => p.getAttribute('data-value') === firstAid);
     expect(sameValue.length).toBeGreaterThan(1); // the controller AID recurs across the icp and ixn bodies
-    fireEvent.click(pills[0].querySelector('button')!); // open the pill -> selects its value
+    fireEvent.click(pills[0].querySelector('button')!); // expand the pill -> the entviz popover
+    fireEvent.click(screen.getByRole('button', { name: /find other occurrences/i })); // locate -> select
     const highlighted = sameValue.filter((p) => p.hasAttribute('data-selected'));
     expect(highlighted.length).toBe(sameValue.length); // every occurrence of the selected value lights up
   });

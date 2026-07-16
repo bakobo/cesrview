@@ -7,9 +7,10 @@ import { STREAM_TRUST } from './trust';
  * It is not a generic pill: it is the cesrview-configured pill that applies `STREAM_TRUST` to every
  * value in a pasted stream, wires cross-reference highlight, and focuses the annotation dock. entviz
  * characterizes the value (its scheme/role) and supplies the recognition aids that make recurrence
- * scannable. Expanding the pill SELECTS the value — every equal-valued pill then highlights via the
- * pill's host-driven `highlight` (cross-ref, c7vn4k) — and sends its code or value to the annotation
- * dock. A no-op wrapper without a CesrViewProvider, so the pill still renders standalone. */
+ * scannable. The pill's first-class LOCATE affordance ("Find other occurrences…") SELECTS the value —
+ * every equal-valued pill then highlights via the pill's host-driven `highlight` (cross-ref, c7vn4k) —
+ * and sends its code or value to the annotation dock. A no-op wrapper without a CesrViewProvider, so
+ * the pill still renders standalone. */
 export function StreamPill({
   value,
   label,
@@ -29,13 +30,13 @@ export function StreamPill({
         trust={STREAM_TRUST}
         highlight={isSelected}
         typeSignal="autoCombo"
-        // ~6tnb: cross-ref selection is piggybacked on the pill's expand signal because EntvizPill has
-        // no first-class locate/select callback yet; swap to onLocate when entviz-js ships it (p7lk3n).
-        onOpenChange={(open) => {
-          if (open) {
-            select();
-            focus(annotation ? { kind: 'code', ...annotation, value } : { kind: 'value', value });
-          }
+        // Cross-reference is now a DELIBERATE act (p7lk3n): the pill's first-class onLocate — its
+        // "Find other occurrences…" popover action — SELECTS this value (every equal-valued pill then
+        // highlights) and explains it in the dock. Recognition, never verification (v7kd3m); no longer
+        // an incidental side effect of merely expanding the pill.
+        onLocate={() => {
+          select();
+          focus(annotation ? { kind: 'code', ...annotation, value } : { kind: 'value', value });
         }}
       />
     </span>
