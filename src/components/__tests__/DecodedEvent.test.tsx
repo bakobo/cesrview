@@ -31,9 +31,9 @@ describe('DecodedEvent', () => {
 
   it('keeps the proof band collapsed by default and expands it on click', () => {
     render(<DecodedEvent message={mk()} bytes={bytes} />);
-    expect(screen.getByRole('button', { name: /proof \(1\)/i })).toBeInTheDocument();
+    const toggle = screen.getByRole('button', { name: /proof/i });
     expect(screen.queryByText('-A')).not.toBeInTheDocument(); // collapsed
-    fireEvent.click(screen.getByRole('button', { name: /proof/i }));
+    fireEvent.click(toggle);
     expect(screen.getByText('-A')).toBeInTheDocument(); // expanded
   });
 
@@ -45,6 +45,11 @@ describe('DecodedEvent', () => {
   it('renders the undecoded state for a frame-only (sad null) message', () => {
     render(<DecodedEvent message={mk({ ilk: null, sad: null, kind: 'CBOR', attachments: [] })} bytes={bytes} />);
     expect(screen.getByText(/undecoded cbor body/i)).toBeInTheDocument();
+  });
+
+  it('pluralizes the proof group count', () => {
+    render(<DecodedEvent message={mk({ attachments: [aGroup, aGroup] })} bytes={bytes} />);
+    expect(screen.getByRole('button', { name: /2 groups/i })).toBeInTheDocument();
   });
 
   it('renders no proof band when there are no attachments', () => {

@@ -7,7 +7,7 @@ const AID = 'EDP1vHcw_wc4M__Fj53-cJaBnZZASd-aMTaSyWEQ-PC2';
 describe('SadValue', () => {
   it('renders a high-entropy string as a cross-reference chip', () => {
     render(<SadValue value={AID} />);
-    expect(screen.getByRole('button')).toHaveTextContent(AID);
+    expect(screen.getByRole('button')).toHaveAttribute('data-value', AID);
   });
 
   it('renders a small string as plain text, not a chip', () => {
@@ -18,7 +18,7 @@ describe('SadValue', () => {
 
   it('renders each element of an array (chipping the high-entropy ones)', () => {
     render(<SadValue value={[AID, '1/3']} />);
-    expect(screen.getByRole('button')).toHaveTextContent(AID); // the key -> chip
+    expect(screen.getByRole('button')).toHaveAttribute('data-value', AID); // the key -> chip
     expect(screen.getByText('1/3')).toBeInTheDocument(); // the threshold -> text
   });
 

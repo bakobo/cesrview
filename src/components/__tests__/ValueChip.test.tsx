@@ -10,7 +10,7 @@ describe('ValueChip', () => {
   it('renders the value as a button with its provided label', () => {
     render(<ValueChip value={AID} label="prefix" />);
     const btn = screen.getByRole('button', { name: 'prefix' });
-    expect(btn).toHaveTextContent(AID);
+    expect(btn).toHaveAttribute('data-value', AID); // full value in data-value; display is shortened
     expect(btn).toHaveAttribute('aria-pressed', 'false');
   });
 

@@ -4,9 +4,9 @@ import { describe, it, expect } from 'vitest';
 import App from './App';
 
 describe('App', () => {
-  it('shows the product name and a paste prompt initially', () => {
+  it('shows the brand and a paste prompt initially', () => {
     render(<App />);
-    expect(screen.getByRole('heading', { name: /cesr viewer/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /cesrview/i })).toBeInTheDocument();
     expect(screen.getByText(/paste cesr above/i)).toBeInTheDocument();
   });
 
@@ -25,7 +25,7 @@ describe('App', () => {
     fireEvent.change(screen.getByLabelText('CESR stream'), { target: { value: sample } });
     const aids = screen
       .getAllByRole('button')
-      .filter((b) => /^[A-Za-z0-9_-]{44}$/.test(b.textContent ?? ''));
+      .filter((b) => /^[A-Za-z0-9_-]{44}$/.test(b.getAttribute('data-value') ?? ''));
     expect(aids.length).toBeGreaterThan(1); // the controller AID recurs across the icp and ixn bodies
     fireEvent.click(aids[0]);
     const highlighted = screen.getAllByRole('button').filter((b) => b.getAttribute('aria-pressed') === 'true');
