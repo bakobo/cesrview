@@ -181,9 +181,10 @@ Make CESR legible to developers in the browser = goal:
                         adding a first-class onLocate / find-occurrences affordance to EntvizPill (a callback
                         plus a "find other occurrences" popover action) — the in-corpus companion to the
                         recognition aids, distinct from the verification compare flow (@b6zx2d / @v7kd3m).
-                        Until it ships the onOpenChange piggyback stands, tracked by tick ~6tnb at the
-                        StreamPill trigger. Accepted tradeoff: an interim selection trigger that overloads
-                        the popover-open signal, retired when the entviz onLocate API lands.
+                        RESOLVED: entviz 0.15.4 shipped the onLocate affordance (entviz-js this.i
+                        lc4ktz6n), and cesrview now uses it — cross-reference selection is a DELIBERATE
+                        locate act ("Find other occurrences…"), no longer an incidental side effect of
+                        expanding the pill; the interim onOpenChange piggyback is retired (tick 6tnb off).
 
     In-browser TS stream-walker, upstreamed; keripy as oracle = decision:
       id: h6rk4d
