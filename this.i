@@ -746,6 +746,25 @@ Make CESR legible to developers in the browser = goal:
                 distinction). Accepted tradeoff: the model hard-codes the v1 KEL/TEL ilk vocabulary,
                 which lives in cesrview until any of it is needed upstream.
 
+            Collapse consecutive same-owner interaction runs in place, expandable = decision:
+              id: r6nk2w
+              why: >
+                Real KELs contain long runs of homogeneous interaction (ixn) events — the sample has
+                one owner with 69 consecutive ixn — and rendering every one as a full card is a
+                dominant cost of the ~15s freeze on a large paste and buries the interesting
+                establishment events in noise. Chose to COLLAPSE a maximal run of 3 or more CONSECUTIVE
+                same-owner ixn events into a single "N interaction events, sn a–b" card, EXPANDABLE IN
+                PLACE to reveal every event at its exact stream position. The sequence is never
+                reordered, grouped across owners, or hidden — a collapsed run is one click from full
+                expansion and shows its sn span, honouring @m3xq7c / @k2vx5n (arrival order is
+                load-bearing). It is a pure display transform (collapseRuns over the stream-order
+                messages), matching the bake-off prototype's run card. Rejected collapsing across
+                owners or across non-ixn events (would fold semantically distinct events) and a fixed
+                page/limit (hides the tail silently). Accepted tradeoff: expanding a very long run still
+                renders all its cards until list virtualization (the next increment) makes even that
+                cheap, and jumping to an event inside a collapsed run is a no-op until the outline
+                learns to expand it (tracked).
+
         First-class failure, empty and loading states = decision:
           id: r7cm3b
           why: >
