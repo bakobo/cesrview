@@ -159,6 +159,31 @@ Make CESR legible to developers in the browser = goal:
                     dep is the audited @noble/hashes) and coupling the pill UI to entviz's release
                     cadence — justified because entviz is maintained in-house and is the whole point of
                     the identifier-legibility design.
+                  children:
+                    Integration landed: StreamPill is the one trust point; the locate gap becomes an entviz-js PR = decision:
+                      id: p7lk3n
+                      why: >
+                        The @e5vk7n adoption is now IMPLEMENTED. cesrview's wrapper around <EntvizPill> is
+                        named StreamPill (not the earlier generic ValueChip) to make its job legible: it is
+                        the SINGLE place that applies the one auditable corpus TrustAssumption (@e5vk7n) to
+                        every value in a pasted stream, wires cross-reference highlight, and focuses the
+                        dock — one greppable trust-application point, never a per-call posture. Two
+                        consequences of consuming entviz's raw-TypeScript surface under cesrview's strict
+                        `tsc --noEmit` build gate: (1) cesrview now requires @entviz >= 0.15.3 — the raw .ts
+                        is part of cesrview's own typecheck, so entviz must itself be strict-typecheck-clean
+                        (0.15.1 added the pill trust/typeSignal/highlight API; 0.15.2–0.15.3 cleared the
+                        type and dead-code errors cesrview's noUnusedLocals/Parameters surfaced), hardening
+                        @e5vk7n's accepted release-cadence coupling from a note into a version floor.
+                        (2) The gap @e5vk7n anticipated has appeared concretely: <EntvizPill> has NO
+                        first-class locate/select callback — a click only toggles its expand popover — so
+                        cross-reference SELECTION is piggybacked on onOpenChange(open) as an interim. Per
+                        @e5vk7n ("any gap found is raised as a PR against entviz-js"), the honest fix is a PR
+                        adding a first-class onLocate / find-occurrences affordance to EntvizPill (a callback
+                        plus a "find other occurrences" popover action) — the in-corpus companion to the
+                        recognition aids, distinct from the verification compare flow (@b6zx2d / @v7kd3m).
+                        Until it ships the onOpenChange piggyback stands, tracked by tick ~6tnb at the
+                        StreamPill trigger. Accepted tradeoff: an interim selection trigger that overloads
+                        the popover-open signal, retired when the entviz onLocate API lands.
 
     In-browser TS stream-walker, upstreamed; keripy as oracle = decision:
       id: h6rk4d
