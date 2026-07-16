@@ -765,6 +765,23 @@ Make CESR legible to developers in the browser = goal:
                 cheap, and jumping to an event inside a collapsed run is a no-op until the outline
                 learns to expand it (tracked).
 
+            Decoded list renders progressively in chunks, not measured windowing = decision:
+              id: v3mk7n
+              why: >
+                Even with run-collapse (@r6nk2w) a large stream can render hundreds of variable-height
+                cards at once — the residual cause of the paste freeze. Chose PROGRESSIVE chunked
+                rendering: the decoded list shows the first ~40 items and reveals the next chunk as its
+                container is scrolled toward the end, bounding the INITIAL paint (what actually froze)
+                without ever dropping an event. Rejected measured/windowed virtualization (render only
+                the rows in view) for the same reason CodeMirror was rejected (@s5kn7w): it needs
+                layout/measurement DOM APIs jsdom does not implement, so it cannot be tested to the
+                100%-branch bar, and variable-height cards make the height bookkeeping fragile; a
+                virtualization dependency trades that for weight against @r4vkp7. Progressive rendering
+                stays pure and jsdom-testable. Accepted tradeoff: memory still grows as you scroll a
+                very large stream (scrolled-past items stay mounted) — true windowing remains a future
+                option if a stream large enough to need it appears; @r6nk2w plus this remove the freeze
+                at the corpus scale we have.
+
         First-class failure, empty and loading states = decision:
           id: r7cm3b
           why: >
