@@ -105,6 +105,30 @@ Make CESR legible to developers in the browser = goal:
                     O(chips) per selection with no occurrence count, and the predicate is a heuristic
                     tunable as real streams exercise it.
 
+                Realize the inspector visual design; a deterministic glyph stands in for entviz = decision:
+                  id: d4nk7v
+                  why: >
+                    The components were shipped functionally correct but UNSTYLED, which read as
+                    generic and ugly — far from the jwt.io-grade inspector the design targets; the owner
+                    flagged that the visualization IS the product, not later polish. Realized the visual
+                    design from the bake-off winner design/1-inspector.html: a dark IDE-inspector design
+                    system (CSS custom properties for the palette, JetBrains Mono / IBM Plex Sans type),
+                    the three-region shell (@t2vd6m: a header with stream stats and integrity chips, a
+                    left outline+identifier rail, the panes, a bottom annotation dock), event CARDS with
+                    colour-coded ilk badges, striped collapsible PROOF blocks (@v3nk7t
+                    statement-over-proof), and field-key→value rows with per-type value colour.
+                    High-entropy values render as entviz-style PILLS whose PRIMARY identity cue is a
+                    deterministic FINGERPRINT GLYPH (@v7kd3m: the glyph, not colour, carries sameness),
+                    with colour demoted to a small CVD-safe CATEGORICAL bucket plus a role label — NOT
+                    the per-identifier hue the prototype used, which the UX critique proved collides and
+                    fails colourblind users at 80 identifiers. The glyph is a cesrview-owned
+                    deterministic stand-in until the enhanced entviz pill is integrated (~2o7m /
+                    @g4mp2w). Keyboard and focus-visible a11y (@f6tk4p) carry over from the components as
+                    built. Rejected matching the prototype's colour scheme literally (unsound per
+                    @v7kd3m) and continuing to defer styling as polish (the visualization is the value).
+                    Accepted tradeoff: a hand-authored design system and a stand-in glyph to swap out
+                    when entviz lands.
+
     In-browser TS stream-walker, upstreamed; keripy as oracle = decision:
       id: h6rk4d
       stage-status: planned
