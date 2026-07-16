@@ -6,7 +6,7 @@ import { useAnnotationFocus } from './CesrView';
 import { SadValue } from './SadValue';
 import { ValueChip } from './ValueChip';
 
-/** Renders one decoded message as an event card: the signed STATEMENT as the foreground (a colour-
+/** Renders one decoded message as an event card: the signed STATEMENT as the foreground (a color-
  * coded ilk badge with its gloss, the SAID pill, and the body fields), with the cryptographic proof
  * band demoted to a collapsed-by-default striped section (this.i v3nk7t / d4nk7v). A framed-but-
  * undecoded body (sad null, e.g. CBOR/MGPK without a decoder) shows a clear undecoded state (r7cm3b). */

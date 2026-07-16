@@ -71,7 +71,7 @@ Make CESR legible to developers in the browser = goal:
                 library-first and INCREMENTAL: the decoded pane with annotations (@w6ph4k) first, then
                 the viewer context + cross-ref, then the source pane with selection sync (@p6hw4k /
                 @p4rz6b), then structural integrity (@b3qm7d) — and entviz pills LAST. Pills are deferred
-                because entviz is being actively enhanced (new colour, shape-by-value-class and
+                because entviz is being actively enhanced (new color, shape-by-value-class and
                 similar-value affordances the owner is still settling, refining @g4mp2w / @v7kd3m);
                 until they land, high-entropy values render as a simple placeholder chip and
                 cross-referencing keys on VALUE EQUALITY rather than the fingerprint glyph, upgrading to
@@ -101,7 +101,7 @@ Make CESR legible to developers in the browser = goal:
                     is a later increment) and over field-key-based detection (brittle; the entropy of
                     the value is the real signal). Deferred: the gutter reference marks (@c5nzr4 layer
                     3, needs the source pane), find-all-references navigation, and the entviz
-                    fingerprint/colour (@g4mp2w, entviz still settling). Accepted tradeoff: highlight is
+                    fingerprint/color (@g4mp2w, entviz still settling). Accepted tradeoff: highlight is
                     O(chips) per selection with no occurrence count, and the predicate is a heuristic
                     tunable as real streams exercise it.
 
@@ -115,16 +115,16 @@ Make CESR legible to developers in the browser = goal:
                     system (CSS custom properties for the palette, JetBrains Mono / IBM Plex Sans type),
                     the three-region shell (@t2vd6m: a header with stream stats and integrity chips, a
                     left outline+identifier rail, the panes, a bottom annotation dock), event CARDS with
-                    colour-coded ilk badges, striped collapsible PROOF blocks (@v3nk7t
-                    statement-over-proof), and field-key→value rows with per-type value colour.
+                    color-coded ilk badges, striped collapsible PROOF blocks (@v3nk7t
+                    statement-over-proof), and field-key→value rows with per-type value color.
                     High-entropy values render as entviz-style PILLS whose PRIMARY identity cue is a
-                    deterministic FINGERPRINT GLYPH (@v7kd3m: the glyph, not colour, carries sameness),
-                    with colour demoted to a small CVD-safe CATEGORICAL bucket plus a role label — NOT
+                    deterministic FINGERPRINT GLYPH (@v7kd3m: the glyph, not color, carries sameness),
+                    with color demoted to a small CVD-safe CATEGORICAL bucket plus a role label — NOT
                     the per-identifier hue the prototype used, which the UX critique proved collides and
-                    fails colourblind users at 80 identifiers. The glyph is a cesrview-owned
+                    fails colorblind users at 80 identifiers. The glyph is a cesrview-owned
                     deterministic stand-in until the enhanced entviz pill is integrated (~2o7m /
                     @g4mp2w). Keyboard and focus-visible a11y (@f6tk4p) carry over from the components as
-                    built. Rejected matching the prototype's colour scheme literally (unsound per
+                    built. Rejected matching the prototype's color scheme literally (unsound per
                     @v7kd3m) and continuing to defer styling as polish (the visualization is the value).
                     Accepted tradeoff: a hand-authored design system and a stand-in glyph to swap out
                     when entviz lands.
@@ -132,9 +132,9 @@ Make CESR legible to developers in the browser = goal:
                 Adopt entviz pills in corpus posture; replace the stand-in glyph = decision:
                   id: e5vk7n
                   why: >
-                    The hand-rolled fingerprint glyph plus colour bucket (@d4nk7v's stand-in for
+                    The hand-rolled fingerprint glyph plus color bucket (@d4nk7v's stand-in for
                     @g2hd6n / @g4mp2w) was always temporary, and it did the very thing the entviz
-                    security model forbids: it invited a same-glyph-or-colour ⇒ same-value EQUALITY
+                    security model forbids: it invited a same-glyph-or-color ⇒ same-value EQUALITY
                     judgement by eye (the @v7kd3m failure). entviz has settled, so cesrview now CONSUMES
                     @entviz/react's <EntvizPill> and <Entviz>, driven by @entviz/core's characterize()
                     and render(): the pill identifies each value's encoding / scheme / ROLE (key,
@@ -144,13 +144,13 @@ Make CESR legible to developers in the browser = goal:
                     KERI KEL from the user's own machine"), so every stream pill references one shared
                     TrustAssumption { posture: "corpus", mnemonic, icon, autoColor }, enabling the
                     recognition aids — a short mnemonic that keeps a scannable value form visible, a
-                    colourbar icon, and an auto-colour tint — that make RECURRENCE scannable: the sound
+                    colorbar icon, and an auto-color tint — that make RECURRENCE scannable: the sound
                     form of the passive cross-reference @c5nzr4 wanted. Cross-reference SELECTION drives
                     the pill's host-controlled `highlight` from actual value equality (not eyeballing);
                     true cross-origin verification routes through entviz's compare flow (<EntvizCompare>
                     / <EntvizWalk>), the honest home for "are these the same?" that @b6zx2d demands.
                     Resolves @g4mp2w by CONSUMPTION rather than extension — entviz already provides
-                    per-value colour/shape recognition in corpus posture, so cesrview neither forks nor
+                    per-value color/shape recognition in corpus posture, so cesrview neither forks nor
                     extends it (and any gap found is raised as a PR against entviz-js, maintained
                     in-house). Deletes the stand-in Fingerprint / fingerprint modules; Vite and Vitest
                     consume entviz's raw-TypeScript packages with no bundler config (verified). Refines
@@ -573,20 +573,20 @@ Make CESR legible to developers in the browser = goal:
             Real streams reference ~80 identifiers that cross-link across distant events; a viewer
             that prettifies each event in isolation loses this. Chose a three-layer solution over any
             single mechanism: (1) PASSIVE — every occurrence of the same identifier carries the same
-            deterministic entviz fingerprint AND accent colour, so correlation is always-on and needs
+            deterministic entviz fingerprint AND accent color, so correlation is always-on and needs
             no interaction (scales to hundreds of events with zero clutter); (2) ACTIVE — selecting an
             identifier highlights all its occurrences and offers jump-to-establishment and next/prev,
             the IDE "find all references" pattern; (3) GUTTER reference marks showing forward/back
             references without drawing a full graph. Separately adopt rainbow-matched delimiters for
             counter-group / JSON nesting legibility. Rejected the canvas's drawn-line web (doesn't
             scale, breaks sequence). Accepted tradeoff: more rendering machinery than a plain tree,
-            and a dependency on per-identifier colour support in entviz (@g4mp2w).
+            and a dependency on per-identifier color support in entviz (@g4mp2w).
 
-        Extend entviz for per-identifier colour, upstreamed = decision:
+        Extend entviz for per-identifier color, upstreamed = decision:
           id: g4mp2w
           why: >
             The passive cross-ref layer (@c5nzr4) needs each identifier pill to carry a deterministic
-            per-identifier background/accent colour, which the published @entviz/react may not yet
+            per-identifier background/accent color, which the published @entviz/react may not yet
             expose. Chose to EXTEND the entviz React component and contribute the change upstream,
             rather than wrap or fork it locally, because cesrview is entviz's first real-world consumer
             and that feedback loop is how entviz matures — and entviz is maintained in-house
@@ -620,21 +620,21 @@ Make CESR legible to developers in the browser = goal:
             entviz's --entviz-pill-* vars. Accepted tradeoff: more interaction surface to build and
             test than a read-only tree.
 
-        Colour cannot be the cross-reference invariant = tension:
+        Color cannot be the cross-reference invariant = tension:
           id: v7kd3m
           why: >
             Fresh-context adversarial review found the passive cross-reference layer's reliance on
             per-identifier COLOUR (@c5nzr4, @g4mp2w) unsound: hue = hash mod 360 collides badly across
-            the ~2100 distinct high-entropy tokens a real stream carries, fails for colourblind users,
-            and is illegible at a 15px swatch. Colour cannot be the sameness invariant.
+            the ~2100 distinct high-entropy tokens a real stream carries, fails for colorblind users,
+            and is illegible at a 15px swatch. Color cannot be the sameness invariant.
           resolution: >
-            The deterministic entviz FINGERPRINT glyph is the sameness invariant; per-value colour
+            The deterministic entviz FINGERPRINT glyph is the sameness invariant; per-value color
             becomes secondary/decorative. Cross-referencing (passive same-fingerprint, active
             find-all-references, gutter marks) applies to ALL high-entropy values — the owner REBUTS
             the reviewers' "pills for AIDs only", because entviz visualises entropy of any kind
             (identifiers, keys, digests, signatures, nonces). Value CLASSES are distinguished instead
             by pill SHAPE (e.g. rounded vs square vs angular corners), which becomes part of the entviz
-            extension (@g4mp2w) alongside or instead of the colour work.
+            extension (@g4mp2w) alongside or instead of the color work.
 
         Source pane pretty-printed, both panes virtualised = tension:
           id: p4rz6b
