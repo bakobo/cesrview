@@ -1,4 +1,4 @@
-import { useDeferredValue, useState } from 'react';
+import { useDeferredValue, useMemo, useState } from 'react';
 import { walk } from './cesr/walk';
 import { prettyPrint } from './cesr/prettyprint';
 import { organize } from './model/stream';
@@ -17,13 +17,16 @@ const encoder = new TextEncoder();
 export default function App() {
   const [text, setText] = useState('');
   const [sourceOpen, setSourceOpen] = useState(false);
-  // Decode the DEFERRED text: while a large paste is being processed the input stays responsive and
-  // the app is marked aria-busy so a "decoding…" indicator shows (this.i m7kv3n / r7cm3b).
+  // Decode the DEFERRED text so the input stays responsive on a large paste (aria-busy shows a
+  // "decoding…" indicator). Every parse/derive is MEMOISED on its inputs so a source-pane toggle or
+  // any other state change never re-parses the stream (this.i m7kv3n / v3mk7n).
   const deferredText = useDeferredValue(text);
   const pending = text !== deferredText;
-  const bytes = encoder.encode(deferredText);
-  const result = walk(bytes);
-  const model = organize(result);
+  const bytes = useMemo(() => encoder.encode(deferredText), [deferredText]);
+  const result = useMemo(() => walk(bytes), [bytes]);
+  const model = useMemo(() => organize(result), [result]);
+  const items = useMemo(() => collapseRuns(result.messages), [result]);
+  const doc = useMemo(() => (sourceOpen ? prettyPrint(result, bytes) : null), [sourceOpen, result, bytes]);
   const first = result.messages[0];
   const encoding = first ? `${first.proto} ${first.version} · ${first.kind}` : '—';
   const goto = (index: number) => document.getElementById(`event-${index}`)?.scrollIntoView?.({ block: 'start' });
@@ -51,7 +54,7 @@ export default function App() {
             <div className="cesr-center">
               {result.errors.length > 0 ? <p role="alert">{result.errors[0].message}</p> : null}
               <EventList
-                items={collapseRuns(result.messages)}
+                items={items}
                 renderItem={(item, k) =>
                   item.kind === 'event' ? (
                     <div key={k} id={`event-${item.index}`}>
@@ -67,7 +70,7 @@ export default function App() {
               <button className="source-toggle" aria-expanded={sourceOpen} onClick={() => setSourceOpen((o) => !o)}>
                 Source
               </button>
-              {sourceOpen ? <SourcePane doc={prettyPrint(result, bytes)} /> : null}
+              {sourceOpen ? <SourcePane doc={doc!} /> : null}
             </aside>
             <AnnotationDock />
           </div>

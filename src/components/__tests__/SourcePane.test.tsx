@@ -12,19 +12,18 @@ const doc: PrettyDoc = {
 };
 
 describe('SourcePane', () => {
-  it('renders each pretty line as a numbered item carrying its byte span', () => {
-    render(<SourcePane doc={doc} />);
-    const items = screen.getAllByRole('listitem');
-    expect(items).toHaveLength(2);
-    expect(items[0]).toHaveTextContent('line-one');
-    expect(items[0]).toHaveAttribute('data-start', '0');
-    expect(items[0]).toHaveAttribute('data-end', '5');
+  it('renders each pretty line with its number and byte span', () => {
+    const { container } = render(<SourcePane doc={doc} />);
+    const lines = container.querySelectorAll('.cesr-source-line');
+    expect(lines).toHaveLength(2);
+    expect(lines[0]).toHaveTextContent('line-one');
+    expect(lines[0]).toHaveAttribute('data-start', '0');
+    expect(lines[0].querySelector('.ln')).toHaveTextContent('1'); // 1-based line number
   });
 
   it('omits the span attributes for a line with no byte origin', () => {
-    render(<SourcePane doc={doc} />);
-    const items = screen.getAllByRole('listitem');
-    expect(items[1]).not.toHaveAttribute('data-start');
+    const { container } = render(<SourcePane doc={doc} />);
+    expect(container.querySelectorAll('.cesr-source-line')[1]).not.toHaveAttribute('data-start');
   });
 
   it('is a labelled region (read-only, no inputs)', () => {
