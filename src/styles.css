@@ -97,7 +97,8 @@ body {
 .cesr-sep { color: var(--faint); white-space: pre; }
 /* a nested object (e.g. an anchored seal) as a compact key/value block */
 .cesr-obj { display: inline-flex; flex-direction: column; gap: 3px; border-left: 2px solid var(--line); padding-left: 10px; margin: 2px 0; vertical-align: top; }
-.cesr-obj-row { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+/* fixed key column so the seal's values line up vertically (like the field rows above) */
+.cesr-obj-row { display: grid; grid-template-columns: 190px 1fr; gap: 8px; align-items: start; }
 .cesr-obj-k { font-family: var(--mono); color: var(--ink); font-weight: 600; }
 /* version string / datetime: raw token, then a prettified decode in parens */
 .cesr-version .vraw, .cesr-dt .dt-raw { color: var(--ink); }
