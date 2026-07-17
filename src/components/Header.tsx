@@ -1,4 +1,5 @@
 import type { StreamDescription } from '../model/describe';
+import { ThemeToggle } from './ThemeToggle';
 
 /** The app header: the cesrview brand, stream statistics, an inferred stream KIND (with the full
  * composition on hover), and the honest "structure only" integrity notice (b6zx2d — cesrview makes no
@@ -42,6 +43,7 @@ export function Header({
           structure only · not cryptographically verified
         </span>
       </div>
+      <ThemeToggle />
       <a className="gallery-link" href="#gallery">
         gallery ↗
       </a>
