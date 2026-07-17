@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { render, screen, fireEvent, within } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import App from './App';
 
@@ -10,74 +10,42 @@ describe('App', () => {
   it('shows the brand and a paste prompt initially', () => {
     render(<App />);
     expect(screen.getByRole('heading', { name: /cesrview/i })).toBeInTheDocument();
-    expect(screen.getByText(/paste cesr above/i)).toBeInTheDocument();
+    expect(screen.getByText(/paste cesr into the left panel/i)).toBeInTheDocument();
   });
 
-  it('decodes a pasted CESR stream into one event per message', () => {
+  it('decodes a pasted stream, showing ONE event (the first) with every event in the outline', () => {
     render(<App />);
     paste();
-    expect(screen.getAllByRole('article')).toHaveLength(2); // icp + ixn
-    expect(screen.getAllByText(/inception/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/interaction/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('article')).toHaveLength(1); // one event at a time
+    expect(screen.getByText(/inception/i)).toBeInTheDocument(); // the first event (icp) is shown
+    // both events are listed in the outline as navigation
+    expect(screen.getByRole('button', { name: /event 1: icp/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /event 2: ixn/i })).toBeInTheDocument();
   });
 
-  it('collapses a run of interaction events into one expandable card', () => {
-    render(<App />);
-    const runSample = readFileSync('src/cesr/__tests__/fixtures/tiny-run-kel.cesr', 'utf8');
-    fireEvent.change(screen.getByLabelText('CESR stream'), { target: { value: runSample } });
-    expect(screen.getAllByRole('article')).toHaveLength(1); // only the icp card; the 4 ixn are collapsed
-    fireEvent.click(screen.getByRole('button', { name: /interaction events/i }));
-    expect(screen.getAllByRole('article')).toHaveLength(5); // icp + 4 expanded ixn, in place
-  });
-
-  it('expands a collapsed run when an outline item inside it is clicked (3apb)', () => {
-    render(<App />);
-    const runSample = readFileSync('src/cesr/__tests__/fixtures/tiny-run-kel.cesr', 'utf8');
-    fireEvent.change(screen.getByLabelText('CESR stream'), { target: { value: runSample } });
-    expect(screen.getAllByRole('article')).toHaveLength(1); // the 4 ixn start collapsed
-    // an interior ixn (outline "event 3" = stream index 2) has no scroll target while collapsed;
-    // clicking it must expand the run so the target exists
-    fireEvent.click(screen.getByRole('button', { name: /event 3: ixn/i }));
-    expect(screen.getAllByRole('article')).toHaveLength(5); // run expanded in place
-  });
-
-  it('keeps the source pane collapsed by default and reveals it on toggle', () => {
+  it('shows the event selected in the outline, one at a time', () => {
     render(<App />);
     paste();
-    expect(screen.queryByRole('region', { name: 'Source' })).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: 'Source' }));
-    expect(screen.getByRole('region', { name: 'Source' })).toBeInTheDocument();
-  });
-
-  it('explains a clicked ilk badge in the annotation dock', () => {
-    render(<App />);
-    paste();
-    fireEvent.click(screen.getByRole('button', { name: 'icp' }));
-    const dock = screen.getByRole('region', { name: 'Annotation' });
-    expect(within(dock).getByText(/inception/i)).toBeInTheDocument();
-  });
-
-  it('jumps to an event when its outline item is clicked', () => {
-    render(<App />);
-    paste();
+    expect(screen.getByText(/inception/i)).toBeInTheDocument(); // first shown by default
     fireEvent.click(screen.getByRole('button', { name: /event 2: ixn/i }));
-    expect(screen.getAllByRole('article')).toHaveLength(2); // goto ran without error
+    expect(screen.getByText(/interaction/i)).toBeInTheDocument(); // now the ixn
+    expect(screen.getAllByRole('article')).toHaveLength(1); // still just one
   });
 
-  it('cross-references identifiers: selecting one highlights its other occurrences', () => {
+  it('prettifies the pasted stream into an always-present source view in the input panel', () => {
+    render(<App />);
+    expect(screen.queryByRole('region', { name: 'Source' })).not.toBeInTheDocument(); // nothing yet
+    paste();
+    expect(screen.getByRole('region', { name: 'Source' })).toBeInTheDocument(); // no toggle — just there
+  });
+
+  it('cross-references a value in the shown event: locating it highlights it', () => {
     const { container } = render(<App />);
     paste();
-    // Each recurring value is a StreamPill wrapper carrying data-value; the controller AID recurs.
-    const pills = [...container.querySelectorAll<HTMLElement>('.cesr-pill[data-value]')].filter((p) =>
-      /^[A-Za-z0-9_-]{44}$/.test(p.getAttribute('data-value') ?? ''),
-    );
-    const firstAid = pills[0].getAttribute('data-value');
-    const sameValue = pills.filter((p) => p.getAttribute('data-value') === firstAid);
-    expect(sameValue.length).toBeGreaterThan(1); // the controller AID recurs across the icp and ixn bodies
-    fireEvent.click(pills[0].querySelector('button')!); // expand the pill -> the entviz popover
+    const pill = container.querySelector<HTMLElement>('.cesr-center .cesr-pill[data-value]');
+    fireEvent.click(pill!.querySelector('button')!); // expand the entviz popover
     fireEvent.click(screen.getByRole('button', { name: /find other occurrences/i })); // locate -> select
-    const highlighted = sameValue.filter((p) => p.hasAttribute('data-selected'));
-    expect(highlighted.length).toBe(sameValue.length); // every occurrence of the selected value lights up
+    expect(pill).toHaveAttribute('data-selected');
   });
 
   it('surfaces a parse error for input that is not a CESR stream', () => {

@@ -9,7 +9,7 @@ describe('Root', () => {
 
   it('shows the app by default and switches to the gallery on hash change', () => {
     render(<Root />);
-    expect(screen.getByText(/paste cesr above/i)).toBeInTheDocument(); // the App view
+    expect(screen.getByText(/paste cesr into the left panel/i)).toBeInTheDocument(); // the App view
     act(() => {
       window.location.hash = '#gallery';
       window.dispatchEvent(new Event('hashchange'));

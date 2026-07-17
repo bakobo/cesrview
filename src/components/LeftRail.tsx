@@ -13,10 +13,12 @@ export function LeftRail({
   messages,
   logs,
   onGo,
+  selected,
 }: {
   messages: CesrMessage[];
   logs: EventLog[];
   onGo: (index: number) => void;
+  selected: number;
 }) {
   return (
     <nav className="cesr-rail" aria-label="Outline and identifiers">
@@ -38,7 +40,8 @@ export function LeftRail({
                 <li>
                   <button
                     type="button"
-                    className="toc-item"
+                    className={`toc-item${k === selected ? ' active' : ''}`}
+                    aria-current={k === selected ? 'true' : undefined}
                     aria-label={`event ${k + 1}: ${m.ilk ?? m.kind}${m.sn !== null ? `, sn ${m.sn}` : ''}`}
                     onClick={() => onGo(k)}
                   >

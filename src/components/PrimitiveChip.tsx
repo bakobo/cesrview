@@ -11,5 +11,5 @@ export function PrimitiveChip({ node, bytes }: { node: Primitive; bytes: Uint8Ar
   const value = td.decode(bytes.subarray(node.span.start, node.span.end));
   const ann = annotate(node.class, node.code);
   const label = ann ? `${node.code}: ${ann.gloss}` : node.code;
-  return <StreamPill value={value} label={label} annotation={{ category: node.class, code: node.code }} />;
+  return <StreamPill value={value} label={label} />;
 }

@@ -41,13 +41,13 @@ describe('StreamPill', () => {
     expect(pillFor(container, OTHER)).not.toHaveAttribute('data-selected');
   });
 
-  it('selects and focuses its code annotation when it is located', () => {
+  it('selects itself when located, inside a provider', () => {
     const { container } = render(
       <CesrViewProvider>
-        <StreamPill value={AID} annotation={{ category: 'matter', code: 'E' }} />
+        <StreamPill value={AID} label="E: digest" />
       </CesrViewProvider>,
     );
-    locate(pillFor(container, AID)!); // expand -> find other occurrences -> select + focus the code
+    locate(pillFor(container, AID)!); // expand -> find other occurrences -> select
     expect(pillFor(container, AID)).toHaveAttribute('data-selected');
   });
 });

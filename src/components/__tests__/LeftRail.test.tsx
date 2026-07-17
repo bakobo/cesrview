@@ -17,7 +17,7 @@ describe('LeftRail', () => {
     const onGo = vi.fn();
     const { container } = render(
       <CesrViewProvider>
-        <LeftRail messages={messages} logs={logs} onGo={onGo} />
+        <LeftRail messages={messages} logs={logs} onGo={onGo} selected={0} />
       </CesrViewProvider>,
     );
     fireEvent.click(screen.getByRole('button', { name: /event 1: icp, sn 0/i })); // 1-based
@@ -35,7 +35,7 @@ describe('LeftRail', () => {
   it('indexes the owning identifiers as pills', () => {
     const { container } = render(
       <CesrViewProvider>
-        <LeftRail messages={messages} logs={logs} onGo={vi.fn()} />
+        <LeftRail messages={messages} logs={logs} onGo={vi.fn()} selected={0} />
       </CesrViewProvider>,
     );
     expect(screen.getByText(/identifiers · 1/i)).toBeInTheDocument();
@@ -47,9 +47,21 @@ describe('LeftRail', () => {
   it('falls back to the serialization kind and omits owner/sn when a message has neither', () => {
     render(
       <CesrViewProvider>
-        <LeftRail messages={[msg({ ilk: null, sn: null, sad: null })]} logs={logs} onGo={vi.fn()} />
+        <LeftRail messages={[msg({ ilk: null, sn: null, sad: null })]} logs={logs} onGo={vi.fn()} selected={0} />
       </CesrViewProvider>,
     );
     expect(screen.getByRole('button', { name: 'event 1: JSON' })).toBeInTheDocument();
+  });
+
+  it('marks the selected event row as active (aria-current)', () => {
+    const { container } = render(
+      <CesrViewProvider>
+        <LeftRail messages={messages} logs={logs} onGo={vi.fn()} selected={1} />
+      </CesrViewProvider>,
+    );
+    const rows = container.querySelectorAll('.toc-item');
+    expect(rows[0]).not.toHaveClass('active');
+    expect(rows[1]).toHaveClass('active');
+    expect(rows[1]).toHaveAttribute('aria-current', 'true');
   });
 });
