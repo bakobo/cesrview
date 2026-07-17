@@ -1,12 +1,14 @@
-import { Entviz } from '@entviz/react';
+import { Fragment } from 'react';
 import type { CesrMessage } from '../cesr/types';
 import type { EventLog } from '../model/stream';
 import { StreamPill } from './StreamPill';
 
 /** The left rail: the OUTLINE of events IN STREAM ORDER — the arrival sequence is load-bearing and is
- * never grouped or hidden (m3xq7c / k2vx5n) — each row enriched with its owning-identifier glyph and
- * an explicit hex sn so interleaved per-identifier sequences read correctly (click to jump); plus an
- * IDENTIFIER INDEX of the owning AIDs as pills (click to cross-reference). */
+ * never reordered or hidden (m3xq7c / k2vx5n). Rows stay lightweight NAV, not deep info: a 1-based
+ * stream position, the event type, and an explicit hex sn (click to jump). Where the owner CHANGES, a
+ * SECTION-HEADER row carries that identifier as an entviz PILL (collapsed — the full visualization only
+ * ever appears when a person clicks a pill, never inline in the index). Below, an IDENTIFIER INDEX
+ * lists the owning AIDs as pills (click to cross-reference). */
 export function LeftRail({
   messages,
   logs,
@@ -19,33 +21,39 @@ export function LeftRail({
   return (
     <nav className="cesr-rail" aria-label="Outline and identifiers">
       <section>
-        <h2 className="rail-h">Outline · {messages.length}</h2>
+        <h2 className="rail-h">Outline · {messages.length} events</h2>
         <ol className="rail-outline">
           {messages.map((m, k) => {
             const owner = typeof m.sad?.i === 'string' ? m.sad.i : null;
+            const prev = k > 0 ? messages[k - 1] : null;
+            const prevOwner = typeof prev?.sad?.i === 'string' ? prev.sad.i : null;
+            const startsSection = owner !== null && owner !== prevOwner;
             return (
-              <li key={k}>
-                <button
-                  type="button"
-                  className="toc-item"
-                  aria-label={`event ${k}: ${m.ilk ?? m.kind}${m.sn !== null ? `, sn ${m.sn}` : ''}`}
-                  onClick={() => onGo(k)}
-                >
-                  {owner ? (
-                    <span className="owner" title={owner}>
-                      <Entviz value={owner} style={{ width: 16, height: 16 }} />
+              <Fragment key={k}>
+                {startsSection ? (
+                  <li className="rail-section">
+                    <StreamPill value={owner} />
+                  </li>
+                ) : null}
+                <li>
+                  <button
+                    type="button"
+                    className="toc-item"
+                    aria-label={`event ${k + 1}: ${m.ilk ?? m.kind}${m.sn !== null ? `, sn ${m.sn}` : ''}`}
+                    onClick={() => onGo(k)}
+                  >
+                    <span className="toc-num" aria-hidden="true">
+                      {k + 1}
                     </span>
-                  ) : (
-                    <span className="owner owner-none" aria-hidden="true" />
-                  )}
-                  <span className={`ilk${m.ilk ? ` ilk-${m.ilk}` : ''}`}>{m.ilk ?? m.kind}</span>
-                  {m.sn !== null ? (
-                    <span className="seq" title="sequence number (hex)">
-                      sn {m.sn}
-                    </span>
-                  ) : null}
-                </button>
-              </li>
+                    <span className={`ilk${m.ilk ? ` ilk-${m.ilk}` : ''}`}>{m.ilk ?? m.kind}</span>
+                    {m.sn !== null ? (
+                      <span className="seq" title="sequence number (hex)">
+                        sn {m.sn}
+                      </span>
+                    ) : null}
+                  </button>
+                </li>
+              </Fragment>
             );
           })}
         </ol>

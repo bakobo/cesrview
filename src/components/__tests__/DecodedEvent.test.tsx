@@ -24,10 +24,20 @@ describe('DecodedEvent', () => {
   it('renders the annotated ilk and chips high-entropy statement values', () => {
     const { container } = render(<DecodedEvent message={mk()} bytes={bytes} />);
     expect(screen.getByText(/inception/i)).toBeInTheDocument(); // the ilk gloss
-    expect(screen.getByText('k')).toBeInTheDocument(); // a field key
+    expect(screen.getByText('(signing keys)')).toBeInTheDocument(); // the `k` field key, glossed
     expect(screen.getByText('0')).toBeInTheDocument(); // the sn value, as plain text
     // the SAID, the d field and the k[] element are each an AID StreamPill (value on the wrapper)
     expect(container.querySelectorAll(`.cesr-pill[data-value="${AID}"]`).length).toBeGreaterThan(1);
+  });
+
+  it('prettifies a datetime (dt) field value inline', () => {
+    render(<DecodedEvent message={mk({ ilk: 'rpy', sad: { t: 'rpy', dt: '2020-08-22T17:50:09.988921+00:00' } })} bytes={bytes} />);
+    expect(screen.getByText(/22 August 17:50 UTC/)).toBeInTheDocument();
+  });
+
+  it('renders an unglossed field key plainly (fail-soft)', () => {
+    render(<DecodedEvent message={mk({ sad: { xyz: 'q' } })} bytes={bytes} />);
+    expect(screen.getByText('xyz')).toBeInTheDocument(); // no gloss span, just the key
   });
 
   it('keeps the proof band collapsed by default and expands it on click', () => {

@@ -30,6 +30,17 @@ describe('App', () => {
     expect(screen.getAllByRole('article')).toHaveLength(5); // icp + 4 expanded ixn, in place
   });
 
+  it('expands a collapsed run when an outline item inside it is clicked (3apb)', () => {
+    render(<App />);
+    const runSample = readFileSync('src/cesr/__tests__/fixtures/tiny-run-kel.cesr', 'utf8');
+    fireEvent.change(screen.getByLabelText('CESR stream'), { target: { value: runSample } });
+    expect(screen.getAllByRole('article')).toHaveLength(1); // the 4 ixn start collapsed
+    // an interior ixn (outline "event 3" = stream index 2) has no scroll target while collapsed;
+    // clicking it must expand the run so the target exists
+    fireEvent.click(screen.getByRole('button', { name: /event 3: ixn/i }));
+    expect(screen.getAllByRole('article')).toHaveLength(5); // run expanded in place
+  });
+
   it('keeps the source pane collapsed by default and reveals it on toggle', () => {
     render(<App />);
     paste();
@@ -49,7 +60,7 @@ describe('App', () => {
   it('jumps to an event when its outline item is clicked', () => {
     render(<App />);
     paste();
-    fireEvent.click(screen.getByRole('button', { name: /event 1: ixn/i }));
+    fireEvent.click(screen.getByRole('button', { name: /event 2: ixn/i }));
     expect(screen.getAllByRole('article')).toHaveLength(2); // goto ran without error
   });
 

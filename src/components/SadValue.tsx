@@ -11,7 +11,14 @@ export function SadValue({ value }: { value: unknown }) {
     return (
       <span className="cesr-array">
         {value.map((v, k) => (
-          <SadValue key={k} value={v} />
+          <span key={k} className="cesr-el">
+            {k > 0 ? (
+              <span className="cesr-sep" aria-hidden="true">
+                ,{' '}
+              </span>
+            ) : null}
+            <SadValue value={v} />
+          </span>
         ))}
       </span>
     );

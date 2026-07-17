@@ -1,6 +1,19 @@
-/** The app header: the cesrview brand, stream statistics, and the honest "structure only" integrity
- * notice (b6zx2d — cesrview makes no cryptographic-validity claims). Part of the 3-region shell. */
-export function Header({ events, logs, encoding }: { events: number; logs: number; encoding: string }) {
+import type { StreamDescription } from '../model/describe';
+
+/** The app header: the cesrview brand, stream statistics, an inferred stream KIND (with the full
+ * composition on hover), and the honest "structure only" integrity notice (b6zx2d — cesrview makes no
+ * cryptographic-validity claims). Part of the 3-region shell. */
+export function Header({
+  events,
+  logs,
+  encoding,
+  stream,
+}: {
+  events: number;
+  logs: number;
+  encoding: string;
+  stream: StreamDescription | null;
+}) {
   return (
     <header className="cesr-header">
       <h1 className="brand">
@@ -8,6 +21,11 @@ export function Header({ events, logs, encoding }: { events: number; logs: numbe
         cesr<b>view</b>
       </h1>
       <div className="stat">
+        {stream ? (
+          <span className="stat-stream" title={stream.composition}>
+            stream <b className="mono">{stream.kind}</b>
+          </span>
+        ) : null}
         <span>
           events <b className="mono">{events}</b>
         </span>

@@ -13,17 +13,23 @@ const messages = [msg({ ilk: 'icp', sn: '0' }), msg({ ilk: 'ixn', sn: 'a' })]; /
 const logs: EventLog[] = [{ aid: AID, kind: 'KEL', events: [], delegator: null, gaps: [], duplicities: [] }];
 
 describe('LeftRail', () => {
-  it('lists events in stream order with an owner glyph and hex sn, and jumps on click', () => {
+  it('lists events with a 1-based index and hex sn, a section-header pill at owner-change; jumps on click', () => {
     const onGo = vi.fn();
     const { container } = render(
       <CesrViewProvider>
         <LeftRail messages={messages} logs={logs} onGo={onGo} />
       </CesrViewProvider>,
     );
-    fireEvent.click(screen.getByRole('button', { name: /event 0: icp, sn 0/i }));
+    fireEvent.click(screen.getByRole('button', { name: /event 1: icp, sn 0/i })); // 1-based
     expect(onGo).toHaveBeenCalledWith(0);
+    // both events share the owner AID, so ONE section-header pill precedes the run (a collapsed pill,
+    // not a full entviz visualization) — never one per row
+    expect(container.querySelectorAll('.rail-section').length).toBe(1);
+    expect(container.querySelector(`.rail-section .cesr-pill[data-value="${AID}"]`)).toBeInTheDocument();
+    // 1-based stream positions on the left, hex sn on the right
+    expect(container.querySelectorAll('.toc-num')[0]).toHaveTextContent('1');
+    expect(container.querySelectorAll('.toc-num')[1]).toHaveTextContent('2');
     expect(screen.getByText('sn a')).toBeInTheDocument(); // the second event's hex sn, prefixed
-    expect(container.querySelectorAll('.owner svg').length).toBe(2); // an entviz owner marker per event
   });
 
   it('indexes the owning identifiers as pills', () => {
@@ -44,6 +50,6 @@ describe('LeftRail', () => {
         <LeftRail messages={[msg({ ilk: null, sn: null, sad: null })]} logs={logs} onGo={vi.fn()} />
       </CesrViewProvider>,
     );
-    expect(screen.getByRole('button', { name: 'event 0: JSON' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'event 1: JSON' })).toBeInTheDocument();
   });
 });

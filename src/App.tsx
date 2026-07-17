@@ -1,8 +1,9 @@
-import { useDeferredValue, useMemo, useState } from 'react';
+import { useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { walk } from './cesr/walk';
 import { prettyPrint } from './cesr/prettyprint';
 import { organize } from './model/stream';
 import { collapseRuns } from './model/collapse';
+import { describeStream } from './model/describe';
 import { AnnotationDock } from './components/AnnotationDock';
 import { CesrViewProvider } from './components/CesrView';
 import { DecodedEvent } from './components/DecodedEvent';
@@ -26,14 +27,32 @@ export default function App() {
   const result = useMemo(() => walk(bytes), [bytes]);
   const model = useMemo(() => organize(result), [result]);
   const items = useMemo(() => collapseRuns(result.messages), [result]);
+  const stream = useMemo(() => describeStream(result.messages, model.logs), [result, model]);
   const doc = useMemo(() => (sourceOpen ? prettyPrint(result, bytes) : null), [sourceOpen, result, bytes]);
   const first = result.messages[0];
   const encoding = first ? `${first.proto} ${first.version} · ${first.kind}` : '—';
-  const goto = (index: number) => document.getElementById(`event-${index}`)?.scrollIntoView?.({ block: 'start' });
+
+  // Run expansion is lifted here so an outline jump into a COLLAPSED run expands it before scrolling
+  // (3apb): otherwise only the run's first event has a scroll target and its interior ixns are dead.
+  const [openRuns, setOpenRuns] = useState<ReadonlySet<number>>(() => new Set<number>());
+  const [scrollTo, setScrollTo] = useState<number | null>(null);
+  // Runs only ever expand (there is no re-collapse affordance once open), so this is add-only.
+  const openRun = (start: number) => setOpenRuns((prev) => new Set(prev).add(start));
+  const goto = (index: number) => {
+    const run = items.find((it) => it.kind === 'run' && index >= it.start && index < it.start + it.messages.length);
+    if (run && run.kind === 'run') openRun(run.start);
+    setScrollTo(index);
+  };
+  // Scroll after the (possible) expansion has rendered its event target.
+  useEffect(() => {
+    if (scrollTo === null) return;
+    document.getElementById(`event-${scrollTo}`)?.scrollIntoView?.({ block: 'start' });
+    setScrollTo(null);
+  }, [scrollTo, openRuns]);
 
   return (
     <div className="cesr-app" aria-busy={pending}>
-      <Header events={result.messages.length} logs={model.logs.length} encoding={encoding} />
+      <Header events={result.messages.length} logs={model.logs.length} encoding={encoding} stream={stream} />
       <div className="cesr-input">
         <textarea
           aria-label="CESR stream"
@@ -61,7 +80,14 @@ export default function App() {
                       <DecodedEvent message={item.message} bytes={bytes} />
                     </div>
                   ) : (
-                    <RunCard key={k} messages={item.messages} start={item.start} bytes={bytes} />
+                    <RunCard
+                      key={k}
+                      messages={item.messages}
+                      start={item.start}
+                      bytes={bytes}
+                      open={openRuns.has(item.start)}
+                      onToggle={() => openRun(item.start)}
+                    />
                   )
                 }
               />

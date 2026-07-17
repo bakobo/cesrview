@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { annotate } from '../annotate/codes';
+import { annotate, annotateField } from '../annotate/codes';
 import type { CesrMessage } from '../cesr/types';
 import { AttachmentGroup } from './AttachmentGroup';
 import { useAnnotationFocus } from './CesrView';
 import { SadValue } from './SadValue';
 import { StreamPill } from './StreamPill';
+import { DatetimeValue } from './DatetimeValue';
+import { VersionValue } from './VersionValue';
 
 /** Renders one decoded message as an event card: the signed STATEMENT as the foreground (a color-
  * coded ilk badge with its gloss, the SAID pill, and the body fields), with the cryptographic proof
@@ -46,9 +48,18 @@ export function DecodedEvent({ message, bytes }: { message: CesrMessage; bytes: 
         <dl className="statement">
           {Object.entries(message.sad).map(([k, v]) => (
             <div key={k} className="row">
-              <dt className="k">{k}</dt>
+              <dt className="k">
+                {k}
+                {annotateField(k) ? <span className="k-gloss"> ({annotateField(k)})</span> : null}
+              </dt>
               <dd className="v">
-                <SadValue value={v} />
+                {k === 'v' ? (
+                  <VersionValue value={String(v)} />
+                ) : k === 'dt' ? (
+                  <DatetimeValue value={String(v)} />
+                ) : (
+                  <SadValue value={v} />
+                )}
               </dd>
             </div>
           ))}

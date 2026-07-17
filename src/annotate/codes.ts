@@ -82,3 +82,35 @@ const TABLES: Record<CodeCategory, Record<string, Annotation>> = {
 export function annotate(category: CodeCategory, code: string): Annotation | null {
   return TABLES[category][code] ?? null;
 }
+
+// Short glosses for KERI/ACDC message FIELD KEYS, shown in parens beside the terse label so a
+// reader need not memorize the single-letter schema. KEL/TEL senses (the common case); a few keys are
+// context-dependent (e.g. `s`/`a` differ in ACDCs) — the KEL reading is used here.
+const FIELD: Record<string, string> = {
+  v: 'version string',
+  t: 'message type',
+  d: 'SAID',
+  i: 'prefix/AID',
+  s: 'sequence number',
+  p: 'prior event digest',
+  kt: 'signing threshold',
+  k: 'signing keys',
+  nt: 'next (rotation) threshold',
+  n: 'next key digests',
+  bt: 'witness threshold',
+  b: 'witnesses',
+  br: 'witnesses cut',
+  ba: 'witnesses added',
+  c: 'config traits',
+  a: 'anchored seals',
+  di: 'delegator prefix',
+  dt: 'datetime',
+  rd: 'registry digest',
+  ri: 'registry identifier',
+  r: 'route',
+};
+
+/** A short human gloss for a message field key (`i` → "identifier prefix (AID)"), or null if unknown. */
+export function annotateField(key: string): string | null {
+  return FIELD[key] ?? null;
+}

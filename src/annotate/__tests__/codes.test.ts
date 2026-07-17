@@ -1,11 +1,23 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { describe, it, expect } from 'vitest';
-import { annotate, DEFERRED_ILKS, type CodeCategory } from '../codes';
+import { annotate, annotateField, DEFERRED_ILKS, type CodeCategory } from '../codes';
 import { walk } from '../../cesr/walk';
 import type { AttachmentNode } from '../../cesr/types';
 
 const CESR = 'https://trustoverip.github.io/kswg-cesr-specification/';
 const KERI = 'https://trustoverip.github.io/kswg-keri-specification/';
+
+describe('annotateField — message field-key glosses (7slk)', () => {
+  it('glosses known KEL field keys', () => {
+    expect(annotateField('i')).toBe('prefix/AID');
+    expect(annotateField('kt')).toBe('signing threshold');
+    expect(annotateField('v')).toBe('version string');
+  });
+
+  it('returns null for an unknown field key (fail-soft)', () => {
+    expect(annotateField('zz')).toBeNull();
+  });
+});
 
 describe('annotate — lookup by category (decision x4nb7q)', () => {
   it('annotates a counter/group code with a gloss and the count-code-table anchor', () => {
