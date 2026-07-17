@@ -149,6 +149,20 @@ Make CESR legible to developers in the browser = goal:
                     (the outline replaces it) and prettifying the source eagerly rather than on toggle
                     (memoised + deferred + progressively rendered, so @v3mk7n's freeze stays bounded).
 
+                Token-driven light + dark themes = decision:
+                  id: t7hm4k
+                  why: >
+                    Every color is a CSS custom-property TOKEN (surfaces, text, accents, shadow), so a
+                    whole theme is one swap: DARK is the :root default and :root[data-theme='light']
+                    overrides the tokens. A header ThemeToggle flips `data-theme` on <html> and persists
+                    the choice to localStorage (dark default). Value-tinted chrome — the ilk badge border,
+                    the warn chip, the ambient body glow — derives from its own color via
+                    color-mix(currentColor | accent, transparent) rather than hardcoded hexes, so it
+                    adapts to either theme with no per-theme rules. Accepted tradeoff: light accents are
+                    hand-tuned darker variants (not a computed inversion), and a returning light-theme
+                    user sees a brief first-paint flash because the toggle applies in an effect — left for
+                    a pre-paint inline set if it ever matters.
+
                 Realize the inspector visual design; a deterministic glyph stands in for entviz = decision:
                   id: d4nk7v
                   why: >
