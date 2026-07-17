@@ -105,6 +105,29 @@ Make CESR legible to developers in the browser = goal:
                     O(chips) per selection with no occurrence count, and the predicate is a heuristic
                     tunable as real streams exercise it.
 
+                Teach inline over a dock; lightweight outline; characterized stream = decision:
+                  id: n8kr4p
+                  why: >
+                    A UX pass with the confirmed expert user (@q7m4rp) moved cesrview's TEACHING from a
+                    click-a-dock model toward INLINE explanation, where the meaning sits next to the data.
+                    Message field keys carry a short gloss in parens (`i (prefix/AID)`, realizing the
+                    deferred field-gloss work); the version string and datetimes show the raw token then a
+                    prettified reading in parens (`KERI10JSON00037f_ (KERI 1.0, JSON, 895 bytes)`;
+                    `2020-…+00:00 (Sat, 22 August 17:50 UTC)`); the ilk gloss reads as inline explanatory
+                    text on the event. Inline explanation beats a separate panel one must click and look
+                    away to read — this is the recorded GROUND for RETIRING the annotation dock (@w6ph4k's
+                    teaching surface) in the next layout pass, moving its one unique affordance (spec
+                    deep-links) inline onto codes. The OUTLINE is re-cut as lightweight NAV (arrival order
+                    still load-bearing, @m3xq7c / @k2vx5n): a 1-based stream position, the ilk, and the hex
+                    sn per row, with the owning identifier shown as a COLLAPSED entviz PILL in a
+                    section-header row at each owner change — never a full entviz visualization inline (a
+                    full render only ever appears when a person clicks a pill), replacing the per-row owner
+                    glyph that read as heavy. A best-effort STREAM CHARACTERIZATION (inferred kind — KEL /
+                    OOBI-reply / TEL / mixed — plus a per-ilk composition) shows in the header, stated as
+                    an inference. Accepted tradeoff: inline glosses spend horizontal space and carry a
+                    hand-authored field glossary (KEL senses; a few keys differ in ACDCs); the kind is a
+                    heuristic.
+
                 Realize the inspector visual design; a deterministic glyph stands in for entviz = decision:
                   id: d4nk7v
                   why: >
