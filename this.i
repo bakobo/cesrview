@@ -128,6 +128,27 @@ Make CESR legible to developers in the browser = goal:
                     hand-authored field glossary (KEL senses; a few keys differ in ACDCs); the kind is a
                     heuristic.
 
+                Retire the dock; one event at a time; the input panel is the source = decision:
+                  id: r8kv3p
+                  why: >
+                    Realizes the @n8kr4p direction as a LAYOUT simplification, reversing three earlier
+                    calls now that teaching is inline. (1) The annotation DOCK is removed (@w6ph4k's
+                    bottom teaching surface): its glosses already read inline, and its one unique
+                    affordance — the spec deep-link — moves inline as a small ↗ on codes (the ilk badge,
+                    the counter code). The CesrView context keeps only cross-reference selection; the
+                    focus half is deleted. (2) The centre shows exactly ONE DecodedEvent at a time — the
+                    one selected in the outline (an outline click SELECTS, no longer scrolls) — reversing
+                    the show-ALL centre with progressive render (@v3mk7n) and the same-owner ixn
+                    run-collapse (@r6nk2w), which existed only to bound the cost of rendering every event
+                    at once. One event is a far lighter render and a clearer read; the outline carries
+                    sequencing. RunCard, collapseRuns and EventList-in-centre are deleted. (3) The paste
+                    INPUT becomes the leftmost narrow panel and shows the PRETTIFIED source in place, so
+                    the separate right-hand source pane (@p6hw4k's dual-pane) is gone: raw in, prettified
+                    below, one artifact. Layout is now three columns — input | outline | one event — with
+                    no dock row. Accepted tradeoff: losing at-a-glance multi-event scanning in the centre
+                    (the outline replaces it) and prettifying the source eagerly rather than on toggle
+                    (memoised + deferred + progressively rendered, so @v3mk7n's freeze stays bounded).
+
                 Realize the inspector visual design; a deterministic glyph stands in for entviz = decision:
                   id: d4nk7v
                   why: >
