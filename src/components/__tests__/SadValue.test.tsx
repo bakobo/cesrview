@@ -3,6 +3,7 @@ import { describe, it, expect } from 'vitest';
 import { SadValue } from '../SadValue';
 
 const AID = 'EDP1vHcw_wc4M__Fj53-cJaBnZZASd-aMTaSyWEQ-PC2';
+const DIG = 'EMpPWxPVNynsdN8H_n1i0YapjdM1pOWCjaGlkmjmTNMn';
 // A high-entropy value becomes a StreamPill; its value lives on the .cesr-pill wrapper, not the button.
 const pills = (c: HTMLElement) => c.querySelectorAll('.cesr-pill[data-value]');
 
@@ -25,9 +26,20 @@ describe('SadValue', () => {
     expect(pills(container)).toHaveLength(1);
   });
 
-  it('renders a non-string, non-array value as JSON', () => {
-    const { container } = render(<SadValue value={{ x: 1 }} />);
-    expect(screen.getByText('{"x":1}')).toBeInTheDocument();
-    expect(pills(container)).toHaveLength(0);
+  it('renders an object (an anchored seal) as a structured key/value block, not raw JSON', () => {
+    // an ixn event seal: {i, s, d} — anchored identifier, its sn, its digest, plus an unglossed key
+    const { container } = render(<SadValue value={{ i: AID, s: '0', d: DIG, x: 'other' }} />);
+    expect(container.querySelector('.cesr-obj')).toBeInTheDocument();
+    expect(container.querySelector('.cesr-obj')?.textContent).not.toContain('{"'); // no raw JSON
+    expect(container.querySelector(`.cesr-pill[data-value="${AID}"]`)).toBeInTheDocument(); // i -> pill
+    expect(container.querySelector(`.cesr-pill[data-value="${DIG}"]`)).toBeInTheDocument(); // d -> pill
+    expect(screen.getByText('0')).toBeInTheDocument(); // s -> plain
+    expect(screen.getByText('(prefix/AID)')).toBeInTheDocument(); // known key i is glossed
+    expect(screen.getByText('x')).toBeInTheDocument(); // unknown key rendered plainly
+  });
+
+  it('renders a bare scalar (number) as JSON text', () => {
+    render(<SadValue value={42} />);
+    expect(screen.getByText('42')).toBeInTheDocument();
   });
 });
