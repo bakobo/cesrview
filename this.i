@@ -218,7 +218,7 @@ Make CESR legible to developers in the browser = goal:
                     cadence — justified because entviz is maintained in-house and is the whole point of
                     the identifier-legibility design.
                   children:
-                    Integration landed: StreamPill is the one trust point; the locate gap becomes an entviz-js PR = decision:
+                    Integration landed — StreamPill is the one trust point; the locate gap becomes an entviz-js PR = decision:
                       id: p7lk3n
                       why: >
                         The @e5vk7n adoption is now IMPLEMENTED. cesrview's wrapper around <EntvizPill> is
@@ -244,6 +244,10 @@ Make CESR legible to developers in the browser = goal:
                         locate act ("Find other occurrences…"), no longer an incidental side effect of
                         expanding the pill; the interim onOpenChange piggyback is retired (tick 6tnb off).
 
+                Printed output is scoped, single-component, and reuses the screen render = decision:
+                  nid: 3p4cnyq7
+                  why: >-
+                    How cesrview prints. Rejected a page-level "print the whole screen" dump (fights the deliberate, scoped-act grain of onLocate @p7lk3n / recognition-not-verification @v7kd3m) and a dedicated per-component print view (Model B, unjustified once exhibits are one event). Chose MODEL A: a print is a FILTER over the already-mounted page (JS sets data-print-scope on <html>; pure @media print CSS hides the others), so there is one render pipeline and no off-screen work. One printout = exactly ONE top-level component: the whole TRANSCRIPT, the whole MANIFEST, or ONE decoded-event EXHIBIT (one event at a time; 3 events = 3 printouts). Rejected multi-select / a report builder (rule of three; physical stapling covers the assembled-filing case). On paper, identity values STAY entviz pills, not expanded to full text: a grayscale probe of multisig-oobi confirmed the pill is monochrome-legible and its first4..mid4..last4 stub is constant-width, making it the only representation that is at once width-stable across primitive sizes (44-char SAID to thousands-char post-quantum), monochrome-legible, and distinct from the transcript. Full values live once in an optional raw-CESR appendix, not per field row. Invariants: print forces the light/paper palette regardless of data-theme; interactive-only affordances are hidden in print (the pill locate glyph) while informational glyphs stay; each printout self-identifies (exhibit: event SAID + controller AID + sn) and carries a "structure decoded, not verified" posture band (b6zx2d, @v7kd3m); structural blocks are unbreakable units. Print and mobile share only a refactored narrow single-column layer, diverging on interaction and color. Accepted tradeoffs: the trigger mechanism is left provisional (native print pegged to the exhibit, other scopes via the ~3xh2 right-click menu, a two-way door recorded separately); pagination of an over-tall event and long-primitive wrapping remain to be validated with a real page.pdf() oracle before this node's code lands.
     In-browser TS stream-walker, upstreamed; keripy as oracle = decision:
       id: h6rk4d
       stage-status: planned
