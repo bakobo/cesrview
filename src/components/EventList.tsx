@@ -1,8 +1,13 @@
-import { useState, type ReactNode, type UIEvent } from 'react';
+import { useState, useRef, useEffect, type ReactNode } from 'react';
 
 /** Renders a list PROGRESSIVELY (decision v3mk7n): the first `chunk` items, revealing the next chunk
- * as its scroll container nears the end. This bounds the INITIAL paint — the cause of the large-paste
- * freeze — without ever dropping an item or reordering the stream. */
+ * as the "more" sentinel scrolls into view. This bounds the INITIAL paint — the cause of the
+ * large-paste freeze — without ever dropping an item or reordering the stream.
+ *
+ * Loading is driven by an IntersectionObserver on the sentinel, NOT a scroll handler on this
+ * component's own element: the real scroll container is usually an ANCESTOR (e.g. `.cesr-source`
+ * has `overflow: auto`, this inner div does not), and scroll events do not bubble — so a self-bound
+ * scroll listener never fired and the list stuck at the first chunk. */
 export function EventList<T>({
   items,
   renderItem,
@@ -13,17 +18,26 @@ export function EventList<T>({
   chunk?: number;
 }) {
   const [shown, setShown] = useState(chunk);
-  const onScroll = (e: UIEvent<HTMLDivElement>) => {
-    const el = e.currentTarget;
-    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 400) {
-      setShown((s) => Math.min(s + chunk, items.length));
-    }
-  };
+  const sentinelRef = useRef<HTMLParagraphElement | null>(null);
+  const hasMore = shown < items.length;
+
+  useEffect(() => {
+    if (!hasMore) return;
+    const el = sentinelRef.current!;
+    const io = new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting)) {
+        setShown((s) => Math.min(s + chunk, items.length));
+      }
+    });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [hasMore, chunk, items.length]);
+
   return (
-    <div className="cesr-eventlist" onScroll={onScroll}>
+    <div className="cesr-eventlist">
       {items.slice(0, shown).map(renderItem)}
-      {shown < items.length ? (
-        <p className="list-more">
+      {hasMore ? (
+        <p className="list-more" ref={sentinelRef}>
           Showing {shown} of {items.length} — scroll for more
         </p>
       ) : null}
