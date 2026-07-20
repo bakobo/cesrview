@@ -20,14 +20,18 @@ describe('PrimitiveChip', () => {
     expect(pillFor(container, 'ELXXiPwoaWOV')).toBeInTheDocument();
   });
 
-  it('labels the pill with the code and its gloss for a known code', () => {
+  it('does NOT caption the pill with a code+gloss label — the value shows as the entviz mnemonic (m8pv3k)', () => {
     render(<PrimitiveChip node={node()} bytes={bytes} />);
-    expect(screen.getByText(/E: Blake3-256 digest/)).toBeInTheDocument();
+    // A host label would win over the mnemonic in entviz (shownLabel = label ?? autoMnemonic); we
+    // pass none, so the long code+gloss caption must not appear — the value is handled like a
+    // SAID/identifier pill (its mnemonic), same as every other value in the stream.
+    expect(screen.queryByText(/Blake3-256 digest/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/E: /)).not.toBeInTheDocument();
   });
 
-  it('falls back to just the code as the label when the code is not annotated', () => {
+  it('does not caption an unannotated code either', () => {
     render(<PrimitiveChip node={node({ code: 'ZZ' })} bytes={bytes} />);
-    expect(screen.getByText('ZZ')).toBeInTheDocument();
+    expect(screen.queryByText('ZZ')).not.toBeInTheDocument();
   });
 
   it('renders the pill as a button, so it is natively keyboard-operable', () => {
