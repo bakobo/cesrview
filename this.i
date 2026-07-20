@@ -301,6 +301,23 @@ Make CESR legible to developers in the browser = goal:
                     page.pdf() probe (docs/print/), NOT CI — jsdom has no layout engine, so the @media
                     print CSS is proven by the probe oracle while the trigger/expand LOGIC is unit-tested
                     to 100% branch.
+
+                Drag-and-drop a file onto the input loads it as the stream = decision:
+                  id: d6rp2k
+                  why: >-
+                    A third load path beside paste and type: the input panel accepts a file DROP
+                    (dragover highlights the panel). The FIRST dropped file is read as TEXT and REPLACES
+                    the textarea contents (a file-load semantic, not append), then flows through the
+                    SAME decode pipeline — no new parsing path. Read-as-text matches the app's existing
+                    text-only model (textarea + TextEncoder); a genuinely binary CESR file would be
+                    mangled — accepted limitation, since paste/type already assume text and the sample
+                    corpus is text (a binary-aware path can come later if a real need appears). Guard:
+                    only file drags are hijacked (dataTransfer.types includes 'Files'); a text/selection
+                    drag is left to the browser's default. Multiple files: FIRST only (rule of three; one
+                    stream at a time). Not restricted by extension — any dropped text is decoded and the
+                    existing parse-error path handles non-CESR input, fail-safe. Encapsulated in a
+                    useFileDrop hook so the guard/first-file/read-as-text branches are unit-tested to
+                    100% independent of layout.
     In-browser TS stream-walker, upstreamed; keripy as oracle = decision:
       id: h6rk4d
       stage-status: planned
