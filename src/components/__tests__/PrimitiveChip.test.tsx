@@ -38,4 +38,13 @@ describe('PrimitiveChip', () => {
     const { container } = render(<PrimitiveChip node={node()} bytes={bytes} />);
     expect(container.querySelector('.cesr-pill button')).toBeInTheDocument();
   });
+
+  it('renders a CESR datetime (Dater) as a prettified datetime, like the dt field — not a pill', () => {
+    const dater = new TextEncoder().encode('1AAG2020-08-22T17c50c09d988921p00c00'); // 36-char Dater
+    const { container } = render(
+      <PrimitiveChip node={node({ code: '1AAG', span: { start: 0, end: 36 } })} bytes={dater} />,
+    );
+    expect(screen.getByText(/22 August 17:50 UTC/)).toBeInTheDocument(); // prettified, same as dt
+    expect(container.querySelector('.cesr-pill')).not.toBeInTheDocument(); // not an entviz pill
+  });
 });
