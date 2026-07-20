@@ -34,7 +34,7 @@ describe('SadValue', () => {
     expect(container.querySelector(`.cesr-pill[data-value="${AID}"]`)).toBeInTheDocument(); // i -> pill
     expect(container.querySelector(`.cesr-pill[data-value="${DIG}"]`)).toBeInTheDocument(); // d -> pill
     expect(screen.getByText('0')).toBeInTheDocument(); // s -> plain
-    expect(screen.getByText('(prefix/AID)')).toBeInTheDocument(); // known key i is glossed
+    expect(screen.getByRole('link', { name: /prefix\/AID/i })).toBeInTheDocument(); // key i gloss -> spec link
     expect(screen.getByText('x')).toBeInTheDocument(); // unknown key rendered plainly
   });
 

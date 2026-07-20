@@ -3,6 +3,7 @@ import { annotate, annotateField } from '../annotate/codes';
 import type { CesrMessage } from '../cesr/types';
 import { AttachmentGroup } from './AttachmentGroup';
 import { SadValue } from './SadValue';
+import { SpecLink } from './SpecLink';
 import { StreamPill } from './StreamPill';
 import { DatetimeValue } from './DatetimeValue';
 import { VersionValue } from './VersionValue';
@@ -38,11 +39,18 @@ export function DecodedEvent({ message, bytes }: { message: CesrMessage; bytes: 
       </header>
       {message.sad ? (
         <dl className="statement">
-          {Object.entries(message.sad).map(([k, v]) => (
+          {Object.entries(message.sad).map(([k, v]) => {
+            const fa = annotateField(k);
+            return (
             <div key={k} className="row">
               <dt className="k">
                 {k}
-                {annotateField(k) ? <span className="k-gloss"> ({annotateField(k)})</span> : null}
+                {fa ? (
+                  <span className="k-gloss">
+                    {' ('}
+                    <SpecLink gloss={fa.gloss} spec={fa.spec} find={fa.find} />)
+                  </span>
+                ) : null}
               </dt>
               <dd className="v">
                 {k === 'v' ? (
@@ -54,7 +62,8 @@ export function DecodedEvent({ message, bytes }: { message: CesrMessage; bytes: 
                 )}
               </dd>
             </div>
-          ))}
+            );
+          })}
         </dl>
       ) : (
         <p className="cesr-undecoded">

@@ -1,5 +1,6 @@
 import { annotateField } from '../annotate/codes';
 import { highEntropy } from './CesrView';
+import { SpecLink } from './SpecLink';
 import { StreamPill } from './StreamPill';
 
 /** Renders a message-body field value: a high-entropy string becomes a cross-reference chip, an array
@@ -28,15 +29,23 @@ export function SadValue({ value }: { value: unknown }) {
   if (value !== null && typeof value === 'object') {
     return (
       <span className="cesr-obj">
-        {Object.entries(value as Record<string, unknown>).map(([k, v]) => (
-          <span key={k} className="cesr-obj-row">
-            <span className="cesr-obj-k">
-              {k}
-              {annotateField(k) ? <span className="k-gloss"> ({annotateField(k)})</span> : null}
+        {Object.entries(value as Record<string, unknown>).map(([k, v]) => {
+          const fa = annotateField(k);
+          return (
+            <span key={k} className="cesr-obj-row">
+              <span className="cesr-obj-k">
+                {k}
+                {fa ? (
+                  <span className="k-gloss">
+                    {' ('}
+                    <SpecLink gloss={fa.gloss} spec={fa.spec} find={fa.find} />)
+                  </span>
+                ) : null}
+              </span>
+              <SadValue value={v} />
             </span>
-            <SadValue value={v} />
-          </span>
-        ))}
+          );
+        })}
       </span>
     );
   }

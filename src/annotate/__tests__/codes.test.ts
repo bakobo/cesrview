@@ -9,9 +9,15 @@ const KERI = 'https://trustoverip.github.io/kswg-keri-specification/';
 
 describe('annotateField — message field-key glosses (7slk)', () => {
   it('glosses known KEL field keys', () => {
-    expect(annotateField('i')).toBe('prefix/AID');
-    expect(annotateField('kt')).toBe('signing threshold');
-    expect(annotateField('v')).toBe('version string');
+    expect(annotateField('i')?.gloss).toBe('prefix/AID');
+    expect(annotateField('kt')?.gloss).toBe('signing threshold');
+    expect(annotateField('v')?.gloss).toBe('version string');
+  });
+
+  it('deep-links a field to the KERI field-labels section, targeting its exact Title (s9grn4)', () => {
+    const a = annotateField('kt')!;
+    expect(a.spec).toBe(`${KERI}#keri-field-labels-for-data-structures`);
+    expect(a.find).toBe('Keys Signing Threshold');
   });
 
   it('returns null for an unknown field key (fail-soft)', () => {

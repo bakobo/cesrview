@@ -24,7 +24,7 @@ describe('DecodedEvent', () => {
   it('renders the annotated ilk and chips high-entropy statement values', () => {
     const { container } = render(<DecodedEvent message={mk()} bytes={bytes} />);
     expect(screen.getByText(/inception/i)).toBeInTheDocument(); // the ilk gloss
-    expect(screen.getByText('(signing keys)')).toBeInTheDocument(); // the `k` field key, glossed
+    expect(screen.getByRole('link', { name: /signing keys/i })).toBeInTheDocument(); // `k` gloss -> spec link
     expect(screen.getByText('0')).toBeInTheDocument(); // the sn value, as plain text
     // the SAID, the d field and the k[] element are each an AID StreamPill (value on the wrapper)
     expect(container.querySelectorAll(`.cesr-pill[data-value="${AID}"]`).length).toBeGreaterThan(1);

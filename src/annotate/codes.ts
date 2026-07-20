@@ -7,10 +7,12 @@
  * (m4dp7k, n6wd3k) while the teaching content lives on top. Lookup is fail-soft: an unannotated
  * code returns null and its node still renders (the d3rk6n spirit). */
 
-/** A human-facing annotation for a code: a plain-language gloss and a spec-section deep link. */
+/** A human-facing annotation for a code: a plain-language gloss, a spec-section deep link, and an
+ * optional exact phrase to target within that section via a URL text fragment (s9grn4). */
 export interface Annotation {
   gloss: string;
   spec: string; // deep link to the relevant spec section (a fragment that exists in the page)
+  find?: string; // exact phrase in that section for text-fragment precision; absent = section floor
 }
 
 /** Which code table a code belongs to. Matter and Indexer are separate because their codes collide
@@ -24,6 +26,9 @@ const KERI = 'https://trustoverip.github.io/kswg-keri-specification/';
 const CESR_COUNTER = `${CESR}#count-code-tables`;
 const CESR_MATTER = `${CESR}#master-code-table-for-genusversion-_aaacaa-keriacdc-protocol-stack-version-200`;
 const CESR_INDEXER = `${CESR}#indexed-code-table`;
+// KERI message field labels live in one table; the `find` phrases below are the verbatim Title-column
+// text for each label, so a text-fragment lands on the exact row (s9grn4).
+const KERI_FIELDS = `${KERI}#keri-field-labels-for-data-structures`;
 
 const COUNTER: Record<string, Annotation> = {
   '-A': { gloss: 'Controller indexed signatures — the controlling keypairs’ signatures on this event, each tagged with the index of the key that made it.', spec: CESR_COUNTER },
@@ -86,31 +91,35 @@ export function annotate(category: CodeCategory, code: string): Annotation | nul
 // Short glosses for KERI/ACDC message FIELD KEYS, shown in parens beside the terse label so a
 // reader need not memorize the single-letter schema. KEL/TEL senses (the common case); a few keys are
 // context-dependent (e.g. `s`/`a` differ in ACDCs) — the KEL reading is used here.
-const FIELD: Record<string, string> = {
-  v: 'version string',
-  t: 'message type',
-  d: 'SAID',
-  i: 'prefix/AID',
-  s: 'sequence number',
-  p: 'prior event digest',
-  kt: 'signing threshold',
-  k: 'signing keys',
-  nt: 'next (rotation) threshold',
-  n: 'next key digests',
-  bt: 'witness threshold',
-  b: 'witnesses',
-  br: 'witnesses cut',
-  ba: 'witnesses added',
-  c: 'config traits',
-  a: 'anchored seals',
-  di: 'delegator prefix',
-  dt: 'datetime',
-  rd: 'registry digest',
-  ri: 'registry identifier',
-  r: 'route',
+// `gloss` is the concise inline label; `find` is the verbatim KERI-spec Title-column text (verified
+// against the published spec) that a text fragment targets for precise navigation. Fields with no
+// verified Title (dt/rd/ri/r are defined outside this table) link to the section floor, no `find`.
+const FIELD: Record<string, Annotation> = {
+  v: { gloss: 'version string', spec: KERI_FIELDS, find: 'Version String' },
+  t: { gloss: 'message type', spec: KERI_FIELDS, find: 'Message Type' },
+  d: { gloss: 'SAID', spec: KERI_FIELDS, find: 'Digest SAID' },
+  i: { gloss: 'prefix/AID', spec: KERI_FIELDS, find: 'Identifier Prefix (AID)' },
+  s: { gloss: 'sequence number', spec: KERI_FIELDS, find: 'Sequence Number' },
+  p: { gloss: 'prior event digest', spec: KERI_FIELDS, find: 'Prior SAID' },
+  kt: { gloss: 'signing threshold', spec: KERI_FIELDS, find: 'Keys Signing Threshold' },
+  k: { gloss: 'signing keys', spec: KERI_FIELDS, find: 'List of Signing Keys (ordered key set)' },
+  nt: { gloss: 'next (rotation) threshold', spec: KERI_FIELDS, find: 'Next Keys Signing Threshold' },
+  n: { gloss: 'next key digests', spec: KERI_FIELDS, find: 'List of Next Key Digests (ordered key digest set)' },
+  bt: { gloss: 'witness threshold', spec: KERI_FIELDS, find: 'Backer Threshold' },
+  b: { gloss: 'witnesses', spec: KERI_FIELDS, find: 'List of Backers (ordered backer set of AIDs)' },
+  br: { gloss: 'witnesses cut', spec: KERI_FIELDS, find: 'List of Backers to Remove (ordered backer set of AIDS)' },
+  ba: { gloss: 'witnesses added', spec: KERI_FIELDS, find: 'List of Backers to Add (ordered backer set of AIDs)' },
+  c: { gloss: 'config traits', spec: KERI_FIELDS, find: 'List of Configuration Traits/Modes' },
+  a: { gloss: 'anchored seals', spec: KERI_FIELDS, find: 'List of Anchors (seals)' },
+  di: { gloss: 'delegator prefix', spec: KERI_FIELDS, find: 'Delegator Identifier Prefix (AID)' },
+  dt: { gloss: 'datetime', spec: KERI_FIELDS },
+  rd: { gloss: 'registry digest', spec: KERI_FIELDS },
+  ri: { gloss: 'registry identifier', spec: KERI_FIELDS },
+  r: { gloss: 'route', spec: KERI_FIELDS },
 };
 
-/** A short human gloss for a message field key (`i` → "identifier prefix (AID)"), or null if unknown. */
-export function annotateField(key: string): string | null {
+/** The annotation for a message field key (`kt` → "signing threshold" + its spec deep-link), or null
+ * if the key is not annotated (fail-soft). */
+export function annotateField(key: string): Annotation | null {
   return FIELD[key] ?? null;
 }
