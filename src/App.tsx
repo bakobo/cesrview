@@ -9,6 +9,7 @@ import { Header } from './components/Header';
 import { LeftRail } from './components/LeftRail';
 import { SourcePane } from './components/SourcePane';
 import { usePrint } from './components/usePrint';
+import { useFileDrop } from './components/useFileDrop';
 
 const encoder = new TextEncoder();
 
@@ -16,6 +17,7 @@ export default function App() {
   const [text, setText] = useState('');
   const [selected, setSelected] = useState(0);
   const { expandAll, print } = usePrint();
+  const { dragging, dropProps } = useFileDrop(setText);
   // Decode the DEFERRED text so the input stays responsive on a large paste (aria-busy shows a
   // "decoding…" indicator). Every parse/derive is MEMOISED on its inputs (this.i m7kv3n / v3mk7n).
   const deferredText = useDeferredValue(text);
@@ -45,7 +47,7 @@ export default function App() {
       />
       <CesrViewProvider>
         <div className="cesr-main">
-          <section className="cesr-input-panel">
+          <section className={`cesr-input-panel${dragging ? ' drag-over' : ''}`} {...dropProps}>
             <textarea
               aria-label="CESR stream"
               placeholder="Paste a CESR stream — a KEL, TEL, ACDC, or OOBI response."

@@ -48,6 +48,23 @@ describe('App', () => {
     expect(pill).toHaveAttribute('data-selected');
   });
 
+  it('highlights the input on a file drag and decodes a dropped CESR file', async () => {
+    const { container } = render(<App />);
+    const panel = container.querySelector<HTMLElement>('.cesr-input-panel')!;
+    expect(screen.queryByRole('region', { name: 'Source' })).not.toBeInTheDocument();
+
+    const fileDrag = { dataTransfer: { types: ['Files'], files: [] as File[] } };
+    fireEvent.dragOver(panel, fileDrag); // a file is over the panel -> highlight
+    expect(panel).toHaveClass('drag-over');
+
+    const file = new File([sample], 'kel.cesr', { type: 'text/plain' });
+    fireEvent.drop(panel, { dataTransfer: { types: ['Files'], files: [file] } });
+    // file.text() is async and the decode is deferred; allow headroom under coverage instrumentation.
+    await screen.findByRole('region', { name: 'Source' }, { timeout: 5000 }); // file loaded + decoded
+    expect(panel).not.toHaveClass('drag-over'); // highlight cleared on drop
+    expect(screen.getByText(/inception/i)).toBeInTheDocument();
+  });
+
   it('surfaces a parse error for input that is not a CESR stream', () => {
     render(<App />);
     fireEvent.change(screen.getByLabelText('CESR stream'), { target: { value: 'garbage' } });

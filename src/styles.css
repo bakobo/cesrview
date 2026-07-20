@@ -39,6 +39,8 @@ body {
 .cesr-app { display: grid; grid-template-rows: auto 1fr; height: 100vh; overflow: hidden; }
 /* input panel (leftmost): raw paste at top, the prettified source below — no separate source pane */
 .cesr-input-panel { grid-area: input; display: flex; flex-direction: column; min-height: 0; border-right: 1px solid var(--line); background: var(--panel2); overflow: hidden; }
+/* drag-and-drop a CESR file onto the input (d6rp2k) — highlight the panel while a file is over it */
+.cesr-input-panel.drag-over { outline: 2px dashed var(--acc2); outline-offset: -6px; background: color-mix(in srgb, var(--acc2) 9%, var(--panel2)); }
 .cesr-input-panel textarea {
   flex: none; height: 84px; resize: vertical; margin: 10px 10px 6px; background: var(--inset); color: var(--ink);
   border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; font-family: var(--mono); font-size: 12px;
