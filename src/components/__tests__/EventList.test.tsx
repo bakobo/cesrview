@@ -53,4 +53,12 @@ describe('EventList', () => {
     expect(container.querySelectorAll('.item')).toHaveLength(3);
     expect(container.querySelector('.list-more')).not.toBeInTheDocument();
   });
+
+  it('renders EVERY item and no sentinel when expandAll is set (print fail-closed)', () => {
+    const { container } = render(
+      <EventList items={items} renderItem={renderItem} chunk={40} expandAll />,
+    );
+    expect(container.querySelectorAll('.item')).toHaveLength(100);
+    expect(container.querySelector('.list-more')).not.toBeInTheDocument();
+  });
 });

@@ -1,5 +1,7 @@
 import type { StreamDescription } from '../model/describe';
 import { ThemeToggle } from './ThemeToggle';
+import { PrintMenu } from './PrintMenu';
+import type { PrintScope } from './usePrint';
 
 /** The app header: the cesrview brand, stream statistics, an inferred stream KIND (with the full
  * composition on hover), and the honest "structure only" integrity notice (b6zx2d — cesrview makes no
@@ -9,11 +11,13 @@ export function Header({
   logs,
   encoding,
   stream,
+  onPrint,
 }: {
   events: number;
   logs: number;
   encoding: string;
   stream: StreamDescription | null;
+  onPrint: (scope: PrintScope) => void;
 }) {
   return (
     <header className="cesr-header">
@@ -43,6 +47,7 @@ export function Header({
           structure only · not cryptographically verified
         </span>
       </div>
+      <PrintMenu onPrint={onPrint} />
       <ThemeToggle />
       <a className="gallery-link" href="#gallery">
         gallery ↗

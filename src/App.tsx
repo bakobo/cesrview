@@ -8,12 +8,14 @@ import { DecodedEvent } from './components/DecodedEvent';
 import { Header } from './components/Header';
 import { LeftRail } from './components/LeftRail';
 import { SourcePane } from './components/SourcePane';
+import { usePrint } from './components/usePrint';
 
 const encoder = new TextEncoder();
 
 export default function App() {
   const [text, setText] = useState('');
   const [selected, setSelected] = useState(0);
+  const { expandAll, print } = usePrint();
   // Decode the DEFERRED text so the input stays responsive on a large paste (aria-busy shows a
   // "decoding…" indicator). Every parse/derive is MEMOISED on its inputs (this.i m7kv3n / v3mk7n).
   const deferredText = useDeferredValue(text);
@@ -34,7 +36,13 @@ export default function App() {
 
   return (
     <div className="cesr-app" aria-busy={pending}>
-      <Header events={result.messages.length} logs={model.logs.length} encoding={encoding} stream={stream} />
+      <Header
+        events={result.messages.length}
+        logs={model.logs.length}
+        encoding={encoding}
+        stream={stream}
+        onPrint={print}
+      />
       <CesrViewProvider>
         <div className="cesr-main">
           <section className="cesr-input-panel">
@@ -47,7 +55,7 @@ export default function App() {
             <span className="decoding" role="status">
               decoding…
             </span>
-            {doc ? <SourcePane doc={doc} /> : null}
+            {doc ? <SourcePane doc={doc} expandAll={expandAll} /> : null}
           </section>
           <LeftRail messages={result.messages} logs={model.logs} onGo={setSelected} selected={activeIndex} />
           <div className="cesr-center">

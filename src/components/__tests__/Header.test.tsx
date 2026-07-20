@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
 import { Header } from '../Header';
 
 describe('Header', () => {
@@ -10,6 +10,7 @@ describe('Header', () => {
         logs={11}
         encoding="KERI1.0 · JSON"
         stream={{ kind: 'OOBI / endpoint reply stream', composition: '11 identifiers · 79 ixn' }}
+        onPrint={() => {}}
       />,
     );
     expect(screen.getByText('102')).toBeInTheDocument();
@@ -20,7 +21,17 @@ describe('Header', () => {
   });
 
   it('omits the stream kind when there is nothing decoded', () => {
-    const { container } = render(<Header events={0} logs={0} encoding="—" stream={null} />);
+    const { container } = render(
+      <Header events={0} logs={0} encoding="—" stream={null} onPrint={() => {}} />,
+    );
     expect(container.querySelector('.stat-stream')).toBeNull();
+  });
+
+  it('offers a print trigger that reports the chosen scope', () => {
+    const onPrint = vi.fn();
+    render(<Header events={0} logs={0} encoding="—" stream={null} onPrint={onPrint} />);
+    fireEvent.click(screen.getByRole('button', { name: /print/i }));
+    fireEvent.click(screen.getByRole('menuitem', { name: /this event/i }));
+    expect(onPrint).toHaveBeenCalledWith('exhibit');
   });
 });

@@ -12,14 +12,19 @@ export function EventList<T>({
   items,
   renderItem,
   chunk = 40,
+  expandAll = false,
 }: {
   items: T[];
   renderItem: (item: T, index: number) => ReactNode;
   chunk?: number;
+  /** Render every item at once with no sentinel — used when printing the transcript, where a
+   * progressively-rendered (truncated) DOM would silently misrepresent the stream (p9rn5t). */
+  expandAll?: boolean;
 }) {
   const [shown, setShown] = useState(chunk);
   const sentinelRef = useRef<HTMLParagraphElement | null>(null);
-  const hasMore = shown < items.length;
+  const hasMore = !expandAll && shown < items.length;
+  const count = expandAll ? items.length : shown;
 
   useEffect(() => {
     if (!hasMore) return;
@@ -35,7 +40,7 @@ export function EventList<T>({
 
   return (
     <div className="cesr-eventlist">
-      {items.slice(0, shown).map(renderItem)}
+      {items.slice(0, count).map(renderItem)}
       {hasMore ? (
         <p className="list-more" ref={sentinelRef}>
           Showing {shown} of {items.length} — scroll for more
