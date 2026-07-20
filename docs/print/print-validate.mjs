@@ -55,22 +55,22 @@ async function withScope(scope, menuLabel) {
 
 const t = await withScope('source', /prettified stream/i);
 const m = await withScope('outline', /outline/i);
-const e = await withScope('exhibit', /this event/i);
+const e = await withScope('event', /this event/i);
 await browser.close();
 
 const checks = [
   ['source: scope attr set', t.scope === 'source'],
   ['source: expanded ALL lines (fail-closed) — grew past first chunk', t.lines > t.before && t.before <= 80],
   ['source: no "more" sentinel after expand', t.hasMore === false],
-  ['source: outline + exhibit hidden', t.railDisplay === 'none' && t.centerDisplay === 'none'],
+  ['source: outline + event hidden', t.railDisplay === 'none' && t.centerDisplay === 'none'],
   ['source: prettified stream has no horizontal overflow (wraps)', t.sourceOverflowX !== null && t.sourceOverflowX <= 2],
   ['source: paper palette forced under dark theme', /rgb\(255, 255, 255\)/.test(t.bodyBg)],
-  ['outline: prettified stream + exhibit hidden', m.inputDisplay === 'none' && m.centerDisplay === 'none'],
+  ['outline: prettified stream + event hidden', m.inputDisplay === 'none' && m.centerDisplay === 'none'],
   ['outline: rail visible', m.railDisplay !== 'none' && m.railDisplay !== 'MISSING'],
-  ['exhibit: prettified stream + outline hidden', e.inputDisplay === 'none' && e.railDisplay === 'none'],
-  ['exhibit: center visible', e.centerDisplay !== 'none' && e.centerDisplay !== 'MISSING'],
-  ['exhibit: event card is NOT break-inside:avoid (no blank page 1)', e.eventBreakInside !== 'avoid'],
-  ['exhibit: field rows ARE break-inside:avoid (rows never split)', e.rowBreakInside === 'avoid'],
+  ['event: prettified stream + outline hidden', e.inputDisplay === 'none' && e.railDisplay === 'none'],
+  ['event: center visible', e.centerDisplay !== 'none' && e.centerDisplay !== 'MISSING'],
+  ['event: event card is NOT break-inside:avoid (no blank page 1)', e.eventBreakInside !== 'avoid'],
+  ['event: field rows ARE break-inside:avoid (rows never split)', e.rowBreakInside === 'avoid'],
 ];
 let ok = true;
 for (const [name, pass] of checks) { console.log(`${pass ? 'PASS' : 'FAIL'}  ${name}`); if (!pass) ok = false; }

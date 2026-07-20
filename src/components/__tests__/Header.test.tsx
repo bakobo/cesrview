@@ -32,6 +32,6 @@ describe('Header', () => {
     render(<Header events={0} logs={0} encoding="—" stream={null} onPrint={onPrint} />);
     fireEvent.click(screen.getByRole('button', { name: /print/i }));
     fireEvent.click(screen.getByRole('menuitem', { name: /this event/i }));
-    expect(onPrint).toHaveBeenCalledWith('exhibit');
+    expect(onPrint).toHaveBeenCalledWith('event');
   });
 });

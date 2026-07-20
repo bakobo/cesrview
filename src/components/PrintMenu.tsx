@@ -4,12 +4,12 @@ import type { PrintScope } from './usePrint';
 const SCOPES: ReadonlyArray<readonly [PrintScope, string]> = [
   ['source', 'Prettified stream (long)'],
   ['outline', 'Outline'],
-  ['exhibit', 'This event'],
+  ['event', 'This event'],
 ];
 
 /** The interim print trigger (p9rn5t): a small header disclosure that offers the three print scopes
  * until the ~3xh2 right-click menu can drive print() instead. Choosing a scope fires onPrint and
- * closes. Native Ctrl+P still works independently — it prints the default (exhibit) scope. */
+ * closes. Native Ctrl+P still works independently — it prints the default (event) scope. */
 export function PrintMenu({ onPrint }: { onPrint: (scope: PrintScope) => void }) {
   const [open, setOpen] = useState(false);
   return (

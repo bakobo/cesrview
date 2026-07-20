@@ -16,7 +16,7 @@ describe('PrintMenu', () => {
   it.each([
     ['source', /prettified stream/i],
     ['outline', /outline/i],
-    ['exhibit', /this event/i],
+    ['event', /this event/i],
   ] as const)('invokes onPrint(%s) and closes when its item is chosen', (scope, label) => {
     const onPrint = vi.fn();
     render(<PrintMenu onPrint={onPrint} />);

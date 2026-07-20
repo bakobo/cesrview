@@ -203,17 +203,17 @@ body {
   .cesr-source-line, .row, .cesr-obj-row, .toc-item, .rail-section { break-inside: avoid; }
   .ev-head { break-inside: avoid; break-after: avoid; } /* keep the event's title row with its body */
 
-  /* ~27df deferred print polish lands here: a per-exhibit SAID+AID+sn self-id band, an optional
+  /* ~27df deferred print polish lands here: a per-event SAID+AID+sn self-id band, an optional
      raw-CESR appendix, hiding the entviz pill locate glyph on paper, and sharing this narrow
      single-column layer with the mobile breakpoint once mobile is validated. */
   /* Scope selection: show exactly one of source = prettified stream (input panel) | outline (rail) |
-   * exhibit = this event (center). */
+   * event = this event (center). */
   html[data-print-scope='source'] .cesr-rail,
   html[data-print-scope='source'] .cesr-center { display: none; }
   html[data-print-scope='outline'] .cesr-input-panel,
   html[data-print-scope='outline'] .cesr-center { display: none; }
-  html[data-print-scope='exhibit'] .cesr-input-panel,
-  html[data-print-scope='exhibit'] .cesr-rail { display: none; }
+  html[data-print-scope='event'] .cesr-input-panel,
+  html[data-print-scope='event'] .cesr-rail { display: none; }
 }
 
 /* responsive: stack to a single vertical column on narrow (mobile) viewports (t2vd6m) */

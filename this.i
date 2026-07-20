@@ -267,15 +267,15 @@ Make CESR legible to developers in the browser = goal:
                 Printed output is scoped, single-component, and reuses the screen render = decision:
                   nid: 3p4cnyq7
                   why: >-
-                    How cesrview prints. Rejected a page-level "print the whole screen" dump (fights the deliberate, scoped-act grain of onLocate @p7lk3n / recognition-not-verification @v7kd3m) and a dedicated per-component print view (Model B, unjustified once exhibits are one event). Chose MODEL A: a print is a FILTER over the already-mounted page (JS sets data-print-scope on <html>; pure @media print CSS hides the others), so there is one render pipeline and no off-screen work. One printout = exactly ONE top-level component: the whole PRETTIFIED STREAM (source view), the whole OUTLINE (left rail), or ONE decoded event ("This event"; one event at a time; 3 events = 3 printouts). [Terminology updated d6rp2k-era: the earlier "transcript"/"manifest" metaphors were dropped for the real UI names — see p9rn5t.] Rejected multi-select / a report builder (rule of three; physical stapling covers the assembled-filing case). On paper, identity values STAY entviz pills, not expanded to full text: a grayscale probe of multisig-oobi confirmed the pill is monochrome-legible and its first4..mid4..last4 stub is constant-width, making it the only representation that is at once width-stable across primitive sizes (44-char SAID to thousands-char post-quantum), monochrome-legible, and distinct from the prettified stream. Full values live once in an optional raw-CESR appendix, not per field row. Invariants: print forces the light/paper palette regardless of data-theme; interactive-only affordances are hidden in print (the pill locate glyph) while informational glyphs stay; each printout self-identifies (exhibit: event SAID + controller AID + sn) and carries a "structure decoded, not verified" posture band (b6zx2d, @v7kd3m); structural blocks are unbreakable units. Print and mobile share only a refactored narrow single-column layer, diverging on interaction and color. Accepted tradeoffs: the trigger mechanism is left provisional (native print pegged to the exhibit, other scopes via the ~3xh2 right-click menu, a two-way door recorded separately); pagination of an over-tall event and long-primitive wrapping remain to be validated with a real page.pdf() oracle before this node's code lands.
+                    How cesrview prints. Rejected a page-level "print the whole screen" dump (fights the deliberate, scoped-act grain of onLocate @p7lk3n / recognition-not-verification @v7kd3m) and a dedicated per-component print view (Model B, unjustified once the printed unit is one event). Chose MODEL A: a print is a FILTER over the already-mounted page (JS sets data-print-scope on <html>; pure @media print CSS hides the others), so there is one render pipeline and no off-screen work. One printout = exactly ONE top-level component: the whole PRETTIFIED STREAM (source view), the whole OUTLINE (left rail), or ONE decoded event ("This event"; one event at a time; 3 events = 3 printouts). [Terminology updated d6rp2k-era: the earlier "transcript"/"manifest" metaphors were dropped for the real UI names — see p9rn5t.] Rejected multi-select / a report builder (rule of three; physical stapling covers the assembled-filing case). On paper, identity values STAY entviz pills, not expanded to full text: a grayscale probe of multisig-oobi confirmed the pill is monochrome-legible and its first4..mid4..last4 stub is constant-width, making it the only representation that is at once width-stable across primitive sizes (44-char SAID to thousands-char post-quantum), monochrome-legible, and distinct from the prettified stream. Full values live once in an optional raw-CESR appendix, not per field row. Invariants: print forces the light/paper palette regardless of data-theme; interactive-only affordances are hidden in print (the pill locate glyph) while informational glyphs stay; each printout self-identifies (event scope: event SAID + controller AID + sn) and carries a "structure decoded, not verified" posture band (b6zx2d, @v7kd3m); structural blocks are unbreakable units. Print and mobile share only a refactored narrow single-column layer, diverging on interaction and color. Accepted tradeoffs: the trigger mechanism is left provisional (native print pegged to the event scope, other scopes via the ~3xh2 right-click menu, a two-way door recorded separately); pagination of an over-tall event and long-primitive wrapping remain to be validated with a real page.pdf() oracle before this node's code lands.
 
                 Print implementation: header trigger, fail-closed transcript expand = decision:
                   id: p9rn5t
                   why: >-
                     Lands the code for 3p4cnyq7 (tick 25ex). TRIGGER: since ~3xh2 (right-click menu)
                     is not built, the interim trigger is a small Print menu in the header offering the
-                    three scopes {Prettified stream (source) | Outline | This event (exhibit)}; each sets data-print-scope on
-                    <html> and calls window.print(). Native Ctrl+P (no menu) defaults to the EXHIBIT
+                    three scopes {Prettified stream (source) | Outline | This event}; each sets data-print-scope on
+                    <html> and calls window.print(). Native Ctrl+P (no menu) defaults to the EVENT
                     scope — the one scope always fully in the DOM (one event), so a bare Ctrl+P is never
                     the truncation trap below. When ~3xh2 lands it can drive the same print(scope) entry
                     point and the header menu can retire (two-way door). FAIL-CLOSED PRETTIFIED STREAM
@@ -284,10 +284,10 @@ Make CESR legible to developers in the browser = goal:
                     truncated stream — misrepresenting completeness, a fail-closed violation. So a
                     `source` print runs a TWO-COMMIT sequence: commit 1 forces EventList to expand ALL
                     doc.lines into the DOM; only after that commit does an effect call window.print().
-                    The outline (LeftRail maps every message directly) and exhibit (one event) need no
+                    The outline (LeftRail maps every message directly) and the event scope (one event) needs no
                     expansion. NAMING: the printable things use their real UI names — `source` = the
                     prettified stream (the input panel's unlabeled Source view), `outline` = the left
-                    rail, `exhibit` = one decoded event ("This event"); the earlier "transcript"/
+                    rail, `event` = one decoded event ("This event"); the earlier "transcript"/
                     "manifest" metaphors were dropped. POSTURE + SELF-ID:
                     reuse the header's existing "structure only · not cryptographically verified" chip
                     (b6zx2d) — kept visible in print — plus the brand and stream kind, to satisfy the
@@ -295,7 +295,7 @@ Make CESR legible to developers in the browser = goal:
                     data-print-scope to hide the two non-selected regions, force the light/paper palette
                     regardless of data-theme, hide interactive chrome, wrap the source, and set
                     break-inside:avoid. Accepted tradeoffs / DEFERRED (two-way doors, not blocking a
-                    first community-shareable print): a dedicated per-exhibit SAID+AID+sn self-id band
+                    first community-shareable print): a dedicated per-event SAID+AID+sn self-id band
                     and the optional raw-CESR appendix (the event card already shows the SAID); hiding
                     the entviz pill locate glyph (entviz-internal DOM, not reliably targetable — the
                     glyph is low-harm on paper); and the shared-narrow-layer refactor with mobile — print

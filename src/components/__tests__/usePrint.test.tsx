@@ -12,7 +12,7 @@ function Harness() {
     <div>
       <span data-testid="scope">{scope}</span>
       <span data-testid="expand">{String(expandAll)}</span>
-      {(['source', 'outline', 'exhibit'] as PrintScope[]).map((s) => (
+      {(['source', 'outline', 'event'] as PrintScope[]).map((s) => (
         <button key={s} onClick={() => print(s)}>
           {s}
         </button>
@@ -31,17 +31,17 @@ describe('usePrint', () => {
     vi.unstubAllGlobals();
   });
 
-  it('defaults to the exhibit scope and reflects it on <html> (native Ctrl+P prints the exhibit)', () => {
+  it('defaults to the event scope and reflects it on <html> (native Ctrl+P prints the event)', () => {
     render(<Harness />);
-    expect(screen.getByTestId('scope')).toHaveTextContent('exhibit');
-    expect(document.documentElement.dataset.printScope).toBe('exhibit');
+    expect(screen.getByTestId('scope')).toHaveTextContent('event');
+    expect(document.documentElement.dataset.printScope).toBe('event');
     expect(printMock).not.toHaveBeenCalled();
   });
 
-  it('prints the exhibit scope on demand without expanding anything', () => {
+  it('prints the event scope on demand without expanding anything', () => {
     render(<Harness />);
-    fireEvent.click(screen.getByRole('button', { name: 'exhibit' }));
-    expect(document.documentElement.dataset.printScope).toBe('exhibit');
+    fireEvent.click(screen.getByRole('button', { name: 'event' }));
+    expect(document.documentElement.dataset.printScope).toBe('event');
     expect(screen.getByTestId('expand')).toHaveTextContent('false');
     expect(printMock).toHaveBeenCalledTimes(1);
   });
@@ -69,7 +69,7 @@ describe('usePrint', () => {
     act(() => {
       window.dispatchEvent(new Event('afterprint'));
     });
-    expect(screen.getByTestId('scope')).toHaveTextContent('exhibit');
+    expect(screen.getByTestId('scope')).toHaveTextContent('event');
     expect(screen.getByTestId('expand')).toHaveTextContent('false');
   });
 });
