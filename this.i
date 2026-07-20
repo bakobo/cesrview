@@ -163,6 +163,26 @@ Make CESR legible to developers in the browser = goal:
                     user sees a brief first-paint flash because the toggle applies in an effect — left for
                     a pre-paint inline set if it ever matters.
 
+                System preference is the default theme; an explicit choice persists = decision:
+                  id: s7prf4
+                  why: >
+                    Supersedes t7hm4k's hardcoded "dark default": the app should open in the visitor's
+                    OWN preferred mode, not assume dark. The default now RESOLVES from the OS/browser via
+                    prefers-color-scheme (window.matchMedia), falling back to dark only when the
+                    environment reports nothing. Consequently localStorage holds a theme ONLY after the
+                    user explicitly clicks the toggle — persisting on mount (as t7hm4k did) would freeze
+                    the resolved value into a fake "choice" and the app could never track the OS. An
+                    unchosen visitor therefore follows their OS LIVE (a matchMedia 'change' listener
+                    reswaps the palette until they pick); a chooser's pick sticks and overrides the OS.
+                    This forced resolving the first-paint flash t7hm4k deferred: because the default can
+                    now be light, a dark→light flash would be visible, so a tiny blocking inline script in
+                    index.html sets data-theme from the same stored-else-system resolution BEFORE React
+                    mounts; savedTheme() shares that logic so script and React agree on the first paint.
+                    Accepted tradeoffs: an explicit choice is sticky with no in-UI "back to auto" (clearing
+                    localStorage is the escape hatch — rule of three before adding a tri-state control),
+                    and the inline script duplicates ~4 lines of resolution in plain JS to stay
+                    dependency- and paint-order-correct.
+
                 Realize the inspector visual design; a deterministic glyph stands in for entviz = decision:
                   id: d4nk7v
                   why: >
