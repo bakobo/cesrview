@@ -13,8 +13,8 @@
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@entviz/core": "^0.15.4",
-    "@entviz/react": "^0.15.4",
+    "@entviz/core": "^0.15.5",
+    "@entviz/react": "^0.15.5",
     "@msgpack/msgpack": "^3.1.3",
     "cbor-x": "^1.6.4",
     "react": "^19.2.7",
