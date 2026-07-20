@@ -2,8 +2,8 @@ import { useState } from 'react';
 import type { PrintScope } from './usePrint';
 
 const SCOPES: ReadonlyArray<readonly [PrintScope, string]> = [
-  ['transcript', 'Transcript'],
-  ['manifest', 'Manifest'],
+  ['source', 'Prettified stream (long)'],
+  ['outline', 'Outline'],
   ['exhibit', 'This event'],
 ];
 

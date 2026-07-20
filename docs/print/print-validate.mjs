@@ -29,7 +29,7 @@ async function withScope(scope, menuLabel) {
   // Trigger the REAL app path: header Print menu -> scope.
   await page.getByRole('button', { name: /print/i }).click();
   await page.getByRole('menuitem', { name: menuLabel }).click();
-  if (scope === 'transcript') await page.waitForSelector('.list-more', { state: 'detached' });
+  if (scope === 'source') await page.waitForSelector('.list-more', { state: 'detached' });
   await page.emulateMedia({ media: 'print' });
   await page.waitForTimeout(150);
   const r = await page.evaluate(() => {
@@ -53,27 +53,27 @@ async function withScope(scope, menuLabel) {
   return { before, ...r };
 }
 
-const t = await withScope('transcript', /transcript/i);
-const m = await withScope('manifest', /manifest/i);
+const t = await withScope('source', /prettified stream/i);
+const m = await withScope('outline', /outline/i);
 const e = await withScope('exhibit', /this event/i);
 await browser.close();
 
 const checks = [
-  ['transcript: scope attr set', t.scope === 'transcript'],
-  ['transcript: expanded ALL lines (fail-closed) — grew past first chunk', t.lines > t.before && t.before <= 80],
-  ['transcript: no "more" sentinel after expand', t.hasMore === false],
-  ['transcript: manifest + exhibit hidden', t.railDisplay === 'none' && t.centerDisplay === 'none'],
-  ['transcript: source has no horizontal overflow (wraps)', t.sourceOverflowX !== null && t.sourceOverflowX <= 2],
-  ['transcript: paper palette forced under dark theme', /rgb\(255, 255, 255\)/.test(t.bodyBg)],
-  ['manifest: transcript + exhibit hidden', m.inputDisplay === 'none' && m.centerDisplay === 'none'],
-  ['manifest: rail visible', m.railDisplay !== 'none' && m.railDisplay !== 'MISSING'],
-  ['exhibit: transcript + manifest hidden', e.inputDisplay === 'none' && e.railDisplay === 'none'],
+  ['source: scope attr set', t.scope === 'source'],
+  ['source: expanded ALL lines (fail-closed) — grew past first chunk', t.lines > t.before && t.before <= 80],
+  ['source: no "more" sentinel after expand', t.hasMore === false],
+  ['source: outline + exhibit hidden', t.railDisplay === 'none' && t.centerDisplay === 'none'],
+  ['source: prettified stream has no horizontal overflow (wraps)', t.sourceOverflowX !== null && t.sourceOverflowX <= 2],
+  ['source: paper palette forced under dark theme', /rgb\(255, 255, 255\)/.test(t.bodyBg)],
+  ['outline: prettified stream + exhibit hidden', m.inputDisplay === 'none' && m.centerDisplay === 'none'],
+  ['outline: rail visible', m.railDisplay !== 'none' && m.railDisplay !== 'MISSING'],
+  ['exhibit: prettified stream + outline hidden', e.inputDisplay === 'none' && e.railDisplay === 'none'],
   ['exhibit: center visible', e.centerDisplay !== 'none' && e.centerDisplay !== 'MISSING'],
   ['exhibit: event card is NOT break-inside:avoid (no blank page 1)', e.eventBreakInside !== 'avoid'],
   ['exhibit: field rows ARE break-inside:avoid (rows never split)', e.rowBreakInside === 'avoid'],
 ];
 let ok = true;
 for (const [name, pass] of checks) { console.log(`${pass ? 'PASS' : 'FAIL'}  ${name}`); if (!pass) ok = false; }
-console.log(`\nbefore-expand lines (transcript first chunk)=${t.before}, after=${t.lines}; bodyBg(print,darktheme)=${t.bodyBg}`);
+console.log(`\nbefore-expand lines (prettified-stream first chunk)=${t.before}, after=${t.lines}; bodyBg(print,darktheme)=${t.bodyBg}`);
 console.log(ok ? '\nALL PRINT-CSS CHECKS PASSED' : '\nSOME CHECKS FAILED');
 process.exit(ok ? 0 : 1);

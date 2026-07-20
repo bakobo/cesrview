@@ -8,14 +8,14 @@ describe('PrintMenu', () => {
     expect(screen.queryByRole('menu')).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /print/i }));
     expect(screen.getByRole('menu')).toBeInTheDocument();
-    expect(screen.getByRole('menuitem', { name: /transcript/i })).toBeInTheDocument();
-    expect(screen.getByRole('menuitem', { name: /manifest/i })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: /prettified stream/i })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: /outline/i })).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: /this event/i })).toBeInTheDocument();
   });
 
   it.each([
-    ['transcript', /transcript/i],
-    ['manifest', /manifest/i],
+    ['source', /prettified stream/i],
+    ['outline', /outline/i],
     ['exhibit', /this event/i],
   ] as const)('invokes onPrint(%s) and closes when its item is chosen', (scope, label) => {
     const onPrint = vi.fn();

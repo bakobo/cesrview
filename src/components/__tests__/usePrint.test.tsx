@@ -12,7 +12,7 @@ function Harness() {
     <div>
       <span data-testid="scope">{scope}</span>
       <span data-testid="expand">{String(expandAll)}</span>
-      {(['transcript', 'manifest', 'exhibit'] as PrintScope[]).map((s) => (
+      {(['source', 'outline', 'exhibit'] as PrintScope[]).map((s) => (
         <button key={s} onClick={() => print(s)}>
           {s}
         </button>
@@ -46,25 +46,25 @@ describe('usePrint', () => {
     expect(printMock).toHaveBeenCalledTimes(1);
   });
 
-  it('prints the manifest scope without expanding anything', () => {
+  it('prints the outline scope without expanding anything', () => {
     render(<Harness />);
-    fireEvent.click(screen.getByRole('button', { name: 'manifest' }));
-    expect(document.documentElement.dataset.printScope).toBe('manifest');
+    fireEvent.click(screen.getByRole('button', { name: 'outline' }));
+    expect(document.documentElement.dataset.printScope).toBe('outline');
     expect(screen.getByTestId('expand')).toHaveTextContent('false');
     expect(printMock).toHaveBeenCalledTimes(1);
   });
 
-  it('expands ALL lines before printing the transcript (fail-closed), printing exactly once', () => {
+  it('expands ALL lines before printing the prettified stream (fail-closed), printing exactly once', () => {
     render(<Harness />);
-    fireEvent.click(screen.getByRole('button', { name: 'transcript' }));
-    expect(document.documentElement.dataset.printScope).toBe('transcript');
+    fireEvent.click(screen.getByRole('button', { name: 'source' }));
+    expect(document.documentElement.dataset.printScope).toBe('source');
     expect(screen.getByTestId('expand')).toHaveTextContent('true');
     expect(printMock).toHaveBeenCalledTimes(1);
   });
 
   it('restores the default scope and collapses expansion after the dialog closes', () => {
     render(<Harness />);
-    fireEvent.click(screen.getByRole('button', { name: 'transcript' }));
+    fireEvent.click(screen.getByRole('button', { name: 'source' }));
     expect(screen.getByTestId('expand')).toHaveTextContent('true');
     act(() => {
       window.dispatchEvent(new Event('afterprint'));

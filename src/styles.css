@@ -206,11 +206,12 @@ body {
   /* ~27df deferred print polish lands here: a per-exhibit SAID+AID+sn self-id band, an optional
      raw-CESR appendix, hiding the entviz pill locate glyph on paper, and sharing this narrow
      single-column layer with the mobile breakpoint once mobile is validated. */
-  /* Scope selection: show exactly one of transcript (input panel) | manifest (rail) | exhibit (center). */
-  html[data-print-scope='transcript'] .cesr-rail,
-  html[data-print-scope='transcript'] .cesr-center { display: none; }
-  html[data-print-scope='manifest'] .cesr-input-panel,
-  html[data-print-scope='manifest'] .cesr-center { display: none; }
+  /* Scope selection: show exactly one of source = prettified stream (input panel) | outline (rail) |
+   * exhibit = this event (center). */
+  html[data-print-scope='source'] .cesr-rail,
+  html[data-print-scope='source'] .cesr-center { display: none; }
+  html[data-print-scope='outline'] .cesr-input-panel,
+  html[data-print-scope='outline'] .cesr-center { display: none; }
   html[data-print-scope='exhibit'] .cesr-input-panel,
   html[data-print-scope='exhibit'] .cesr-rail { display: none; }
 }
