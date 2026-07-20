@@ -322,6 +322,21 @@ Make CESR legible to developers in the browser = goal:
                     existing parse-error path handles non-CESR input, fail-safe. Encapsulated in a
                     useFileDrop hook so the guard/first-file/read-as-text branches are unit-tested to
                     100% independent of layout.
+
+                Proof/attachment value pills show the mnemonic, not a code+gloss label = decision:
+                  id: m8pv3k
+                  why: >-
+                    Refines e5vk7n. Proof/attachment primitives (signatures, digests, seals) now render
+                    as the entviz VALUE MNEMONIC (first4..mid4..last4) — the same handling as SAID /
+                    identifier / hash pills — NOT a per-primitive code+gloss host label. Cause: EntvizPill
+                    resolves shownLabel = label ?? autoMnemonic, so an explicit host `label` WINS over the
+                    mnemonic; PrimitiveChip was passing `${code}: ${gloss}`, which displaced the mnemonic
+                    with a long, non-value caption (a 88-char indexed signature read as a wall of gloss
+                    text, not a scannable stub). The per-primitive label was redundant anyway: the counter
+                    GROUP header already teaches code/count/gloss for the whole group (e.g. "-A ×N
+                    controller indexed signatures"), and entviz's typeSignal characterizes each value's
+                    role. So PrimitiveChip drops the label; every value pill in the stream is now
+                    width-stable and recurrence-scannable in the same way.
     In-browser TS stream-walker, upstreamed; keripy as oracle = decision:
       id: h6rk4d
       stage-status: planned
