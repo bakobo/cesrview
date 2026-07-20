@@ -337,6 +337,28 @@ Make CESR legible to developers in the browser = goal:
                     controller indexed signatures"), and entviz's typeSignal characterizes each value's
                     role. So PrimitiveChip drops the label; every value pill in the stream is now
                     width-stable and recurrence-scannable in the same way.
+
+                Every concept deep-links to the spec, precisely, via text fragments = decision:
+                  id: s9grn4
+                  why: >-
+                    cesrview's teaching value is a bridge INTO the normative text: every concept in a
+                    decoded event — message FIELD labels (v/t/kt/k/…), counter/group codes, and ilks —
+                    links to its exact place in the CESR/KERI spec. Unified on ONE annotation shape
+                    {gloss, spec, find?}: annotateField is upgraded from a bare gloss string to the same
+                    Annotation the code/ilk tables already return, so fields gain spec links too.
+                    PRECISION via the URL Text Fragments directive (#section:~:text=phrase): a supporting
+                    browser (Chromium/Safari) scrolls to AND highlights the exact phrase; others
+                    (Firefox default) ignore the directive and still land on the section — so the section
+                    anchor stays the reliable FLOOR and text-fragment precision is a progressive
+                    enhancement layered per-annotation (`find` present) as phrases are verified against
+                    the live spec (text fragments fail silent if the phrase is absent, degrading to the
+                    section). A literal '-' in `find` is %2D-escaped (the directive reserves '-' as a
+                    range separator). AFFORDANCE FIX: the gloss itself becomes the spec hyperlink
+                    everywhere; the proof disclosure keeps expand/collapse on the code+count control
+                    ONLY — resolving the confusion where a proof gloss looked linked (an adjacent ↗) but
+                    clicking it toggled. Fail-soft as ever: an unannotated field/code renders with no
+                    link. Mechanism (specHref + a SpecLink component) is unit-tested to 100%; the spec
+                    URLs/phrases are verified content, not logic.
     In-browser TS stream-walker, upstreamed; keripy as oracle = decision:
       id: h6rk4d
       stage-status: planned
