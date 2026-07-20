@@ -12,6 +12,7 @@
   --card-2: #15161a; --inset: #0c0d10; --raised: #1a1c22;
   --ink: #ced1d7; --dim: #7c808a; --faint: #565961;
   --acc: #97b89b; --acc2: #63a89d; --key: #cca47d; --dig: #9db2c8; --id: #b8abcc; --warn: #d68e88; --num: #adbccc;
+  --hl: #ff5a52; /* cross-ref selection highlight — bright, unmistakable vs. the focus/hover outline */
   --shadow: 0 8px 30px #00000030;
   --mono: 'JetBrains Mono', ui-monospace, monospace;
   --ui: 'IBM Plex Sans', system-ui, sans-serif;
@@ -21,6 +22,7 @@
   --card-2: #f6f7f9; --inset: #edeff3; --raised: #e6e9ef;
   --ink: #1c2431; --dim: #58616f; --faint: #8b94a4;
   --acc: #2f7d4f; --acc2: #227e73; --key: #94652b; --dig: #35618f; --id: #6a4c93; --warn: #b23a33; --num: #3a6a94;
+  --hl: #e11d1d; /* a touch deeper for legibility on the light/paper surface */
   --shadow: 0 6px 20px #0000001a;
 }
 * { box-sizing: border-box; }
@@ -109,6 +111,10 @@ body {
 /* pill — a bare inline host for an entviz <EntvizPill>; the pill draws its own chrome and (via the
    `highlight` prop) its own cross-ref emphasis. The wrapper only carries data-value for cross-ref/tests. */
 .cesr-pill { display: inline-flex; vertical-align: middle; }
+/* Cross-ref selection ring (c7vn4k): override entviz's subtle default `--entviz-pill-highlight`
+   (a faint currentColor ring that read as a mere focus rect) with a bright red ring + glow, so a
+   located value's other occurrences pop out. entviz draws it as box-shadow, host-colorable. */
+.cesr-pill { --entviz-pill-highlight: 0 0 0 2.5px var(--hl), 0 0 8px 1px color-mix(in srgb, var(--hl) 55%, transparent); }
 
 /* proof band */
 .proof { border-top: 1px dashed var(--line); background: var(--panel2); }

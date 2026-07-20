@@ -359,6 +359,19 @@ Make CESR legible to developers in the browser = goal:
                     clicking it toggled. Fail-soft as ever: an unannotated field/code renders with no
                     link. Mechanism (specHref + a SpecLink component) is unit-tested to 100%; the spec
                     URLs/phrases are verified content, not logic.
+
+                Cross-ref selection highlight is a saturated amber ring, not entviz's subtle default = decision:
+                  id: h7vr9k
+                  why: >-
+                    Refines c7vn4k's presentation. entviz's EntvizPill highlight is host-colorable via the
+                    CSS custom property --entviz-pill-highlight (a full box-shadow value); its default is a
+                    faint currentColor ring indistinguishable from the focus/hover outline, so a "find other
+                    occurrences" selection did not visibly pop. cesrview now overrides it on .cesr-pill with
+                    a saturated amber ring + glow, tuned per theme (--hl: #ffb020 dark, #d97706 light) for
+                    legibility on both the dark and paper surfaces. Amber grabs attention like a highlighter
+                    without red's error/danger connotation, and is distinct from the app's muted --warn
+                    advisory chip; a deliberate, unmistakable marker for the located value across all its
+                    occurrences.
     In-browser TS stream-walker, upstreamed; keripy as oracle = decision:
       id: h6rk4d
       stage-status: planned
