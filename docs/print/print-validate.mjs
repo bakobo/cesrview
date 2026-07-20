@@ -35,6 +35,7 @@ async function withScope(scope, menuLabel) {
   const r = await page.evaluate(() => {
     const disp = (sel) => { const el = document.querySelector(sel); return el ? getComputedStyle(el).display : 'MISSING'; };
     const src = document.querySelector('.cesr-source');
+    const brk = (sel) => { const el = document.querySelector(sel); return el ? getComputedStyle(el).breakInside : 'MISSING'; };
     return {
       scope: document.documentElement.getAttribute('data-print-scope'),
       inputDisplay: disp('.cesr-input-panel'),
@@ -44,6 +45,8 @@ async function withScope(scope, menuLabel) {
       hasMore: !!document.querySelector('.list-more'),
       sourceOverflowX: src ? src.scrollWidth - src.clientWidth : null,
       bodyBg: getComputedStyle(document.body).backgroundColor,
+      eventBreakInside: brk('.cesr-event'),
+      rowBreakInside: brk('.row'),
     };
   });
   await page.close();
@@ -66,6 +69,8 @@ const checks = [
   ['manifest: rail visible', m.railDisplay !== 'none' && m.railDisplay !== 'MISSING'],
   ['exhibit: transcript + manifest hidden', e.inputDisplay === 'none' && e.railDisplay === 'none'],
   ['exhibit: center visible', e.centerDisplay !== 'none' && e.centerDisplay !== 'MISSING'],
+  ['exhibit: event card is NOT break-inside:avoid (no blank page 1)', e.eventBreakInside !== 'avoid'],
+  ['exhibit: field rows ARE break-inside:avoid (rows never split)', e.rowBreakInside === 'avoid'],
 ];
 let ok = true;
 for (const [name, pass] of checks) { console.log(`${pass ? 'PASS' : 'FAIL'}  ${name}`); if (!pass) ok = false; }

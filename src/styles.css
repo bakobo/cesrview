@@ -195,8 +195,11 @@ body {
   .cesr-source-line { white-space: pre-wrap; overflow-wrap: anywhere; }
   .cesr-source-line code { word-break: break-all; }
 
-  /* Keep structural units whole across page breaks. */
-  .cesr-event, .cesr-source-line, .row, .toc-item, .rail-section { break-inside: avoid; }
+  /* Keep the SMALL structural units whole across page breaks (a field row, a source line, an
+   * outline item). NOT the whole .cesr-event card — it can approach/exceed a page, and forcing it
+   * unbreakable shoves the entire event onto page 2, leaving page 1 blank under the header. */
+  .cesr-source-line, .row, .cesr-obj-row, .toc-item, .rail-section { break-inside: avoid; }
+  .ev-head { break-inside: avoid; break-after: avoid; } /* keep the event's title row with its body */
 
   /* ~27df deferred print polish lands here: a per-exhibit SAID+AID+sn self-id band, an optional
      raw-CESR appendix, hiding the entviz pill locate glyph on paper, and sharing this narrow
