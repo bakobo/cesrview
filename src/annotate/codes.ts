@@ -26,8 +26,9 @@ const KERI = 'https://trustoverip.github.io/kswg-keri-specification/';
 const CESR_COUNTER = `${CESR}#count-code-tables`;
 const CESR_MATTER = `${CESR}#master-code-table-for-genusversion-_aaacaa-keriacdc-protocol-stack-version-200`;
 const CESR_INDEXER = `${CESR}#indexed-code-table`;
-// KERI message field labels live in one table; the `find` phrases below are the verbatim Title-column
-// text for each label, so a text-fragment lands on the exact row (s9grn4).
+// Each field deep-links to the section where its concept is EXPLAINED (not the field-labels glossary
+// table), with a `find` phrase verified to occur exactly once in that section (s9grn4). KERI_FIELDS
+// (the glossary table) is the floor only for fields with no dedicated explanatory section.
 const KERI_FIELDS = `${KERI}#keri-field-labels-for-data-structures`;
 
 const COUNTER: Record<string, Annotation> = {
@@ -95,23 +96,23 @@ export function annotate(category: CodeCategory, code: string): Annotation | nul
 // against the published spec) that a text fragment targets for precise navigation. Fields with no
 // verified Title (dt/rd/ri/r are defined outside this table) link to the section floor, no `find`.
 const FIELD: Record<string, Annotation> = {
-  v: { gloss: 'version string', spec: KERI_FIELDS, find: 'Version String' },
-  t: { gloss: 'message type', spec: KERI_FIELDS, find: 'Message Type' },
-  d: { gloss: 'SAID', spec: KERI_FIELDS, find: 'Digest SAID' },
-  i: { gloss: 'prefix/AID', spec: KERI_FIELDS, find: 'Identifier Prefix (AID)' },
-  s: { gloss: 'sequence number', spec: KERI_FIELDS, find: 'Sequence Number' },
-  p: { gloss: 'prior event digest', spec: KERI_FIELDS, find: 'Prior SAID' },
-  kt: { gloss: 'signing threshold', spec: KERI_FIELDS, find: 'Keys Signing Threshold' },
-  k: { gloss: 'signing keys', spec: KERI_FIELDS, find: 'List of Signing Keys (ordered key set)' },
-  nt: { gloss: 'next (rotation) threshold', spec: KERI_FIELDS, find: 'Next Keys Signing Threshold' },
-  n: { gloss: 'next key digests', spec: KERI_FIELDS, find: 'List of Next Key Digests (ordered key digest set)' },
-  bt: { gloss: 'witness threshold', spec: KERI_FIELDS, find: 'Backer Threshold' },
-  b: { gloss: 'witnesses', spec: KERI_FIELDS, find: 'List of Backers (ordered backer set of AIDs)' },
-  br: { gloss: 'witnesses cut', spec: KERI_FIELDS, find: 'List of Backers to Remove (ordered backer set of AIDS)' },
-  ba: { gloss: 'witnesses added', spec: KERI_FIELDS, find: 'List of Backers to Add (ordered backer set of AIDs)' },
-  c: { gloss: 'config traits', spec: KERI_FIELDS, find: 'List of Configuration Traits/Modes' },
-  a: { gloss: 'anchored seals', spec: KERI_FIELDS, find: 'List of Anchors (seals)' },
-  di: { gloss: 'delegator prefix', spec: KERI_FIELDS, find: 'Delegator Identifier Prefix (AID)' },
+  v: { gloss: 'version string', spec: `${KERI}#version-string-field`, find: 'MUST be the first field in any top-level KERI field map encoded in JSON' },
+  t: { gloss: 'message type', spec: `${KERI}#message-type-field`, find: 'MUST be a three-character string that provides the message type' },
+  d: { gloss: 'SAID', spec: `${KERI}#said-fields`, find: 'Some fields in KERI data structures can have a SAID' },
+  i: { gloss: 'prefix/AID', spec: `${KERI}#autonomic-identifier-aid`, find: 'The use of a KEL gives rise to an enhanced class of SCIDs that are persistent' },
+  s: { gloss: 'sequence number', spec: `${KERI}#sequence-number-field`, find: 'non-negative strictly monotonically increasing integer' },
+  p: { gloss: 'prior event digest', spec: `${KERI}#tetrad-bindings`, find: 'Each event after the Inception event also MUST include a cryptographic digest of the previous event' },
+  kt: { gloss: 'signing threshold', spec: `${KERI}#key-and-key-digest-threshold-fields`, find: 'any set of M valid signatures from the keys in the list satisfies such a threshold' },
+  k: { gloss: 'signing keys', spec: `${KERI}#key-list-field`, find: 'a list of strings that are each a fully qualified public key' },
+  nt: { gloss: 'next (rotation) threshold', spec: `${KERI}#key-and-key-digest-threshold-fields`, find: 'Next Key Digest Threshold' },
+  n: { gloss: 'next key digests', spec: `${KERI}#pre-rotation`, find: 'is hidden in or blinded by a digest of that key' },
+  bt: { gloss: 'witness threshold', spec: `${KERI}#backer-threshold-field`, find: 'This is the number of backers in the backer list that MUST support a key event' },
+  b: { gloss: 'witnesses', spec: `${KERI}#indirect-exchange-via-witnesses-and-watchers`, find: 'the direct exchange of key event messages between controller applications' },
+  br: { gloss: 'witnesses cut', spec: `${KERI}#backer-remove-list`, find: 'a Backer to be removed from the current Backer list' },
+  ba: { gloss: 'witnesses added', spec: `${KERI}#backer-add-list`, find: 'a Backer to be appended to the current Backer list' },
+  c: { gloss: 'config traits', spec: `${KERI}#configuration-traits-field`, find: 'Each string represents a configuration trait for the KEL' },
+  a: { gloss: 'anchored seals', spec: `${KERI}#seals`, find: 'The dictionary definition of the seal is' },
+  di: { gloss: 'delegator prefix', spec: `${KERI}#cooperative-delegation`, find: 'A delegation or identifier delegation operation is provided by a pair of events' },
   dt: { gloss: 'datetime', spec: KERI_FIELDS },
   rd: { gloss: 'registry digest', spec: KERI_FIELDS },
   ri: { gloss: 'registry identifier', spec: KERI_FIELDS },
