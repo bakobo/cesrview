@@ -372,6 +372,23 @@ Make CESR legible to developers in the browser = goal:
                     without red's error/danger connotation, and is distinct from the app's muted --warn
                     advisory chip; a deliberate, unmistakable marker for the located value across all its
                     occurrences.
+
+                Proof-section datetimes render as text (DatetimeValue), not an entviz pill = decision:
+                  id: dt7rn4
+                  why: >-
+                    A CESR datetime (Dater, code 1AAG) inside a -E first-seen replay couple is decoded and
+                    rendered with the SAME DatetimeValue used for the SAD `dt` field, not handed to an
+                    entviz pill. daterToIso() reverses CESR's b64-safe substitutions (c->:, d->., p->+) on
+                    the 32-char body after the 1AAG code; PrimitiveChip routes a decoded Dater to
+                    DatetimeValue (raw ISO + prettified UTC reading) so proof datetimes read exactly like
+                    datetimes elsewhere in an event. Reinforced by the disposition of entviz issue #36: the
+                    entviz owner now recognizes 1AAG as "CESR datetime" but deliberately keeps it ROLE-LESS
+                    and does NOT visualize it — "a datetime is low-entropy and directly human-readable, you
+                    just read a date" — so the meaningful rendering is textual and belongs on cesrview's
+                    side, not in the pill. Fail-soft: a non-Dater (wrong code/length) stays a pill, and an
+                    unparseable stamp falls through DatetimeValue's own raw-text fallback. Contrast:
+                    indexed SIGNATURES are genuine entropy and were fixed IN entviz #36 (new Indexer table),
+                    so they need no cesrview change — only a dependency bump once entviz-js re-releases.
     In-browser TS stream-walker, upstreamed; keripy as oracle = decision:
       id: h6rk4d
       stage-status: planned
