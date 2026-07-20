@@ -198,6 +198,9 @@ body {
   /* Keep structural units whole across page breaks. */
   .cesr-event, .cesr-source-line, .row, .toc-item, .rail-section { break-inside: avoid; }
 
+  /* ~27df deferred print polish lands here: a per-exhibit SAID+AID+sn self-id band, an optional
+     raw-CESR appendix, hiding the entviz pill locate glyph on paper, and sharing this narrow
+     single-column layer with the mobile breakpoint once mobile is validated. */
   /* Scope selection: show exactly one of transcript (input panel) | manifest (rail) | exhibit (center). */
   html[data-print-scope='transcript'] .cesr-rail,
   html[data-print-scope='transcript'] .cesr-center { display: none; }
