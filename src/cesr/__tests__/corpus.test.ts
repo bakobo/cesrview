@@ -3,19 +3,26 @@ import { describe, it, expect } from 'vitest';
 import { walk } from '../walk';
 import type { AttachmentGroup, AttachmentNode } from '../types';
 
-/* Local corpus regression guard. Runs the walker over the real (gitignored, PII-bearing) samples
- * and locks the framing invariants that every increment must preserve: delta-0 framing, zero
- * errors, exact wrapper tiling, and — for these fully-modelled samples — zero unknown/invalid
+/* Local corpus regression guard. Runs the walker over the real (gitignored, synthetic PII-free)
+ * samples and locks the framing invariants that every increment must preserve: delta-0 framing,
+ * zero errors, exact wrapper tiling, and — for these fully-modelled samples — zero unknown/invalid
  * nodes. Auto-skips where the corpus is absent (CI, fresh clones); the committed keripy oracle
- * fixtures (tiny-*.cesr) carry the CI-visible differential coverage. */
+ * fixtures (tiny-*.cesr) carry the CI-visible differential coverage.
+ *
+ * Only the CESR-1 samples are listed: the walker does not yet frame CESR-2 (see the in-progress
+ * v2 parser work), so samples/*-cesr2.cesr are intentionally excluded until it does. */
 
 interface Sample {
   path: string;
   messages: number;
+  /** Expected count of -V/-0V wrappers that have children (0 for controller-signed KELs with
+   *  bare -AAB groups and no wrapper). */
+  wrappers: number;
 }
 const SAMPLES: Sample[] = [
-  { path: 'samples/multisig-oobi.cesr', messages: 102 },
-  { path: 'samples/credential.cesr', messages: 361 },
+  { path: 'samples/witness-controller-kel-cesr1.cesr', messages: 4, wrappers: 4 },
+  { path: 'samples/witness-role-oobi-cesr1.cesr', messages: 1, wrappers: 1 },
+  { path: 'samples/kel-icp-rot-ixn-cesr1.cesr', messages: 3, wrappers: 0 },
 ];
 
 /** Collect every group node in the attachment forest of a message. */
@@ -44,7 +51,7 @@ describe('walk — real corpus regression guard', () => {
       expect(allGroups.filter((g) => g.state !== 'known')).toEqual([]);
       // every wrapper is exactly tiled by its inner groups (last child ends at the wrapper's end)
       const wrappers = allGroups.filter((g) => (g.code === '-V' || g.code === '-0V') && g.items.length > 0);
-      expect(wrappers).not.toHaveLength(0);
+      expect(wrappers).toHaveLength(sample.wrappers);
       for (const w of wrappers) {
         expect(w.items[w.items.length - 1].span.end).toBe(w.span.end);
       }
