@@ -416,6 +416,23 @@ Make CESR legible to developers in the browser = goal:
                     cleanly today (KEL icp+rot+ixn; witness-controller OOBI; witness-role OOBI); the v2 twins
                     are excluded until the walker frames CESR-2 (@h6rk4d), and a TEL + ACDC example is deferred
                     (needs a credential-issuance flow to generate clean PII-free data) to a follow-up tick.
+
+                The example affordance is a persistent meta-control above the input, not a one-shot empty state = decision:
+                  id: s8vp3x
+                  why: >-
+                    Refines @e7xm4p's PLACEMENT. First cut put the "try an example" buttons only in the
+                    center empty state, so the instant any sample (or paste) decoded, `current` became
+                    truthy and the whole affordance vanished with no way back — a one-shot onboarding gesture,
+                    not a tool. But loading examples is a REPEAT action: you compare a KEL against an OOBI,
+                    reload after clearing, swap one example for another. So the buttons MOVE to the top of the
+                    input panel (the left column, above the textarea) where they are ALWAYS present,
+                    independent of decode state, reachable after the first click. Sized as a META control —
+                    small, muted, uppercase lead — so it reads as tooling/chrome, distinct from the primary
+                    paste surface and from decoded content, and doesn't compete with the user's own stream for
+                    attention. The center empty state reverts to just the paste prompt. Behaviour is otherwise
+                    unchanged: a click still fetches same-origin and replaces the stream via the shared load
+                    path (@e7xm4p), so clicking an example while a stream is loaded swaps it in, consistent
+                    with paste/drop's replace semantics (@d6rp2k).
     In-browser TS stream-walker, upstreamed; keripy as oracle = decision:
       id: h6rk4d
       stage-status: in-progress
