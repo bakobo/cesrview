@@ -391,7 +391,7 @@ Make CESR legible to developers in the browser = goal:
                     so they need no cesrview change — only a dependency bump once entviz-js re-releases.
     In-browser TS stream-walker, upstreamed; keripy as oracle = decision:
       id: h6rk4d
-      stage-status: planned
+      stage-status: in-progress
       why: >
         Chose to write a native-TypeScript CESR stream-walker and contribute it plus current
         (v2.0.0) code tables UPSTREAM to signify-ts, over (a) shipping keripy's reference Parser
@@ -407,6 +407,29 @@ Make CESR legible to developers in the browser = goal:
         Phase-1 engine spike (see @t3zc5m); keripy-via-Pyodide is the documented fallback, and if
         the spike overturns this, record a tension rather than editing this node silently.
       children:
+        v1 stream parser first: land the walker as signify-ts src/keri/core/parsing.ts = decision:
+          id: p2rz8k
+          why: >-
+            Executing h6rk4d / tick 7zpj. A read-only study of signify-ts confirmed it has NO stream/
+            attachment-group parser (serder.ts is body-only; eventing.ts only EMITS framed streams;
+            core.ts sniffs but never frames), so our walker (walk.ts + types.ts — already importing
+            ONLY signify-ts Counter/Matter/Indexer) fills a real gap. Those classes expose the {qb64}
+            ctor + .code/.count/.qb64 our walker assumes; genus/version/Ilks/sniff constants live in
+            core.ts (kering.ts is just EmptyMaterialError). CHOSE to contribute the V1 parser FIRST
+            over the full v2 machinery: signify-ts is v1-only (no v2 counter table, no genus/version
+            model beyond an opaque --AAA counter, Serials JSON-only, deversify/VEREX hard-locked to
+            the 17-char v1 version string) and OUR walker is likewise v1 today — so a v1 parser lands
+            with ZERO prerequisite table/version PRs as a self-contained "the missing Parser"
+            contribution; v2 (genus/version + v2 count/version-string machinery) follows as separate
+            upstream PRs. Placement: src/keri/core/parsing.ts + one export line in src/exports.ts;
+            tests at test/core/parsing.test.ts (vitest assert.*, .ts-extension imports, keripy
+            golden-stream fixtures — an established house pattern, and cesrview already has the
+            fixtures + spike/gen-*.py generators = the keripy oracle h6rk4d requires). Adapt to
+            signify-ts conventions (prettier tabWidth 4 / singleQuote / printWidth 80; no any/unused)
+            and pass its 4 CI gates (pretty:check, lint, build, test --coverage on Node 20/22/24);
+            base on `development`, 2-of-3 maintainer review, no DCO/CLA. Prepared locally; the PR is
+            opened by the maintainer, not auto-pushed.
+
         Consume signify-ts tables; author only the annotation layer = decision:
           id: w6ph4k
           why: >
