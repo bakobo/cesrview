@@ -79,6 +79,21 @@ describe('organize — KEL/TEL log model (decision w3rn6k)', () => {
     expect(logs[0].duplicities[0].events.map((e) => e.message.said)).toEqual(['y', 'z']);
   });
 
+  it('sorts duplicities by sequence number when a log forks at more than one sn', () => {
+    const { logs } = organize(
+      result([
+        msg({ i: 'A', s: '0', t: 'icp', d: 'i' }),
+        msg({ i: 'A', s: '2', t: 'ixn', d: 'p' }),
+        msg({ i: 'A', s: '2', t: 'ixn', d: 'q' }), // fork at sn 2 — encountered FIRST
+        msg({ i: 'A', s: '1', t: 'ixn', d: 'y' }),
+        msg({ i: 'A', s: '1', t: 'ixn', d: 'z' }), // fork at sn 1 — encountered later
+      ]),
+    );
+    // two forks -> the duplicities array has length 2, so its comparator actually runs and must
+    // order ascending by sn even though sn 2's fork appeared before sn 1's.
+    expect(logs[0].duplicities.map((d) => d.sn)).toEqual([1, 2]);
+  });
+
   it('records the delegator from a delegated inception, null otherwise', () => {
     const { logs } = organize(
       result([
