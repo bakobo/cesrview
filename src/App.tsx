@@ -8,6 +8,7 @@ import { DecodedEvent } from './components/DecodedEvent';
 import { Header } from './components/Header';
 import { LeftRail } from './components/LeftRail';
 import { SourcePane } from './components/SourcePane';
+import { SamplePicker } from './components/SamplePicker';
 import { usePrint } from './components/usePrint';
 import { useFileDrop } from './components/useFileDrop';
 
@@ -65,7 +66,10 @@ export default function App() {
             {current ? (
               <DecodedEvent message={current} bytes={bytes} />
             ) : (
-              <p className="cesr-empty">Paste CESR into the left panel to decode it.</p>
+              <div className="cesr-empty">
+                <p>Paste CESR into the left panel to decode it.</p>
+                <SamplePicker onLoad={setText} />
+              </div>
             )}
           </div>
         </div>

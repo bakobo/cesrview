@@ -1,7 +1,9 @@
 import { readFileSync } from 'node:fs';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import App from './App';
+
+afterEach(() => vi.restoreAllMocks());
 
 const sample = readFileSync('src/cesr/__tests__/fixtures/tiny-piped-kel.cesr', 'utf8');
 const paste = () => fireEvent.change(screen.getByLabelText('CESR stream'), { target: { value: sample } });
@@ -62,6 +64,14 @@ describe('App', () => {
     // file.text() is async and the decode is deferred; allow headroom under coverage instrumentation.
     await screen.findByRole('region', { name: 'Source' }, { timeout: 5000 }); // file loaded + decoded
     expect(panel).not.toHaveClass('drag-over'); // highlight cleared on drop
+    expect(screen.getByText(/inception/i)).toBeInTheDocument();
+  });
+
+  it('offers example samples in the empty state and decodes one when chosen', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(sample, { status: 200 }));
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: /key event log/i }));
+    await screen.findByRole('region', { name: 'Source' }, { timeout: 5000 }); // fetched + decoded
     expect(screen.getByText(/inception/i)).toBeInTheDocument();
   });
 
