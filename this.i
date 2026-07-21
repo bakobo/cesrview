@@ -389,6 +389,33 @@ Make CESR legible to developers in the browser = goal:
                     unparseable stamp falls through DatetimeValue's own raw-text fallback. Contrast:
                     indexed SIGNATURES are genuine entropy and were fixed IN entviz #36 (new Indexer table),
                     so they need no cesrview change — only a dependency bump once entviz-js re-releases.
+
+                Bundled sample library, fetched by URL from the same origin on explicit click = decision:
+                  id: e7xm4p
+                  why: >-
+                    Realizes @r7pm3q (ship a curated sample library instead of payload-in-URL sharing) and
+                    extends the first-class empty state @r7cm3b: with no data of their own, a user can click
+                    "try an example" to load a known-good stream and see the tool work. Chose to PUBLISH the
+                    samples as standalone static files and FETCH them at runtime, NOT to compile them into the
+                    JS bundle — the CESR bytes never bloat the app artifact and the corpus can grow without
+                    touching component code. SAME-ORIGIN to avoid CORS: files live in this repo under
+                    public/samples/, which Vite copies to the site root, so they publish to
+                    cesrview.bakobo.com/samples/*.cesr and the app fetches ${BASE_URL}samples/<file>. Accepted
+                    consequence of same-origin on GitHub Pages (one site = one repo): the files ride this
+                    repo's deploy cadence rather than an independent one; an independent lifecycle would need
+                    a separate origin + CORS, rejected for the CORS cost. This is the FIRST and ONLY outbound
+                    request cesrview makes, so it REFINES — does not reverse — the privacy constraint @k7t3mq
+                    ("nothing leaves the machine") and the no-network-fetch scope @n2fq6b: the only
+                    permitted request is a GET for a PUBLIC, curated sample the user explicitly asked for; it
+                    carries NONE of the user's data, so the real invariant (the user's own stream never leaves
+                    the machine) is intact. FAIL CLOSED per the Bakobo error standard: a failed/offline/404
+                    fetch surfaces a stable-coded, plain-sentence, retryable error, never a silent no-op; the
+                    loaded text then flows through the SAME decode pipeline as paste/type/drop — no new parse
+                    path (cf. @d6rp2k). The in-app catalog is METADATA only ({id, label, description, file});
+                    the bytes are fetched. Starting corpus is the three PII-free v1 samples that frame
+                    cleanly today (KEL icp+rot+ixn; witness-controller OOBI; witness-role OOBI); the v2 twins
+                    are excluded until the walker frames CESR-2 (@h6rk4d), and a TEL + ACDC example is deferred
+                    (needs a credential-issuance flow to generate clean PII-free data) to a follow-up tick.
     In-browser TS stream-walker, upstreamed; keripy as oracle = decision:
       id: h6rk4d
       stage-status: in-progress
