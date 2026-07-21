@@ -67,12 +67,15 @@ describe('App', () => {
     expect(screen.getByText(/inception/i)).toBeInTheDocument();
   });
 
-  it('offers example samples in the empty state and decodes one when chosen', async () => {
+  it('offers example samples as a persistent control that survives loading a stream', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(sample, { status: 200 }));
     render(<App />);
-    fireEvent.click(screen.getByRole('button', { name: /key event log/i }));
+    const kelButton = () => screen.getByRole('button', { name: /key event log/i });
+    expect(kelButton()).toBeInTheDocument(); // available before anything is loaded
+    fireEvent.click(kelButton());
     await screen.findByRole('region', { name: 'Source' }, { timeout: 5000 }); // fetched + decoded
     expect(screen.getByText(/inception/i)).toBeInTheDocument();
+    expect(kelButton()).toBeInTheDocument(); // STILL available after a stream is loaded (not one-shot)
   });
 
   it('surfaces a parse error for input that is not a CESR stream', () => {

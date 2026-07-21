@@ -24,7 +24,7 @@ export function SamplePicker({ onLoad }: { onLoad: (text: string) => void }) {
 
   return (
     <div className="sample-picker">
-      <p className="sample-picker-lead">…or try an example:</p>
+      <p className="sample-picker-lead">examples</p>
       <ul className="sample-list">
         {SAMPLES.map((sample) => (
           <li key={sample.id}>

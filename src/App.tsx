@@ -49,6 +49,7 @@ export default function App() {
       <CesrViewProvider>
         <div className="cesr-main">
           <section className={`cesr-input-panel${dragging ? ' drag-over' : ''}`} {...dropProps}>
+            <SamplePicker onLoad={setText} />
             <textarea
               aria-label="CESR stream"
               placeholder="Paste a CESR stream — a KEL, TEL, ACDC, or OOBI response."
@@ -66,10 +67,7 @@ export default function App() {
             {current ? (
               <DecodedEvent message={current} bytes={bytes} />
             ) : (
-              <div className="cesr-empty">
-                <p>Paste CESR into the left panel to decode it.</p>
-                <SamplePicker onLoad={setText} />
-              </div>
+              <p className="cesr-empty">Paste CESR into the left panel to decode it.</p>
             )}
           </div>
         </div>
