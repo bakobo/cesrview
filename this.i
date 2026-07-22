@@ -512,6 +512,83 @@ Make CESR legible to developers in the browser = goal:
                 renders (the @d3rk6n spirit). Accepted tradeoff: the gloss/URL table is hand-authored
                 and versioned in cesrview until the walker is upstreamed, kept low-drift because it is
                 descriptions, not sizes (@w6ph4k).
+              children:
+                Annotation lookup is genus-aware, mirroring the Matter/Indexer class split = decision:
+                  id: a7kp2v
+                  why: >
+                    x4nb7q keys each gloss by the bare STRUCTURAL code, which is ambiguous across the
+                    CESR major line exactly as @d7km3p found it ambiguous across the Matter/Indexer
+                    tables: the same counter selector denotes different groups by genus — -C is
+                    NonTransReceiptCouples in v1 but a DIFFERENT group in v2, the wire codes genuinely
+                    collide. So the annotation lookup gains a GENUS discriminator, the counter analog of
+                    @d7km3p's `class`. The walker already knows each group's genus at framing time (from
+                    the message version string; @q9rd3m threads it onto group nodes), so a group node
+                    carries its genus and annotate resolves the correct v1-vs-v2 counter-gloss table from
+                    it. This keeps the teaching layer (@q7m4rp's value-add) HONEST for v2 attachments
+                    rather than showing a v1 gloss on a v2 group, which would actively misteach. Primitive
+                    and ilk glosses are untouched (primitive codes are genus-stable per @f2wn8k; ilks are
+                    protocol-level, not counter-table). Lookup stays fail-soft (@d3rk6n spirit): an
+                    unglossed v2 code returns null and the node still renders framed-but-unglossed.
+                    Rejected (a) leaving annotate v1-only and deferring v2 glosses to a tick — the owner
+                    set full-v1-parity as this pass's bar, and a v2 group framed but showing a v1 gloss is
+                    exactly the mistaught/blank gap x4nb7q exists to prevent; and (b) a flat merged table
+                    with the v2 codes renamed to dodge the collision — there is no free rename, the wire
+                    codes collide, so genus must be a lookup KEY, not something encoded into the string.
+                    Refines @x4nb7q; mirrors @d7km3p. Accepted tradeoff: a genus field threaded onto group
+                    nodes and into the annotation key.
+
+            cesrview authors the v2 counter tables now; upstream follows = tension:
+              id: f2wn8k
+              why: >
+                @w6ph4k accepted "coupling our v2 support to landing upstream table additions," and
+                @n6wd3k accepted "temporarily carrying any v2/selector additions locally until they land
+                in signify-ts" — both framed v2 as WAITING on signify-ts. But the installed signify-ts
+                (0.4.0) has only the v1 counter table and, verified against the real v2 sample,
+                MISFRAMES v2 rather than erroring: new Counter({qb64:'-CAi…'}) returns v1 code -C with a
+                v1 count and the wrong group meaning, so delegating v2 counters to it is not merely
+                incomplete, it is SILENTLY WRONG. And upstream is only now landing the v1 stream parser
+                (PR #402 / @p2rz8k); a v2 counter-table PR has no reviewed base to build on. Waiting would
+                block cesrview's stated v2 goal (@h6rk4d) indefinitely on a community merge cycle cesrview
+                does not control.
+              resolution: >
+                For the v2 COUNTER table (and the v2 version string) only, cesrview authors a native table
+                NOW, ground-truthed to keripy 2.0's counting.py CtrDex_2_0 and coring.py Vrsn_2_0 (the
+                samples' 2.0.0-dev6 genus) and differential-tested against the keripy oracle — the same
+                discipline @d3rk6n/@t6nv4q already apply to v1 groups. This INVERTS the dependency: the
+                native v2 table becomes the ARTIFACT cesrview upstreams (the stacked signify-ts PR that
+                follows @p2rz8k), so cesrview is the reference and signify-ts follows, rather than cesrview
+                waiting. Scope is deliberately minimal — native applies ONLY to what signify-ts lacks or
+                misframes for v2 (the counter table + the v2 version string); genus-STABLE primitives
+                (Matter/Indexer) still delegate to signify-ts unchanged, since a v2 AID/SAID/key/sig is the
+                same qb64 and signify-ts parses it correctly (verified). @w6ph4k HOLDS for v1 and for all
+                primitives; only its "v2 counters wait for upstream" coupling is withdrawn, and @n6wd3k's
+                "carry locally until upstreamed" still holds — this just makes the local carry
+                authoritative rather than provisional.
+              children:
+                Genus-dispatched v2 framing: v2 version string + native v2 counter table = decision:
+                  id: q9rd3m
+                  why: >
+                    Implemented CESR 2.0 framing as a GENUS DISPATCH inside the one table-driven walker
+                    (@c4nk7p), not a second parser. Two concrete gaps close. (1) parseVersion gains a v2
+                    branch: the v2 version string (e.g. KERI·CAA·CAA·JSON·AAD_·.) is
+                    proto(4) + protocol-version(3) + CESR-GENUS-version(3) + kind(4) + base64-size(4) + '.'
+                    terminator — verified, AAD_ decodes to 255, the exact JSON body length of the role-OOBI
+                    sample — replacing the v1-only hex-size/underscore VEREX; the parsed GENUS version is
+                    threaded onto every message and group so downstream code (framing AND @a7kp2v
+                    annotation) can dispatch on it. (2) frameGroup consults a native v2 GROUP_SPEC + v2
+                    hard/soft sizing keyed by genus, because v2 count codes COLLIDE with v1 strings but
+                    differ in meaning (v1 -C is NonTransReceiptCouples; v2 -C is a different group), so the
+                    v1 GROUP_SPEC cannot be reused and signify-ts's v1 Counter silently misreads them
+                    (@f2wn8k). Primitive framing is unchanged — 'p'/'sig' parts still go through signify-ts
+                    Matter/Indexer even under v2 (@f2wn8k scope) — and the three-state resilience (@d3rk6n)
+                    plus the -V/-0V resilience-boundary rule (@p3wk7n) apply identically under v2: an
+                    unmodelled v2 counter is unknown-but-framed, never a halt. Rejected (a) a separate v2
+                    parser (duplicates framing, breaks @c4nk7p's one-engine intent), (b) sniffing '{' or the
+                    JSON "v" field to detect the version (@s7bk4m already locates the bare version token
+                    anywhere in the window, and CBOR/MGPK v2 bodies carry it as ASCII too), and (c)
+                    delegating v2 counters to signify-ts (silently wrong, @f2wn8k). Accepted tradeoff: the
+                    walker now carries two genus-keyed counter tables to keep current with the spec,
+                    mitigated by the keripy oracle and the byte-alignment invariant (@t6nv4q).
 
         Table-driven walker is v2-capable, not v1-only = tension:
           id: c4nk7p
