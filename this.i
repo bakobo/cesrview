@@ -433,6 +433,29 @@ Make CESR legible to developers in the browser = goal:
                     unchanged: a click still fetches same-origin and replaces the stream via the shared load
                     path (@e7xm4p), so clicking an example while a stream is loaded swaps it in, consistent
                     with paste/drop's replace semantics (@d6rp2k).
+                  children:
+                    Collapse the picker to one "Examples" dropdown; add the CESR-2 twins = decision:
+                      id: d4mx9k
+                      why: >
+                        Refines @s8vp3x's PRESENTATION now that the catalog spans two CESR genera. s8vp3x
+                        rendered one button PER sample under a small uppercase "examples" lead — fine for the
+                        three v1 samples, but adding the CESR-2 twins (which @e7xm4p anticipated as "excluded
+                        until the walker frames CESR-2", now unblocked by @q9rd3m) would grow a five-button
+                        wrapping row that competes with the paste surface for width and attention — the very
+                        thing @s8vp3x sized the control DOWN to avoid. So the buttons collapse into a single
+                        "Examples" disclosure button that opens a menu on demand, and the separate "EXAMPLES"
+                        lead label is dropped (the button now names the affordance, so the label was
+                        redundant chrome). The menu GROUPS samples by CESR version (1.0 / 2.0) so the matched
+                        v1/v2 witness-OOBI pair (same AID, different genus) reads as a deliberate
+                        compare-the-genera set, serving the expert audience (@q7m4rp). Behaviour is otherwise
+                        unchanged: a menu item fetches same-origin and replaces the stream via the shared load
+                        path (@e7xm4p/@d6rp2k), a fetch in flight disables the items, and a failed fetch
+                        surfaces the same fail-closed in-place alert. Keyboard-operable (aria-haspopup menu +
+                        aria-expanded, Escape closes), consistent with the app's other disclosures (@r8kv3p).
+                        Rejected keeping the button row (width/attention cost at five-plus samples) and a
+                        native <select> (cannot carry per-sample descriptions or the version group headers the
+                        menu shows, and styles inconsistently across platforms). Accepted tradeoff: a little
+                        open/close state and menu markup versus a flat button list.
     In-browser TS stream-walker, upstreamed; keripy as oracle = decision:
       id: h6rk4d
       stage-status: in-progress
