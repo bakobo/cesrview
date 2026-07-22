@@ -17,6 +17,12 @@ describe('sample catalog', () => {
     expect(new Set(SAMPLES.map((s) => s.id)).size).toBe(SAMPLES.length);
   });
 
+  it('tags each sample with a CESR genus and covers both v1 and v2 (the picker groups by it, d4mx9k)', () => {
+    for (const s of SAMPLES) expect(s.version).toMatch(/^[12]$/);
+    const genera = new Set(SAMPLES.map((s) => s.version));
+    expect(genera).toEqual(new Set(['1', '2']));
+  });
+
   it('points every entry at a file that is actually published under public/ (no dead 404s)', () => {
     for (const s of SAMPLES) {
       expect(existsSync(`public/${s.file}`)).toBe(true);
