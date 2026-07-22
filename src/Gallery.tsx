@@ -15,8 +15,8 @@ const bytes = new TextEncoder().encode(AID + 'A'.repeat(88)); // AID then an 88-
 
 const aidPrim: Primitive = { kind: 'primitive', code: 'E', class: 'matter', span: { start: 0, end: 44 } };
 const sigPrim: Primitive = { kind: 'primitive', code: 'A', class: 'indexer', span: { start: 44, end: 132 } };
-const aGroup: GroupNode = { kind: 'group', code: '-A', count: 1, state: 'known', span: { start: 40, end: 132 }, items: [sigPrim] };
-const vGroup: GroupNode = { kind: 'group', code: '-V', count: 23, state: 'known', span: { start: 36, end: 132 }, items: [aGroup] };
+const aGroup: GroupNode = { kind: 'group', code: '-A', count: 1, genus: 1, state: 'known', span: { start: 40, end: 132 }, items: [sigPrim] };
+const vGroup: GroupNode = { kind: 'group', code: '-V', count: 23, genus: 1, state: 'known', span: { start: 36, end: 132 }, items: [aGroup] };
 
 const event: CesrMessage = {
   proto: 'KERI',

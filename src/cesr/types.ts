@@ -29,6 +29,7 @@ export interface AttachmentGroup {
   kind: 'group';
   code: string;
   count: number;
+  genus: number; // CESR genus major (1 or 2) — the same code means different groups by genus (a7kp2v)
   span: ByteSpan;
   state: NodeState;
   items: AttachmentNode[]; // typed children; empty for opaque quadlet frames and unknown codes

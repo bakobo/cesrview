@@ -9,7 +9,7 @@ import { SpecLink } from './SpecLink';
  * (nested groups and primitives) rendered recursively. */
 export function AttachmentGroup({ node, bytes }: { node: GroupNode; bytes: Uint8Array }) {
   const [open, setOpen] = useState(true);
-  const ann = annotate('counter', node.code);
+  const ann = annotate('counter', node.code, node.genus);
   return (
     <div className="cesr-group" data-code={node.code} data-state={node.state}>
       <div className="cesr-group-head">

@@ -1,0 +1,20 @@
+{
+  "bytes": 395,
+  "genus": 2,
+  "messages": [
+    {
+      "ilk": "icp",
+      "sn": "0",
+      "said": "EP16vD37O8CcvmgKRrjI5WbrtAioC34lY-eXX7-VTxt6",
+      "size": 255,
+      "attachStart": 255,
+      "attachLen": 140,
+      "groups": [
+        {
+          "code": "-C",
+          "count": 34
+        }
+      ]
+    }
+  ]
+}

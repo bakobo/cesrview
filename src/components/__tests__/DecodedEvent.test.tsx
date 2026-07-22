@@ -6,7 +6,7 @@ import type { AttachmentGroup, CesrMessage, Primitive } from '../../cesr/types';
 const AID = 'EDP1vHcw_wc4M__Fj53-cJaBnZZASd-aMTaSyWEQ-PC2';
 const bytes = new TextEncoder().encode('AAAA');
 const prim: Primitive = { kind: 'primitive', code: 'A', class: 'indexer', span: { start: 0, end: 4 } };
-const aGroup: AttachmentGroup = { kind: 'group', code: '-A', count: 1, state: 'known', span: { start: 0, end: 4 }, items: [prim] };
+const aGroup: AttachmentGroup = { kind: 'group', code: '-A', count: 1, genus: 1, state: 'known', span: { start: 0, end: 4 }, items: [prim] };
 const mk = (over: Partial<CesrMessage> = {}): CesrMessage => ({
   proto: 'KERI',
   version: '1.0',

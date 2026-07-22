@@ -9,20 +9,27 @@ import type { AttachmentGroup, AttachmentNode } from '../types';
  * nodes. Auto-skips where the corpus is absent (CI, fresh clones); the committed keripy oracle
  * fixtures (tiny-*.cesr) carry the CI-visible differential coverage.
  *
- * Only the CESR-1 samples are listed: the walker does not yet frame CESR-2 (see the in-progress
- * v2 parser work), so samples/*-cesr2.cesr are intentionally excluded until it does. */
+ * Both CESR-1 and CESR-2 samples are listed: the walker frames v2 natively now (decision q9rd3m),
+ * so the v2 twins (samples/*-cesr2.cesr) are locked to the same delta-0/fully-known invariants. */
+
+// The universal material-quadlet wrapper, per genus — GENUS-AWARE because the codes collide: v1's
+// -V/-0V vs v2's -C/--C AttachmentGroup (in v1, -C is NonTransReceiptCouples, not a wrapper).
+const isWrapper = (g: AttachmentGroup) =>
+  g.genus === 2 ? g.code === '-C' || g.code === '--C' : g.code === '-V' || g.code === '-0V';
 
 interface Sample {
   path: string;
   messages: number;
-  /** Expected count of -V/-0V wrappers that have children (0 for controller-signed KELs with
-   *  bare -AAB groups and no wrapper). */
+  /** Expected count of universal wrappers that have children (0 for controller-signed KELs with
+   *  bare sig groups and no wrapper). */
   wrappers: number;
 }
 const SAMPLES: Sample[] = [
   { path: 'samples/witness-controller-kel-cesr1.cesr', messages: 4, wrappers: 4 },
   { path: 'samples/witness-role-oobi-cesr1.cesr', messages: 1, wrappers: 1 },
   { path: 'samples/kel-icp-rot-ixn-cesr1.cesr', messages: 3, wrappers: 0 },
+  { path: 'samples/witness-controller-kel-cesr2.cesr', messages: 4, wrappers: 4 },
+  { path: 'samples/witness-role-oobi-cesr2.cesr', messages: 1, wrappers: 1 },
 ];
 
 /** Collect every group node in the attachment forest of a message. */
@@ -50,7 +57,7 @@ describe('walk — real corpus regression guard', () => {
       // every node is fully recognised (these samples exercise only modelled codes)
       expect(allGroups.filter((g) => g.state !== 'known')).toEqual([]);
       // every wrapper is exactly tiled by its inner groups (last child ends at the wrapper's end)
-      const wrappers = allGroups.filter((g) => (g.code === '-V' || g.code === '-0V') && g.items.length > 0);
+      const wrappers = allGroups.filter((g) => isWrapper(g) && g.items.length > 0);
       expect(wrappers).toHaveLength(sample.wrappers);
       for (const w of wrappers) {
         expect(w.items[w.items.length - 1].span.end).toBe(w.span.end);

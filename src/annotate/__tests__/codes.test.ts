@@ -26,11 +26,45 @@ describe('annotateField — message field-key glosses (7slk)', () => {
   });
 });
 
+describe('annotate — genus-aware counter glosses (decision a7kp2v)', () => {
+  it('reads the SAME counter code differently by CESR genus (the codes collide across the major line)', () => {
+    // -C is NonTransReceiptCouples in v1 but the AttachmentGroup wrapper in v2.
+    const v1 = annotate('counter', '-C', 1)!;
+    const v2 = annotate('counter', '-C', 2)!;
+    expect(v1.gloss).toMatch(/non-transferable receipt/i);
+    expect(v2.gloss).toMatch(/attachment/i);
+    expect(v1.gloss).not.toBe(v2.gloss);
+  });
+
+  it('glosses the v2 controller-indexed-signatures group (-K), which is a SAD-path group in v1', () => {
+    expect(annotate('counter', '-K', 2)?.gloss).toMatch(/controller indexed signatures/i);
+    expect(annotate('counter', '-K', 1)?.gloss).toMatch(/sad path/i);
+  });
+
+  it('glosses the v2 first-seen-replay couples group (-O)', () => {
+    expect(annotate('counter', '-O', 2)?.gloss).toMatch(/first-seen replay/i);
+    expect(annotate('counter', '-O', 2)?.spec).toBe(`${CESR}#count-code-tables`);
+  });
+
+  it('is fail-soft: an unglossed v2 counter code returns null', () => {
+    expect(annotate('counter', '-z', 2)).toBeNull();
+  });
+
+  it('leaves primitive and ilk lookups genus-independent (they are stable across the major line)', () => {
+    expect(annotate('matter', 'E', 2)?.gloss).toBe(annotate('matter', 'E', 1)?.gloss);
+    expect(annotate('ilk', 'icp', 2)?.gloss).toBe(annotate('ilk', 'icp')?.gloss);
+  });
+});
+
 describe('annotate — lookup by category (decision x4nb7q)', () => {
   it('annotates a counter/group code with a gloss and the count-code-table anchor', () => {
     const a = annotate('counter', '-A');
     expect(a?.gloss).toMatch(/controller indexed signatures/i);
     expect(a?.spec).toBe(`${CESR}#count-code-tables`);
+  });
+
+  it('defaults counter lookups to the v1 (genus 1) table when no genus is given', () => {
+    expect(annotate('counter', '-C')?.gloss).toBe(annotate('counter', '-C', 1)?.gloss);
   });
 
   it('annotates a Matter primitive code (Blake3 digest)', () => {

@@ -48,6 +48,26 @@ const COUNTER: Record<string, Annotation> = {
   '-0V': { gloss: 'Big attached material quadlets — the large-count form of the universal attachment wrapper.', spec: CESR_COUNTER },
 };
 
+// The CESR 2.0 (genus 2) counter table (keripy CtrDex_2_0). The code STRINGS collide with the v1
+// table above but denote different groups, so v2 lookups use this table, selected by the group's
+// genus (decision a7kp2v). Anchored to the same count-code-tables section (the spec renders both
+// genera there). Only the load-bearing groups are glossed; unglossed codes fail soft (d3rk6n).
+const COUNTER_2: Record<string, Annotation> = {
+  '-A': { gloss: 'Generic group — a universal count-coded group whose enclosed material is sized in 4-byte quadlets.', spec: CESR_COUNTER },
+  '-B': { gloss: 'Message-body-plus-attachments group — a universal wrapper enclosing a message body together with its attachments.', spec: CESR_COUNTER },
+  '-C': { gloss: 'Attachment group — the universal wrapper whose count sizes all enclosed attachments in 4-byte quadlets (the v2 counterpart of v1’s -V).', spec: CESR_COUNTER },
+  '-K': { gloss: 'Controller indexed signatures — the controlling keypairs’ signatures on this event, each tagged with the index of the key that made it.', spec: CESR_COUNTER },
+  '-L': { gloss: 'Witness indexed signatures — receipts from the designated witnesses, indexed by their position in the witness list.', spec: CESR_COUNTER },
+  '-M': { gloss: 'Non-transferable receipt couples — (verifier prefix, signature) pairs receipted by non-transferable identifiers.', spec: CESR_COUNTER },
+  '-N': { gloss: 'Transferable receipt indexed-signature groups — an endorser located by (prefix, sequence number, digest) followed by its controller indexed signatures.', spec: CESR_COUNTER },
+  '-O': { gloss: 'First-seen replay couples — (first-seen ordinal, datetime) recording when the receiver first saw an event, used for ordered replay.', spec: CESR_COUNTER },
+  '-S': { gloss: 'Seal source couples — (sequence number, digest) locating the event that anchors a seal within the same log.', spec: CESR_COUNTER },
+  '-T': { gloss: 'Seal source triples — (prefix, sequence number, digest) locating an anchoring event in another identifier’s log.', spec: CESR_COUNTER },
+  '-X': { gloss: 'Transferable indexed signature groups — an endorser located by (prefix, sequence number, digest) followed by its controller indexed signatures.', spec: CESR_COUNTER },
+  '-Y': { gloss: 'Transferable last indexed signature groups — an endorser located by prefix (using its latest key state) followed by its indexed signatures.', spec: CESR_COUNTER },
+  '-_AAA': { gloss: 'CESR genus/version — declares the KERI/ACDC protocol-stack genus and version of the code tables used by the material that follows.', spec: CESR_COUNTER },
+};
+
 const MATTER: Record<string, Annotation> = {
   E: { gloss: 'Blake3-256 digest — a 32-byte hash, used for SAIDs and event digests.', spec: CESR_MATTER },
   D: { gloss: 'Ed25519 public key (transferable) — a verification key whose identifier may rotate.', spec: CESR_MATTER },
@@ -84,9 +104,13 @@ const TABLES: Record<CodeCategory, Record<string, Annotation>> = {
   ilk: ILK,
 };
 
-/** Look up the teaching annotation for a code, or null if it is not annotated (fail-soft). */
-export function annotate(category: CodeCategory, code: string): Annotation | null {
-  return TABLES[category][code] ?? null;
+/** Look up the teaching annotation for a code, or null if it is not annotated (fail-soft). Counter
+ * lookups are GENUS-AWARE (decision a7kp2v): the same counter code denotes different groups in CESR
+ * v1 vs v2, so `genus` (default 1) selects the v1 or v2 counter table. Primitive (Matter/Indexer)
+ * and ilk codes are genus-stable, so `genus` does not affect them. */
+export function annotate(category: CodeCategory, code: string, genus = 1): Annotation | null {
+  const table = category === 'counter' && genus === 2 ? COUNTER_2 : TABLES[category];
+  return table[code] ?? null;
 }
 
 // Short glosses for KERI/ACDC message FIELD KEYS, shown in parens beside the terse label so a

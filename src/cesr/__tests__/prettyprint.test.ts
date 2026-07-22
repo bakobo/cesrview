@@ -6,8 +6,8 @@ import type { AttachmentGroup, CesrMessage, Primitive, WalkResult } from '../typ
 
 const bytes = new TextEncoder().encode('SIGVALUEHERE'); // primitive 'SIGVALUE' at [0, 8)
 const prim: Primitive = { kind: 'primitive', code: 'A', class: 'indexer', span: { start: 0, end: 8 } };
-const aGroup: AttachmentGroup = { kind: 'group', code: '-A', count: 1, state: 'known', span: { start: 0, end: 8 }, items: [prim] };
-const vGroup: AttachmentGroup = { kind: 'group', code: '-V', count: 1, state: 'known', span: { start: 0, end: 12 }, items: [aGroup] };
+const aGroup: AttachmentGroup = { kind: 'group', code: '-A', count: 1, genus: 1, state: 'known', span: { start: 0, end: 8 }, items: [prim] };
+const vGroup: AttachmentGroup = { kind: 'group', code: '-V', count: 1, genus: 1, state: 'known', span: { start: 0, end: 12 }, items: [aGroup] };
 const msg = (over: Partial<CesrMessage> = {}): CesrMessage => ({
   proto: 'KERI',
   version: '1.0',

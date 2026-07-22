@@ -9,6 +9,7 @@ const group = (over: Partial<GroupNode> = {}): GroupNode => ({
   kind: 'group',
   code: '-A',
   count: 1,
+  genus: 1,
   state: 'known',
   span: { start: 0, end: 8 },
   items: [prim],
