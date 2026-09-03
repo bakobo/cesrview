@@ -819,6 +819,69 @@ Make CESR legible to developers in the browser = goal:
                 adding a transient/retryable variant (the walker performs no I/O, so nothing it does is
                 transient). Refines @d3rk6n's typed-error model and @m4dp7k's output contract. Accepted
                 tradeoff: a code union to keep in step with the error sites.
+              children:
+                Truncation is a RECOVERABLE failure, and declared lengths must be bounds-checked = tension:
+                  id: jr9p4w
+                  why: >
+                    @n4kr7p rejected a transient/retryable error variant on the reasoning that "the
+                    walker performs no I/O, so nothing it does is transient", and typed
+                    ParseError.permanent as the literal `true`. That conflates two things. The walker is
+                    indeed pure over the buffer it is HANDED — but a stream parser is handed a PREFIX of
+                    a stream, and "these bytes are wrong" and "there are not yet enough bytes" are
+                    different verdicts calling for different actions from the caller. Having no way to
+                    say the second, the walker said the first, or said nothing at all. daidoji found it
+                    on WebOfTrust/signify-ts#402 (2026-08-31) with `{"v":"KERI10JSON100000_"}`: 25 bytes
+                    claiming 0x100000, walked as ONE COMPLETE MESSAGE with no error and with `consumed`
+                    and `span.end` a megabyte past the end of the buffer — because `subarray` clamps
+                    silently and the clamped slice happened to be valid JSON. The same hole runs through
+                    the attachment framing: a truncated -V frames `state: 'known'` with a span past the
+                    buffer, and a truncated -A frames `unframable-group` with permanent: true,
+                    condemning bytes that were merely absent. Worse, a version string with size 0 and a
+                    serialization with no registered decoder never advanced the cursor and looped
+                    forever, pushing a message per iteration: 25 bytes take a node process to a 4 GB
+                    heap death in about 40 seconds, which in cesrview is the user's browser tab, on
+                    pasted or dropped input. One omission produced all of it — nothing compared a
+                    DECLARED length against the bytes actually available.
+                  resolution: >
+                    ParseError.permanent becomes a boolean, and a new `incomplete` code carries
+                    permanent: false as the one failure more bytes can cure. @n4kr7p's reasoning still
+                    holds for every other code: over a FIXED buffer the walker is pure, so those
+                    verdicts never change on a retry. What it got wrong is that completeness of the
+                    buffer is not an I/O property. Every declared length — the version-string size, a
+                    counter's count*4 quadlet body, and a primitive's fs — is now checked against
+                    bytes.length before it is trusted, and primitive shortage is read from the
+                    Matter/Indexer size tables rather than inferred from a constructor throw, which
+                    could never tell malformed from short. A version size that cannot contain its own
+                    version string is rejected as `invalid-version-size`, which makes forward progress
+                    an INVARIANT of the loop rather than a special case for size 0. @d3rk6n's
+                    three-state resilience and @p3wk7n's wrapper boundary are untouched: a shortage
+                    INSIDE a sized -V/-0V or v2 wrapper still stops decomposition without condemning the
+                    wrapper, because the wrapper's own bytes are all present. Accepted tradeoff: a
+                    widened public type and two more error codes on a module already under review
+                    upstream (#402/#403), taken now rather than after it lands.
+                  children:
+                    An incomplete message is not emitted, and consumed marks where to resume = decision:
+                      id: z3fn5v
+                      why: >
+                        On `incomplete` the walker emits NO message for the truncated one and leaves
+                        `consumed` at that message's first byte, rather than emitting it flagged as
+                        partial. This is what makes walk() restartable: a caller keeps
+                        bytes.slice(consumed), appends what arrives, and re-walks, with no risk of
+                        emitting the same message twice. It reads as an exception to @d3rk6n's
+                        return-everything-parsed-so-far rule but is the same principle applied to a
+                        recoverable failure — @d3rk6n emits a partially-understood element because
+                        nothing better will ever come, whereas here something better is precisely what
+                        is coming. The contrast with `unframable-group`, which still emits its message,
+                        is deliberate and follows from @jr9p4w's split: a permanent verdict admits no
+                        retry, so emitting is a strict gain; a recoverable one would double-emit. The
+                        invariant a consumer can now rely on is that every emitted message and every
+                        span is wholly within the bytes it passed in, and `consumed <= bytes.length`
+                        always. Tested by a truncation SWEEP — every corpus vector cut at every byte
+                        offset — because the class of bug, not the one example, is what went undetected;
+                        a single case per defect would not have found the -V or the size-0 loop.
+                        Rejected emitting the message with a `truncated: true` flag (pushes dedupe onto
+                        every consumer, and leaves "wait" indistinguishable from "give up" without
+                        inspecting fields beyond the error code).
 
         Develop the walker in cesrview, upstream once proven = decision:
           id: n6wd3k
