@@ -64,16 +64,21 @@ export interface WalkOptions {
 /** A stable symbolic code for a framing failure — branch on this, not the prose (decision n4kr7p). */
 export type ParseErrorCode =
   | 'no-version-string' // no CESR version string at a message position — not a recognizable message
+  | 'invalid-version-size' // a version string whose size cannot even contain the version string
   | 'malformed-body' // the version size is claimed but the body does not decode in its serialization
   | 'unparseable-counter' // a '-' counter code signify-ts cannot parse
-  | 'unframable-group'; // a recognized counter whose group could not be framed
+  | 'unframable-group' // a recognized counter whose group could not be framed
+  | 'incomplete'; // the stream ends inside an element — RECOVERABLE, more bytes may complete it
 
 /** A framing failure, with a stable code, the byte position it occurred at, and its permanence. */
 export interface ParseError {
   code: ParseErrorCode;
   message: string;
   span: ByteSpan;
-  permanent: true; // the walker is pure and deterministic — the same bytes always fail the same way
+  /** False only for `incomplete`, the one failure more bytes can cure. Every other code is a verdict
+   * on bytes that are all present, and the walker is pure, so re-walking them fails identically. A
+   * caller feeding a growing buffer must branch on this: wait, or give up (decision jr9p4w). */
+  permanent: boolean;
 }
 
 /** The result of walking a stream: what parsed, what failed, and how far we got. */
