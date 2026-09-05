@@ -49,4 +49,12 @@ export const SAMPLES: SampleMeta[] = [
     file: 'samples/witness-role-oobi-v2.cesr',
     version: '2',
   },
+  {
+    id: 'falcon-receipt',
+    label: 'Post-quantum receipt',
+    description:
+      'A classical Ed25519 event receipted with post-quantum Falcon: the FN-DSA-512 key and signature dwarf the event they attest (decision z9puaw).',
+    file: 'samples/falcon-receipt.cesr',
+    version: '1',
+  },
 ];

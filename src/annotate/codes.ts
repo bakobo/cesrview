@@ -26,6 +26,11 @@ const KERI = 'https://trustoverip.github.io/kswg-keri-specification/';
 const CESR_COUNTER = `${CESR}#count-code-tables`;
 const CESR_MATTER = `${CESR}#master-code-table-for-genusversion-_aaacaa-keriacdc-protocol-stack-version-200`;
 const CESR_INDEXER = `${CESR}#indexed-code-table`;
+// The post-quantum codes are explained by the code-table-entry-policy section (why they MUST occupy
+// the four-character tables), which is the finest stable target for them. No `find` phrase: CESR 1.1
+// is not published to this site yet, so a text fragment quoting its post-quantum prose would not
+// match — add one when v1.1 ships (~5fgs).
+const CESR_PQ = `${CESR}#code-table-entry-policy`;
 // Each field deep-links to the section where its concept is EXPLAINED (not the field-labels glossary
 // table), with a `find` phrase verified to occur exactly once in that section (s9grn4). KERI_FIELDS
 // (the glossary table) is the floor only for fields with no dedicated explanatory section.
@@ -75,6 +80,42 @@ const MATTER: Record<string, Annotation> = {
   '0A': { gloss: 'A 128-bit fixed-size number — used for sequence numbers, salts, and thresholds (the Salt_128 code).', spec: CESR_MATTER },
   '0B': { gloss: 'Ed25519 signature (non-indexed) — a standalone signature, as carried in a receipt couple.', spec: CESR_MATTER },
   '1AAG': { gloss: 'Datetime — an ISO-8601 timestamp encoded as a fixed-length primitive (a Dater).', spec: CESR_MATTER },
+  // CESR 1.1 post-quantum primitives (decision j2b7dw). All 33 live in the four-character fixed
+  // tables because every post-quantum primitive is large — the smallest signature here is 666 B and
+  // the largest 29,792 B — so a four-character code costs under half a percent of the encoding.
+  '1AAQ': { gloss: 'FN-DSA-512 public verification key — post-quantum, from the Falcon family (FIPS 206); 897 B of raw key.', spec: CESR_PQ },
+  '1AAR': { gloss: 'FN-DSA-512 signature — post-quantum, from the Falcon family (FIPS 206); 666 B raw. Carried non-indexed: CESR 1.1 defines no indexed post-quantum signature code.', spec: CESR_PQ },
+  '1AAS': { gloss: 'ML-DSA-87 public verification key — post-quantum, from the CRYSTALS-Dilithium family (FIPS 204); 2592 B of raw key.', spec: CESR_PQ },
+  '1AAT': { gloss: 'ML-DSA-65 signature — post-quantum, from the CRYSTALS-Dilithium family (FIPS 204); 3309 B raw. Carried non-indexed: CESR 1.1 defines no indexed post-quantum signature code.', spec: CESR_PQ },
+  '1AAU': { gloss: 'SLH-DSA-SHA2-192s public verification key — post-quantum, from the SPHINCS+ family (FIPS 205); 48 B of raw key.', spec: CESR_PQ },
+  '1AAV': { gloss: 'SLH-DSA-SHAKE-192s public verification key — post-quantum, from the SPHINCS+ family (FIPS 205); 48 B of raw key.', spec: CESR_PQ },
+  '1AAW': { gloss: 'SLH-DSA-SHA2-192s signature — post-quantum, from the SPHINCS+ family (FIPS 205); 16224 B raw. Carried non-indexed: CESR 1.1 defines no indexed post-quantum signature code.', spec: CESR_PQ },
+  '1AAX': { gloss: 'SLH-DSA-SHAKE-192s signature — post-quantum, from the SPHINCS+ family (FIPS 205); 16224 B raw. Carried non-indexed: CESR 1.1 defines no indexed post-quantum signature code.', spec: CESR_PQ },
+  '1AAY': { gloss: 'Seed of a SLH-DSA-SHA2-128s private key — 48 B of secret from which the full post-quantum private key is expanded.', spec: CESR_PQ },
+  '1AAZ': { gloss: 'Seed of a SLH-DSA-SHAKE-128s private key — 48 B of secret from which the full post-quantum private key is expanded.', spec: CESR_PQ },
+  '1AAa': { gloss: 'Seed of a SLH-DSA-SHA2-192s private key — 72 B of secret from which the full post-quantum private key is expanded.', spec: CESR_PQ },
+  '1AAb': { gloss: 'Seed of a SLH-DSA-SHAKE-192s private key — 72 B of secret from which the full post-quantum private key is expanded.', spec: CESR_PQ },
+  '1AAc': { gloss: 'Seed of a SLH-DSA-SHA2-256s private key — 96 B of secret from which the full post-quantum private key is expanded.', spec: CESR_PQ },
+  '1AAd': { gloss: 'Seed of a SLH-DSA-SHAKE-256s private key — 96 B of secret from which the full post-quantum private key is expanded.', spec: CESR_PQ },
+  '2AAA': { gloss: 'FN-DSA-1024 public verification key — post-quantum, from the Falcon family (FIPS 206); 1793 B of raw key.', spec: CESR_PQ },
+  '2AAB': { gloss: 'FN-DSA-1024 signature — post-quantum, from the Falcon family (FIPS 206); 1280 B raw. Carried non-indexed: CESR 1.1 defines no indexed post-quantum signature code.', spec: CESR_PQ },
+  '2AAC': { gloss: 'Seed of a FN-DSA-512 private key — 32 B of secret from which the full post-quantum private key is expanded.', spec: CESR_PQ },
+  '2AAD': { gloss: 'Seed of a FN-DSA-1024 private key — 32 B of secret from which the full post-quantum private key is expanded.', spec: CESR_PQ },
+  '2AAE': { gloss: 'ML-DSA-65 public verification key — post-quantum, from the CRYSTALS-Dilithium family (FIPS 204); 1952 B of raw key.', spec: CESR_PQ },
+  '2AAF': { gloss: 'ML-DSA-44 signature — post-quantum, from the CRYSTALS-Dilithium family (FIPS 204); 2420 B raw. Carried non-indexed: CESR 1.1 defines no indexed post-quantum signature code.', spec: CESR_PQ },
+  '2AAG': { gloss: 'Seed of a ML-DSA-44 private key — 32 B of secret from which the full post-quantum private key is expanded.', spec: CESR_PQ },
+  '2AAH': { gloss: 'Seed of a ML-DSA-65 private key — 32 B of secret from which the full post-quantum private key is expanded.', spec: CESR_PQ },
+  '2AAI': { gloss: 'Seed of a ML-DSA-87 private key — 32 B of secret from which the full post-quantum private key is expanded.', spec: CESR_PQ },
+  '2AAJ': { gloss: 'SLH-DSA-SHA2-128s public verification key — post-quantum, from the SPHINCS+ family (FIPS 205); 32 B of raw key.', spec: CESR_PQ },
+  '2AAK': { gloss: 'SLH-DSA-SHAKE-128s public verification key — post-quantum, from the SPHINCS+ family (FIPS 205); 32 B of raw key.', spec: CESR_PQ },
+  '2AAL': { gloss: 'SLH-DSA-SHA2-128s signature — post-quantum, from the SPHINCS+ family (FIPS 205); 7856 B raw. Carried non-indexed: CESR 1.1 defines no indexed post-quantum signature code.', spec: CESR_PQ },
+  '2AAM': { gloss: 'SLH-DSA-SHAKE-128s signature — post-quantum, from the SPHINCS+ family (FIPS 205); 7856 B raw. Carried non-indexed: CESR 1.1 defines no indexed post-quantum signature code.', spec: CESR_PQ },
+  '2AAN': { gloss: 'SLH-DSA-SHA2-256s signature — post-quantum, from the SPHINCS+ family (FIPS 205); 29792 B raw. Carried non-indexed: CESR 1.1 defines no indexed post-quantum signature code.', spec: CESR_PQ },
+  '2AAO': { gloss: 'SLH-DSA-SHAKE-256s signature — post-quantum, from the SPHINCS+ family (FIPS 205); 29792 B raw. Carried non-indexed: CESR 1.1 defines no indexed post-quantum signature code.', spec: CESR_PQ },
+  '3AAA': { gloss: 'ML-DSA-44 public verification key — post-quantum, from the CRYSTALS-Dilithium family (FIPS 204); 1312 B of raw key.', spec: CESR_PQ },
+  '3AAB': { gloss: 'ML-DSA-87 signature — post-quantum, from the CRYSTALS-Dilithium family (FIPS 204); 4627 B raw. Carried non-indexed: CESR 1.1 defines no indexed post-quantum signature code.', spec: CESR_PQ },
+  '3AAC': { gloss: 'SLH-DSA-SHA2-256s public verification key — post-quantum, from the SPHINCS+ family (FIPS 205); 64 B of raw key.', spec: CESR_PQ },
+  '3AAD': { gloss: 'SLH-DSA-SHAKE-256s public verification key — post-quantum, from the SPHINCS+ family (FIPS 205); 64 B of raw key.', spec: CESR_PQ },
 };
 
 const INDEXER: Record<string, Annotation> = {

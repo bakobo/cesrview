@@ -5,6 +5,7 @@
  * cannot frame it stops and reports, returning everything parsed so far (decision d3rk6n). */
 
 import { Counter, Indexer, Matter } from 'signify-ts';
+import { pqSizage } from './pq';
 import type {
   AttachmentGroup,
   AttachmentNode,
@@ -125,10 +126,18 @@ interface GroupSequence {
   short?: true; // the window ends inside an element — the caller decides whether that is an error
 }
 
-/** The full byte length of the primitive at `at`, read from signify-ts's size tables BEFORE
- * construction. Probing rather than catching is what separates a truncated primitive from a
- * malformed one: the constructor throws for both (jr9p4w). */
-function probePrimitive(bytes: Uint8Array, at: number, part: PrimitivePart): Attempt<number> {
+/** How a primitive is sized: its full qb64 length, and whether that length came from the
+ * post-quantum overlay rather than from signify-ts (which decides how it is then framed). */
+interface Sizing {
+  fs: number;
+  pq: boolean;
+}
+
+/** The full byte length of the primitive at `at`, read from the size tables BEFORE construction.
+ * Probing rather than catching is what separates a truncated primitive from a malformed one: the
+ * constructor throws for both (jr9p4w). signify-ts's tables are consulted first and the
+ * post-quantum overlay only on a miss, so it can never shadow a delegated code (j2b7dw). */
+function probePrimitive(bytes: Uint8Array, at: number, part: PrimitivePart): Attempt<Sizing> {
   const hards = part === 'sig' ? Indexer.Hards : Matter.Hards;
   const sizes = part === 'sig' ? Indexer.Sizes : Matter.Sizes;
   const avail = bytes.length - at;
@@ -137,21 +146,38 @@ function probePrimitive(bytes: Uint8Array, at: number, part: PrimitivePart): Att
   const hs = hards.get(head[0]);
   if (hs === undefined) return { fail: 'bad' }; // an unrecognized selector is wrong, not short
   if (avail < hs) return { fail: 'short' }; // the hard code itself is cut off
-  const sizage = sizes.get(head.slice(0, hs));
-  if (!sizage) return { fail: 'bad' };
+  const code = head.slice(0, hs);
+  const sizage = sizes.get(code);
+  if (!sizage) {
+    // signify-ts does not know this code. A CESR v1.1 post-quantum code is not wrong, only
+    // unshipped, so the overlay answers for it (j2b7dw). Matter codes ONLY: v1.1 defines no
+    // indexed post-quantum signature, so an indexed part must never resolve here (z9puaw).
+    const pq = part === 'sig' ? undefined : pqSizage(code);
+    if (!pq) return { fail: 'bad' };
+    return avail < pq.fs ? { fail: 'short' } : { node: { fs: pq.fs, pq: true } };
+  }
   // A variable-size code carries no full size — signify-ts stores that as null, which its own
   // `fs?: number` type does not admit, so this tests the VALUE rather than trusting the type. `fs <
   // 0` alone would let null through (null >= 0 is true) and hand back a null length.
   const fs = sizage.fs;
   if (typeof fs !== 'number' || fs < 0) return { fail: 'bad' }; // variable-size: unsupported upstream
-  return avail < fs ? { fail: 'short' } : { node: fs };
+  return avail < fs ? { fail: 'short' } : { node: { fs, pq: false } };
 }
 
 /** Frame one primitive of the given part kind at `at`, delegating sizing to signify-ts. */
 function framePrimitive(bytes: Uint8Array, at: number, part: PrimitivePart): Attempt<Primitive> {
   const probe = probePrimitive(bytes, at, part);
   if (failed(probe)) return probe;
-  const q = td.decode(bytes.subarray(at, at + probe.node));
+  const { fs, pq } = probe.node;
+  const q = td.decode(bytes.subarray(at, at + fs));
+  if (pq) {
+    // A post-quantum primitive cannot go through signify-ts's Matter — it would throw on the
+    // unknown code — so it is framed straight from the table (j2b7dw). The walker needs a code and
+    // a span, never raw bytes. Its value is still checked for base64url, so corrupt material is
+    // 'bad' rather than framed on the strength of its first four characters alone.
+    if (!/^[A-Za-z0-9_-]+$/.test(q)) return { fail: 'bad' };
+    return { node: { kind: 'primitive', code: q.slice(0, 4), class: 'matter', span: { start: at, end: at + fs } } };
+  }
   try {
     const prim = part === 'sig' ? new Indexer({ qb64: q }) : new Matter({ qb64: q });
     const cls = part === 'sig' ? 'indexer' : 'matter';
