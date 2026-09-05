@@ -613,6 +613,87 @@ Make CESR legible to developers in the browser = goal:
                     walker now carries two genus-keyed counter tables to keep current with the spec,
                     mitigated by the keripy oracle and the byte-alignment invariant (@t6nv4q).
 
+            cesrview authors the post-quantum PRIMITIVE codes now; upstream follows = tension:
+              id: j2b7dw
+              why: >
+                CESR v1.1 (trustoverip/kswg-cesr-specification, branch v1.1) defines 33 post-quantum
+                Primitive codes across the four-character `1`, `2` and `3` fixed tables — FN-DSA
+                (Falcon), ML-DSA and SLH-DSA keys, signatures and private-key seeds. @f2wn8k drew its
+                scope line deliberately: it took the v2 COUNTER table native and left "genus-STABLE
+                primitives (Matter/Indexer) still delegate to signify-ts unchanged", with @w6ph4k
+                holding "for v1 and for all primitives". The PQ codes are precisely a PRIMITIVE-table
+                addition, so the recorded intent says delegate — and the installed signify-ts (0.4.0)
+                does not have them, so delegation yields `unframable-group` on every PQ Primitive and
+                cesrview can display nothing at all. Note honestly that this is a WEAKER trigger than
+                @f2wn8k's: there, delegation was SILENTLY WRONG (a v2 counter misframed as v1 with a
+                plausible count); here it fails LOUDLY and correctly, as an unrecognized code. What
+                makes waiting untenable is not danger but sequencing — the fix must land in
+                WebOfTrust/signify-ts, clear review, and be published to npm before cesrview could
+                render a single Falcon Primitive, and cesrview controls none of those steps.
+              resolution: >
+                For the PQ Primitive codes only, cesrview carries a native size table NOW
+                (src/cesr/pq.ts), ground-truthed to the v1.1 spec tables and arithmetically verified:
+                every declared full size is 4-aligned, every lead size follows the selector (`1`→0,
+                `2`→1, `3`→2), and every non-seed raw size equals its NIST parameter set exactly
+                (FN-DSA-512 signature 666 B, ML-DSA-87 signature 4627 B, SLH-DSA-256s signature
+                29,792 B). This EXTENDS @f2wn8k's inversion from counters to primitives and withdraws,
+                for these codes only, @w6ph4k's "all primitives delegate": the native table is the
+                ARTIFACT cesrview upstreams, in a signify-ts PR stacked on the v2 one. Everything else
+                of @w6ph4k holds — cesrview still authors no size for any code signify-ts already
+                carries, and the overlay is consulted only on a MISS, so it can never shadow or
+                contradict the delegated tables. A PQ Primitive also cannot be constructed through
+                signify-ts's Matter (it would throw on the unknown code), so framing produces the
+                node directly from the table; the walker needs only code and span, never raw bytes,
+                which is why this costs a size table rather than a decoder. Rejected vendoring or
+                patching signify-ts (a fork to maintain, @w6ph4k's rejected option) and depending on
+                the unmerged PR branch by git URL (a dependency that moves underfoot; that branch has
+                already been rebased twice). Accepted tradeoff: one hand-kept table with real drift
+                risk — mitigated by its being spec-derived, arithmetically self-checking, and dead the
+                day signify-ts ships these codes, at which point the miss-only lookup stops firing on
+                its own and the module can be deleted (~tick).
+              children:
+                Post-quantum signatures are non-indexed, so the Falcon exhibit is a receipt couple = decision:
+                  id: z9puaw
+                  why: >
+                    The v1.1 INDEXED code table (spec-body.md, "Indexed code table for genus/version
+                    --AAACAA") defines no post-quantum entries — it stops at Ed25519, secp256k1 and
+                    Ed448 — and Daniel, who authored the PQ tables, confirms this is deliberate rather
+                    than an oversight. A Falcon signature therefore CANNOT appear as a controller or
+                    witness indexed signature: there is no code for it, so no `-A`/`-B` (v1) or
+                    `-K`/`-L` (v2) placement is licensed. The bundled Falcon exhibit (@e7xm4p) is
+                    consequently a `-C` NonTransReceiptCouples group, whose two members are both
+                    Matter Primitives: a `1AAQ` FN-DSA-512 public verification key (1200 chars) and a
+                    `1AAR` FN-DSA-512 signature (892 chars). This is the honest shape, and it teaches
+                    the spec's own argument better than a contrived one would — roughly 2100
+                    characters of attachment hanging off a ~300-character event is exactly why §"Code
+                    table policy" insists PQ codes live in the four-character tables and never consume
+                    the one- and two-character ones. Rejected modelling an indexed PQ signature
+                    labelled "ahead of spec": cesrview exists to teach CESR, and an exhibit whose
+                    stream no conformant parser should accept teaches the wrong thing. This is a
+                    NEGATIVE requirement, so it carries a positive oracle rather than a comment — a
+                    test asserts the exhibit's attachments contain no Indexer-class Primitive, which
+                    fails if anyone later "improves" the sample into an indexed form.
+                Bundled exhibits carry real cryptography, never plausible-looking bytes = decision:
+                  id: ja9z4m
+                  why: >
+                    The Falcon exhibit's keys and signature are REAL: generated by a dev-time script
+                    from @noble/post-quantum (which ships Falcon alongside FIPS 203/204/205), signing
+                    the exact serialized bytes of a KERI event whose SAID is correctly computed, so
+                    the signature verifies against the embedded key. Chose this over a well-formed
+                    random payload of the right length and over real Falcon KAT vectors not bound to
+                    this event. Every other artifact in the corpus is a real capture from an ephemeral
+                    test witness (samples/PROVENANCE.md), so a fabricated one would be the first, and
+                    a viewer that renders unverifiable material as though it were a stream is exactly
+                    the failure the product exists to prevent. The dependency is DEV-TIME ONLY: the
+                    exhibit ships as a static .cesr under public/samples/ and is fetched on demand
+                    (@e7xm4p), so the runtime bundle is unchanged and @n6wd3k's signify-ts-only core
+                    is untouched. PROVENANCE.md states precisely what is real (the keypair, the
+                    signature, the SAID) and what is synthetic (the event was hand-built, not produced
+                    by a live keripy witness, because no KERI implementation can yet issue a
+                    Falcon-keyed identifier). Accepted tradeoff: a generator script to keep working,
+                    and a sample that cannot be regenerated by anyone without the devDependency
+                    installed.
+
         Table-driven walker is v2-capable, not v1-only = tension:
           id: c4nk7p
           why: >
