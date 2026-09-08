@@ -1,4 +1,5 @@
 [![CI](https://github.com/bakobo/cesrview/actions/workflows/ci.yml/badge.svg)](https://github.com/bakobo/cesrview/actions/workflows/ci.yml)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
 # cesrview
 
@@ -60,3 +61,7 @@ Other scripts:
 cesrview follows the [Bakobo engineering standards](./AGENTS.md): intent-first development with the
 design rationale recorded in [`this.i`](./this.i) **before** the code it justifies, and strict TDD.
 Read `AGENTS.md` before making changes.
+
+## License
+
+Apache-2.0.
