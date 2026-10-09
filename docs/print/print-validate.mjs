@@ -4,13 +4,14 @@
  * the header Print menu and asserts computed styles + line counts per scope (no PII PDF needed).
  *
  * Prereqs: `npm run build` then serve dist on :5175 (`npx vite preview --port 5175`); Playwright +
- * chromium available; samples/multisig-oobi.cesr present (gitignored, local-only). Exit 0 = all pass.
+ * chromium resolvable from the repo (`npm install --no-save playwright && npx playwright install
+ * chromium`); a sample stream at samples/multisig-oobi.cesr (gitignored, local-only) or at the path
+ * in CESRVIEW_SAMPLE. Exit 0 = all pass.
  */
-import pw from '/home/daniel/.npm/_npx/e41f203b7505f1fb/node_modules/playwright/index.js';
+import { chromium } from 'playwright';
 import { readFileSync } from 'node:fs';
-const { chromium } = pw;
-const sample = readFileSync('/home/daniel/code/bakobo/cesrview/samples/multisig-oobi.cesr', 'utf8');
-const URL = 'http://localhost:5175/';
+const sample = readFileSync(process.env.CESRVIEW_SAMPLE || new URL('../../samples/multisig-oobi.cesr', import.meta.url), 'utf8');
+const APP_URL = 'http://localhost:5175/';
 
 const browser = await chromium.launch();
 const ctx = await browser.newContext({ viewport: { width: 1500, height: 1000 } });
@@ -22,7 +23,7 @@ async function withScope(scope, menuLabel) {
     localStorage.setItem('cesrview-theme', 'dark');
     window.print = () => {}; // no dialog in headless; the expand side-effect still runs
   });
-  await page.goto(URL, { waitUntil: 'networkidle' });
+  await page.goto(APP_URL, { waitUntil: 'networkidle' });
   await page.getByLabel('CESR stream').fill(sample);
   await page.waitForSelector('.cesr-source-line');
   const before = await page.locator('.cesr-source-line').count();

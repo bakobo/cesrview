@@ -12,14 +12,27 @@ It runs **entirely in your browser**. No backend, nothing uploaded: CESR streams
 key material, so parsing happens client-side and your data never leaves your machine. The site is a
 static build served from GitHub Pages at **[cesrview.bakobo.com](https://cesrview.bakobo.com)**.
 
-> **Status:** engine in progress; no UI yet. The headless parsing/annotation engine
-> (`src/cesr`, `src/annotate`) already frames real v1 KERI/ACDC streams end-to-end — see below.
-> The dual-pane inspector UI is not built yet. See [`this.i`](./this.i) for the design decisions
-> driving every part.
+> **Status:** early. The parsing/annotation engine (`src/cesr`, `src/annotate`) frames real
+> KERI/ACDC streams in CESR v1 and v2 — see below. A first inspector UI sits on top of it and is
+> still thin. cesrview decodes structure only; it does not verify signatures or digests. See
+> [`this.i`](./this.i) for the design decisions driving every part.
+
+## What the UI does today
+
+- Paste a stream, drop a file onto the input panel, or load one of the bundled samples in
+  `public/samples/` (CESR v1, plus v2 twins of the two witness OOBIs).
+- The input panel shows the stream pretty-printed as numbered source lines.
+- A left rail outlines the stream's events and the logs they belong to; the centre shows one
+  decoded event at a time, with its fields, attachment groups and links into the spec.
+- Identifiers render as [entviz](https://github.com/dhh1128/entviz-js) pills, so the same AID is
+  recognisable wherever it appears.
+- A header shows the stream's kind and counts, a light/dark toggle, and a print menu that prints the
+  prettified stream, the outline, or the current event.
+- A component gallery for development is at `/#gallery`.
 
 ## What the engine does today
 
-The `src/cesr` **walker** turns a v1 CESR byte stream into a typed decomposition with byte-span
+The `src/cesr` **walker** turns a v1 or v2 CESR byte stream into a typed decomposition with byte-span
 provenance on every node, delegating primitive/counter sizing to `signify-ts`:
 
 - Frames each message (version string → body → attachments) deterministically, no `{`-sniffing.
@@ -34,7 +47,7 @@ The decoupled `src/annotate` **annotation layer** maps each code and message ilk
 gloss plus a deep link into the CESR/KERI spec — the teaching value-add, kept out of the
 upstreamable walker.
 
-The walker frames the full local test corpus to the exact byte with zero errors.
+In development the walker frames a local corpus of real streams to the exact byte with zero errors; CI checks it against committed keripy oracle fixtures.
 
 ## Develop
 
