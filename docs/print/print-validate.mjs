@@ -11,7 +11,7 @@
 import { chromium } from 'playwright';
 import { readFileSync } from 'node:fs';
 const sample = readFileSync(process.env.CESRVIEW_SAMPLE || new URL('../../samples/multisig-oobi.cesr', import.meta.url), 'utf8');
-const URL = 'http://localhost:5175/';
+const APP_URL = 'http://localhost:5175/';
 
 const browser = await chromium.launch();
 const ctx = await browser.newContext({ viewport: { width: 1500, height: 1000 } });
@@ -23,7 +23,7 @@ async function withScope(scope, menuLabel) {
     localStorage.setItem('cesrview-theme', 'dark');
     window.print = () => {}; // no dialog in headless; the expand side-effect still runs
   });
-  await page.goto(URL, { waitUntil: 'networkidle' });
+  await page.goto(APP_URL, { waitUntil: 'networkidle' });
   await page.getByLabel('CESR stream').fill(sample);
   await page.waitForSelector('.cesr-source-line');
   const before = await page.locator('.cesr-source-line').count();
