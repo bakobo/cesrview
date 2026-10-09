@@ -3,7 +3,7 @@ import { readFileSync, mkdirSync } from 'node:fs';
 
 const OUT = '/tmp/print-probe';
 mkdirSync(OUT, { recursive: true });
-const sample = readFileSync(process.env.CESRVIEW_SAMPLE ?? 'samples/multisig-oobi.cesr', 'utf8');
+const sample = readFileSync(process.env.CESRVIEW_SAMPLE || new URL('../../samples/multisig-oobi.cesr', import.meta.url), 'utf8');
 
 const browser = await chromium.launch();
 const page = await browser.newContext({ viewport: { width: 1500, height: 1000 }, deviceScaleFactor: 2 }).then(c => c.newPage());

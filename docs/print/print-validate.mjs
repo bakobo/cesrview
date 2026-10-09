@@ -6,11 +6,11 @@
  * Prereqs: `npm run build` then serve dist on :5175 (`npx vite preview --port 5175`); Playwright +
  * chromium resolvable from the repo (`npm install --no-save playwright && npx playwright install
  * chromium`); a sample stream at samples/multisig-oobi.cesr (gitignored, local-only) or at the path
- * in CESRVIEW_SAMPLE. Run from the repo root. Exit 0 = all pass.
+ * in CESRVIEW_SAMPLE. Exit 0 = all pass.
  */
 import { chromium } from 'playwright';
 import { readFileSync } from 'node:fs';
-const sample = readFileSync(process.env.CESRVIEW_SAMPLE ?? 'samples/multisig-oobi.cesr', 'utf8');
+const sample = readFileSync(process.env.CESRVIEW_SAMPLE || new URL('../../samples/multisig-oobi.cesr', import.meta.url), 'utf8');
 const URL = 'http://localhost:5175/';
 
 const browser = await chromium.launch();
