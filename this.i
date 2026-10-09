@@ -1078,7 +1078,7 @@ Make CESR legible to developers in the browser = goal:
             host-controlled (short prefix or full value) and its default type annotation is turned off
             (showType=false). Accepted tradeoff: an external UI dependency (@entviz/react, peer
             React >=17, only transitive dep @noble/hashes, themeable via --entviz-pill-* vars) whose
-            release cadence we track; justified because it is maintained in-house (bakobo/dhh1128).
+            release cadence we track; justified because it is maintained in-house (dhh1128/entviz-js).
 
         IDE inspector is the chosen view direction = decision:
           id: m3xq7c
@@ -1130,7 +1130,7 @@ Make CESR legible to developers in the browser = goal:
             expose. Chose to EXTEND the entviz React component and contribute the change upstream,
             rather than wrap or fork it locally, because cesrview is entviz's first real-world consumer
             and that feedback loop is how entviz matures — and entviz is maintained in-house
-            (bakobo/dhh1128), so upstreaming is low-friction. Refines @g2hd6n. Accepted tradeoff:
+            (dhh1128/entviz-js), so upstreaming is low-friction. Refines @g2hd6n. Accepted tradeoff:
             cesrview's identifier rendering is coupled to landing an entviz enhancement rather than
             shipping purely against today's published API.
 

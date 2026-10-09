@@ -1,10 +1,9 @@
-import pw from '/home/daniel/.npm/_npx/e41f203b7505f1fb/node_modules/playwright/index.js';
+import { chromium } from 'playwright';
 import { readFileSync, mkdirSync } from 'node:fs';
-const { chromium } = pw;
 
 const OUT = '/tmp/print-probe';
 mkdirSync(OUT, { recursive: true });
-const sample = readFileSync('/home/daniel/code/bakobo/cesrview/samples/multisig-oobi.cesr', 'utf8');
+const sample = readFileSync(process.env.CESRVIEW_SAMPLE ?? 'samples/multisig-oobi.cesr', 'utf8');
 
 const browser = await chromium.launch();
 const page = await browser.newContext({ viewport: { width: 1500, height: 1000 }, deviceScaleFactor: 2 }).then(c => c.newPage());
