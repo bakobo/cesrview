@@ -81,7 +81,7 @@ describe('App', () => {
 
   it('surfaces a parse error for input that is not a CESR stream', () => {
     render(<App />);
-    fireEvent.change(screen.getByLabelText('CESR stream'), { target: { value: 'garbage' } });
+    fireEvent.change(screen.getByLabelText('CESR stream'), { target: { value: 'garbage that is long enough to rule out a version' } });
     expect(screen.getByRole('alert')).toHaveTextContent(/no cesr version string/i);
   });
 });
